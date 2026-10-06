@@ -1,0 +1,6 @@
+{
+  "name": "RS TOURNAMENT",
+  "description": "Premier Free Fire esports tournament platform featuring Solo, Duo, Squad matches, real-time standings, verified scoring, and instant wallet rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

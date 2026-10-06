@@ -1,0 +1,3693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Free Fire Arena — Admin Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #080a0f;
+      --bg-card: #111520;
+      --bg-card-hover: #171d2c;
+      --surface-border: #1e2536;
+      --neon-orange: #ff5722;
+      --neon-amber: #ff9800;
+      --neon-cyan: #00e5ff;
+      --neon-green: #00e676;
+      --neon-purple: #7c4dff;
+      --neon-red: #ff1744;
+      --text-primary: #ffffff;
+      --text-secondary: #909bb0;
+      --text-muted: #546075;
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Poppins', sans-serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: calc(60px + var(--safe-top));
+      padding-bottom: calc(24px + var(--safe-bottom));
+    }
+
+    .admin-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: calc(60px + var(--safe-top));
+      padding-top: var(--safe-top);
+      background: rgba(8, 10, 15, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 16px;
+      padding-right: 16px;
+      z-index: 100;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--neon-purple), #4a148c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+      box-shadow: 0 0 12px rgba(124, 77, 255, 0.4);
+    }
+
+    .admin-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .admin-badge {
+      font-size: 9px;
+      font-weight: 800;
+      background: rgba(124, 77, 255, 0.2);
+      color: #b388ff;
+      border: 1px solid rgba(124, 77, 255, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Admin Tabs */
+    .admin-nav-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 18px;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .admin-tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .admin-tab-btn.active {
+      background: var(--neon-purple);
+      color: #fff;
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 12px rgba(124, 77, 255, 0.3);
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .stat-icon {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .stat-num {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-text {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--neon-purple); color: #fff; }
+    .btn-secondary { background: var(--bg-card-hover); border: 1px solid var(--surface-border); color: var(--text-primary); }
+    .btn-approve { background: rgba(0, 230, 118, 0.15); border: 1px solid rgba(0, 230, 118, 0.4); color: var(--neon-green); }
+    .btn-reject { background: rgba(255, 23, 68, 0.15); border: 1px solid rgba(255, 23, 68, 0.4); color: var(--neon-red); }
+
+    .btn-approve:hover { background: var(--neon-green); color: #000; }
+    .btn-reject:hover { background: var(--neon-red); color: #fff; }
+
+    .db-node-tag {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--surface-border);
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin: 3px;
+      color: var(--neon-cyan);
+    }
+
+    .notice-box {
+      background: rgba(124, 77, 255, 0.1);
+      border: 1px solid rgba(124, 77, 255, 0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .tab-section { display: none; }
+    .tab-section.active { display: block; animation: fadeIn 0.2s ease-out; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Admin Table Rows */
+    .admin-table-item {
+      background: #0d1017;
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.pending { background: rgba(255, 152, 0, 0.2); color: var(--neon-amber); border: 1px solid rgba(255, 152, 0, 0.4); }
+    .status-badge.approved { background: rgba(0, 230, 118, 0.2); color: var(--neon-green); border: 1px solid rgba(0, 230, 118, 0.4); }
+    .status-badge.rejected { background: rgba(255, 23, 68, 0.2); color: var(--neon-red); border: 1px solid rgba(255, 23, 68, 0.4); }
+    /* Admin Auth Screen Overlay */
+    .admin-auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(8, 10, 15, 0.98);
+      backdrop-filter: blur(14px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .admin-auth-card {
+      background: #111520;
+      border: 1px solid rgba(124, 77, 255, 0.4);
+      border-radius: 18px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 40px rgba(124, 77, 255, 0.2);
+      text-align: center;
+    }
+    .admin-auth-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--neon-purple), #4a148c);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(124, 77, 255, 0.4);
+      margin-bottom: 12px;
+    }
+    .admin-input-group {
+      text-align: left;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .admin-input-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .admin-input {
+      width: 100%;
+      background: #090c13;
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .admin-input:focus {
+      border-color: var(--neon-purple);
+    }
+    .password-wrap {
+      position: relative;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .admin-err-msg {
+      background: rgba(255, 23, 68, 0.15);
+      border: 1px solid rgba(255, 23, 68, 0.4);
+      color: #ff80ab;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 14px;
+      display: none;
+      text-align: left;
+    }
+    /* Modal generic styles */
+    .admin-modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .admin-modal-backdrop.active { display: flex; }
+    .admin-modal-content {
+      background: #111520;
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      position: relative;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <!-- ADMIN AUTHENTICATION GATEWAY -->
+  <div id="adminAuthOverlay" class="admin-auth-overlay">
+    <div class="admin-auth-card">
+      <div class="admin-auth-icon">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 style="font-family:var(--font-heading); font-size:18px; margin-bottom:4px; color:#fff;">ADMIN CONTROL CENTER</h2>
+      <p style="font-size:11px; color:var(--text-secondary); margin-bottom:18px;">Restricted Access • Authorized Esports Arbiters Only</p>
+      
+      <div id="adminAuthError" class="admin-err-msg"></div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        <div class="admin-input-group">
+          <label class="admin-input-label">Admin Email</label>
+          <input type="email" id="adminEmailInput" class="admin-input" placeholder="admin@freefirearena.com" required autocomplete="email">
+        </div>
+
+        <div class="admin-input-group">
+          <label class="admin-input-label">Security Key / Password</label>
+          <div class="password-wrap">
+            <input type="password" id="adminPasswordInput" class="admin-input" placeholder="••••••••" required autocomplete="current-password">
+            <i class="fa-solid fa-eye password-toggle" onclick="toggleAdminPassVisibility(this)"></i>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <label style="font-size:11px; color:var(--text-secondary); display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="adminRememberCheck" checked> Remember Device
+          </label>
+          <a href="javascript:void(0)" onclick="adminForgotPassword()" style="font-size:11px; color:var(--neon-purple); text-decoration:none;">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btnAdminSignIn" style="width:100%; padding:12px; font-size:13px; justify-content:center;">
+          <i class="fa-solid fa-lock"></i> Authorize & Enter Console
+        </button>
+      </form>
+
+      <div style="margin-top:16px; border-top:1px solid var(--surface-border); padding-top:14px;">
+        <button type="button" class="btn btn-secondary" style="font-size:11px; width:100%; justify-content:center;" onclick="quickDemoAdminLogin()">
+          <i class="fa-solid fa-user-shield" style="color:var(--neon-green);"></i> Quick Sandbox Arbiter Demo
+        </button>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:8px;">
+          Unauthorized attempts are logged with IP & timestamp to /auditLogs.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="admin-bar">
+    <div class="admin-brand">
+      <div class="brand-icon">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <span class="admin-title">FREE FIRE ARENA</span>
+        <span class="admin-badge">Admin</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn btn-secondary" id="btnAdminLogout" onclick="adminLogout()" style="display:none; color:var(--neon-red); border-color:rgba(255,23,68,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+      <a href="index.html" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> User Panel
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Admin Navigation Tabs -->
+    <div class="admin-nav-tabs">
+      <button class="admin-tab-btn active" onclick="switchAdminTab('overview')">
+        <i class="fa-solid fa-chart-pie"></i> Overview
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('ai-assistant')">
+        <i class="fa-solid fa-robot" style="color:var(--neon-cyan);"></i> AI Admin Assistant
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tournaments')">
+        <i class="fa-solid fa-trophy" style="color:var(--neon-orange);"></i> Tournaments
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('users')">
+        <i class="fa-solid fa-users" style="color:var(--neon-purple);"></i> Users
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('payments')">
+        <i class="fa-solid fa-coins"></i> Payments
+        <span id="badgePendingPayments" style="background:var(--neon-orange); color:#fff; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('redeems')">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i> Redeems
+        <span id="badgePendingRedeems" style="background:var(--neon-cyan); color:#000; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('reports')">
+        <i class="fa-solid fa-shield-halved"></i> Fair Play
+        <span id="badgePendingReports" style="background:var(--neon-red); color:#fff; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('chat-mod')">
+        <i class="fa-solid fa-comments" style="color:var(--neon-green);"></i> Chat Mod
+        <span id="badgePendingChatReports" style="background:var(--neon-red); color:#fff; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('results')">
+        <i class="fa-solid fa-square-poll-vertical"></i> Results & Disputes
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('announcements')">
+        <i class="fa-solid fa-bullhorn"></i> Announcements
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('support')">
+        <i class="fa-solid fa-headset"></i> Support
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('settings')">
+        <i class="fa-solid fa-sliders"></i> Gateways
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('audit')">
+        <i class="fa-solid fa-clock-rotate-left"></i> Audit
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('config-docs')">
+        <i class="fa-solid fa-gear"></i> Setup Docs
+      </button>
+    </div>
+
+    <!-- TAB 1: OVERVIEW -->
+    <div id="tab-overview" class="tab-section active">
+      <div class="notice-box">
+        <i class="fa-solid fa-circle-info" style="color:var(--neon-purple); margin-right:6px;"></i>
+        <strong>Part 3 Ready:</strong> Khalti & eSewa payment verification, payout processing, Fair Play anti-cheat reports, and player moderation are active.
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <i class="fa-solid fa-users stat-icon" style="color:var(--neon-cyan);"></i>
+          <div class="stat-num" id="statUsers">1,240</div>
+          <div class="stat-text">Registered Players</div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-coins stat-icon" style="color:var(--neon-amber);"></i>
+          <div class="stat-num" id="statPendingPayments">0</div>
+          <div class="stat-text">Pending Deposits</div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-arrow-up-from-bracket stat-icon" style="color:var(--neon-green);"></i>
+          <div class="stat-num" id="statPendingRedeems">0</div>
+          <div class="stat-text">Pending Redeems</div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-shield-halved stat-icon" style="color:var(--neon-red);"></i>
+          <div class="stat-num" id="statPendingReports">0</div>
+          <div class="stat-text">Pending Reports</div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-comments stat-icon" style="color:var(--neon-green);"></i>
+          <div class="stat-num" id="statPendingChatReports">0</div>
+          <div class="stat-text">Chat Reports</div>
+        </div>
+      </div>
+
+      <!-- Realtime Database Structure Foundation -->
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-database" style="color:var(--neon-cyan);"></i>
+          Realtime Database Structure Foundation
+        </h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+          The Realtime Database nodes prepared for Free Fire Arena backend:
+        </p>
+        <div>
+          <span class="db-node-tag">/users</span>
+          <span class="db-node-tag">/tournaments</span>
+          <span class="db-node-tag">/registrations</span>
+          <span class="db-node-tag">/checkins</span>
+          <span class="db-node-tag">/rooms</span>
+          <span class="db-node-tag">/wallets</span>
+          <span class="db-node-tag">/transactions</span>
+          <span class="db-node-tag">/payments</span>
+          <span class="db-node-tag">/redeems</span>
+          <span class="db-node-tag">/results</span>
+          <span class="db-node-tag">/reports</span>
+          <span class="db-node-tag">/teamRequests</span>
+          <span class="db-node-tag">/disputes</span>
+          <span class="db-node-tag">/notifications</span>
+          <span class="db-node-tag">/announcements</span>
+          <span class="db-node-tag">/favorites</span>
+          <span class="db-node-tag">/referrals</span>
+          <span class="db-node-tag">/achievements</span>
+          <span class="db-node-tag">/support</span>
+          <span class="db-node-tag">/tournamentChats</span>
+          <span class="db-node-tag">/tournamentAnnouncements</span>
+          <span class="db-node-tag">/communityChats</span>
+          <span class="db-node-tag">/chatReports</span>
+          <span class="db-node-tag">/chatBlocks</span>
+          <span class="db-node-tag">/chatMutes</span>
+          <span class="db-node-tag">/chatPresence</span>
+          <span class="db-node-tag">/chatRestrictions</span>
+          <span class="db-node-tag">/adminSettings</span>
+          <span class="db-node-tag">/auditLogs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: AI ADMIN ASSISTANT -->
+    <div id="tab-ai-assistant" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 class="card-title" style="margin-bottom:0;">
+            <i class="fa-solid fa-robot" style="color:var(--neon-cyan);"></i>
+            AI Esports Tournament Arbiter & Assistant
+          </h3>
+          <span class="status-badge approved">Ready</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Ask AI for tournament scheduling advice, rule clarification, automated dispute triage, fraud detection summaries, or room broadcast announcements.
+        </p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+          <button type="button" class="btn btn-secondary" style="font-size:11px;" onclick="runAiQuickPrompt('Summarize pending financial queue and total cash payout requirement')">
+            <i class="fa-solid fa-calculator" style="color:var(--neon-amber);"></i> Summarize Finances
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size:11px;" onclick="runAiQuickPrompt('Draft urgent room ID & password release broadcast message for players')">
+            <i class="fa-solid fa-bullhorn" style="color:var(--neon-cyan);"></i> Draft Room Alert
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size:11px;" onclick="runAiQuickPrompt('Triage high-risk anti-cheat reports and recommend bans')">
+            <i class="fa-solid fa-shield-halved" style="color:var(--neon-red);"></i> Anti-Cheat Audit
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size:11px;" onclick="runAiQuickPrompt('Calculate tournament points with tie-breaker for top 3 teams')">
+            <i class="fa-solid fa-trophy" style="color:var(--neon-orange);"></i> Points & Tie-Breaker
+          </button>
+        </div>
+
+        <div id="aiChatHistory" style="background:#090c13; border:1px solid var(--surface-border); border-radius:12px; padding:14px; min-height:160px; max-height:280px; overflow-y:auto; margin-bottom:12px; font-size:12px; line-height:1.6;">
+          <div style="color:var(--neon-cyan); margin-bottom:8px;">
+            <i class="fa-solid fa-robot"></i> <strong>AI Assistant:</strong> Welcome Arbiter. I have analyzed active tournaments, registrations, and pending withdrawal tickets. How can I assist your operations?
+          </div>
+        </div>
+
+        <form onsubmit="handleAiPromptSubmit(event)" style="display:flex; gap:8px;">
+          <input type="text" id="aiInputPrompt" class="admin-input" placeholder="Ask AI assistant anything about tournament rules, payouts, scoring..." style="flex:1;">
+          <button type="submit" class="btn btn-primary" id="btnSendAiPrompt">
+            <i class="fa-solid fa-paper-plane"></i> Send
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB: TOURNAMENTS MANAGEMENT -->
+    <div id="tab-tournaments" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+          <div>
+            <h3 class="card-title" style="margin-bottom:2px;">
+              <i class="fa-solid fa-trophy" style="color:var(--neon-orange);"></i>
+              Tournament Control Center
+            </h3>
+            <div style="font-size:11px; color:var(--text-secondary);">Manage match schedules, slots, room IDs, scoring, and auto-refunds</div>
+          </div>
+          <button class="btn btn-primary" onclick="openCreateTournamentModal()">
+            <i class="fa-solid fa-plus"></i> Create Tournament
+          </button>
+        </div>
+
+        <div style="display:flex; gap:6px; overflow-x:auto; margin-bottom:14px; padding-bottom:4px;">
+          <button class="btn btn-secondary active" id="tourneyFilterAll" onclick="filterAdminTournaments('ALL')">All</button>
+          <button class="btn btn-secondary" id="tourneyFilterReg" onclick="filterAdminTournaments('REGISTRATION')">Open</button>
+          <button class="btn btn-secondary" id="tourneyFilterCheckin" onclick="filterAdminTournaments('CHECKIN')">Check-In</button>
+          <button class="btn btn-secondary" id="tourneyFilterLive" onclick="filterAdminTournaments('LIVE')">Live</button>
+          <button class="btn btn-secondary" id="tourneyFilterCompleted" onclick="filterAdminTournaments('COMPLETED')">Completed</button>
+        </div>
+
+        <div id="adminTournamentsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: USER MANAGEMENT & BALANCE MODERATION -->
+    <div id="tab-users" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3 class="card-title" style="margin-bottom:0;">
+            <i class="fa-solid fa-users" style="color:var(--neon-purple);"></i>
+            Player Roster & Balance Moderation
+          </h3>
+          <div style="display:flex; gap:6px; width:100%; max-width:320px;">
+            <input type="text" id="adminUserSearchInput" class="admin-input" placeholder="Search by Username, UID, or Email..." oninput="filterAdminUsers(this.value)" style="padding:8px 12px; font-size:12px;">
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          View player balances, adjust coins with mandatory audit justifications, or ban bad actors.
+        </p>
+
+        <div id="adminUsersList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+    <div id="tab-payments" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3 class="card-title" style="margin-bottom:0;">
+            <i class="fa-solid fa-coins" style="color:var(--neon-amber);"></i>
+            Deposit Payments Management (Khalti / eSewa)
+          </h3>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary active" id="payFilterAll" onclick="setAdminPaymentFilter('ALL')">All</button>
+            <button class="btn btn-secondary" id="payFilterKhalti" onclick="setAdminPaymentFilter('Khalti')">Khalti</button>
+            <button class="btn btn-secondary" id="payFilterEsewa" onclick="setAdminPaymentFilter('eSewa')">eSewa</button>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Review user deposit transactions. Approving a payment credits coins exactly once and writes an immutable audit record.
+        </p>
+        <div id="adminPaymentsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: REDEEMS PAYOUTS -->
+    <div id="tab-redeems" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3 class="card-title" style="margin-bottom:0;">
+            <i class="fa-solid fa-arrow-up-from-bracket" style="color:var(--neon-green);"></i>
+            Redeem Payouts Queue (Manual Payout Verification)
+          </h3>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary active" id="redFilterAll" onclick="setAdminRedeemFilter('ALL')">All</button>
+            <button class="btn btn-secondary" id="redFilterKhalti" onclick="setAdminRedeemFilter('Khalti')">Khalti</button>
+            <button class="btn btn-secondary" id="redFilterEsewa" onclick="setAdminRedeemFilter('eSewa')">eSewa</button>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Send the real payment via Khalti or eSewa manually to the player's account, then mark as Paid. If rejected, coins are safely refunded once.
+        </p>
+        <div id="adminRedeemsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: FAIR PLAY REPORTS -->
+    <div id="tab-reports" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-shield-halved" style="color:var(--neon-red);"></i>
+          Player & Match Fair Play Reports
+        </h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Investigate player reports (aimbot, scripts, wallhack, teaming, toxic chat). Review evidence and take disciplinary action.
+        </p>
+        <div id="adminReportsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CHAT & COMMUNITY MODERATION -->
+    <div id="tab-chat-mod" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3 class="card-title" style="margin-bottom:0;">
+            <i class="fa-solid fa-comments" style="color:var(--neon-green);"></i>
+            Tournament & Community Chat Moderation Center
+          </h3>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary active" id="chatSubtabReports" onclick="switchChatModSubtab('reports')">
+              <i class="fa-solid fa-flag"></i> Reports Queue
+            </button>
+            <button class="btn btn-secondary" id="chatSubtabExplorer" onclick="switchChatModSubtab('explorer')">
+              <i class="fa-solid fa-magnifying-glass"></i> Message Explorer
+            </button>
+            <button class="btn btn-secondary" id="chatSubtabAnnounce" onclick="switchChatModSubtab('announce')">
+              <i class="fa-solid fa-bullhorn"></i> Post Match Notice
+            </button>
+          </div>
+        </div>
+
+        <!-- SUBVIEW 1: REPORTS QUEUE -->
+        <div id="chatModViewReports">
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+            Investigate player-reported messages and conduct violations across tournament and community chats.
+          </p>
+          <div id="adminChatReportsList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- SUBVIEW 2: LIVE MESSAGE EXPLORER -->
+        <div id="chatModViewExplorer" style="display:none;">
+          <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <input type="text" id="adminChatSearchInput" class="btn-secondary" style="width:100%; padding:8px 12px; border-radius:6px; color:#fff;" placeholder="Search message content or player username..." oninput="filterAdminLiveChat()">
+            </div>
+            <select id="adminChatChannelSelect" class="btn-secondary" style="padding:8px 12px; border-radius:6px; color:#fff;" onchange="filterAdminLiveChat()">
+              <option value="ALL">All Channels & Tournaments</option>
+              <option value="COMMUNITY">Global Community Chat</option>
+              <option value="ff-tourney-1">Bermuda Clash Squad (TOURN-1)</option>
+              <option value="ff-tourney-2">Midnight Havoc Duo (TOURN-2)</option>
+              <option value="ff-tourney-3">Alpine Solo Survival (TOURN-3)</option>
+            </select>
+          </div>
+          <div id="adminLiveChatExplorerList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- SUBVIEW 3: BROADCAST TOURNAMENT ANNOUNCEMENT -->
+        <div id="chatModViewAnnounce" style="display:none;">
+          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--surface-border); border-radius:10px; padding:14px; max-width:600px;">
+            <h4 style="font-size:14px; color:#fff; margin-bottom:12px;"><i class="fa-solid fa-bullhorn" style="color:var(--neon-orange);"></i> Broadcast Official Arbiter Announcement</h4>
+            <form onsubmit="adminBroadcastTournamentNotice(event)">
+              <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Target Tournament Match *</label>
+                <select id="adminNoticeTourneyId" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" required>
+                  <option value="ff-tourney-1">Bermuda Clash Squad Grand Cup (ff-tourney-1)</option>
+                  <option value="ff-tourney-2">Midnight Havoc Duo Showdown (ff-tourney-2)</option>
+                  <option value="ff-tourney-3">Alpine Solo Survival Challenge (ff-tourney-3)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Announcement Category</label>
+                <select id="adminNoticeType" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;">
+                  <option value="ROOM_RELEASE">🔑 Room ID & Password Release</option>
+                  <option value="CHECKIN_REMINDER">⏰ Check-in Reminder</option>
+                  <option value="MATCH_DELAY">⚠️ Match Delay Notice</option>
+                  <option value="MATCH_STARTING">🚀 Match Starting Soon (Lobby Open)</option>
+                  <option value="OFFICIAL_NOTICE">📢 General Arbiter Notice</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Pinned Headline / Title *</label>
+                <input type="text" id="adminNoticeTitle" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" placeholder="e.g. Room ID: 948102 | Pass: arena2026" required maxlength="80">
+              </div>
+              <div class="form-group" style="margin-bottom:14px;">
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Full Message Details *</label>
+                <textarea id="adminNoticeText" class="btn-secondary" style="width:100%; height:80px; padding:8px 10px; border-radius:6px;" placeholder="Enter instructions for all match participants..." required maxlength="300"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i> Publish Pinned Announcement to Chat
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: RESULTS, LEADERBOARDS & DISPUTES -->
+    <div id="tab-results" class="tab-section">
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div>
+            <h3 class="card-title" style="margin-bottom:2px;">
+              <i class="fa-solid fa-square-poll-vertical" style="color:var(--neon-green);"></i>
+              Tournament Rankings & Result Verification Command Center
+            </h3>
+            <p style="font-size:12px; color:var(--text-secondary);">
+              Manage live scoring, verify official results, execute audited score corrections, and configure tie-breaker scoring rules.
+            </p>
+          </div>
+        </div>
+
+        <!-- Subtab Navigation for Results Command Center -->
+        <div style="display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; padding-bottom:4px; border-bottom:1px solid var(--surface-border);">
+          <button class="filter-btn active" id="btnSubtabAdminLeaderboard" onclick="switchAdminResultsSubtab('leaderboard')">
+            <i class="fa-solid fa-ranking-star"></i> Standings & Live Scoring
+          </button>
+          <button class="filter-btn" id="btnSubtabAdminDisputes" onclick="switchAdminResultsSubtab('disputes')">
+            <i class="fa-solid fa-triangle-exclamation"></i> Dispute Tickets
+            <span id="badgeAdminDisputes" style="background:var(--neon-orange); color:#fff; font-size:9px; border-radius:8px; padding:1px 5px; margin-left:4px;">0</span>
+          </button>
+          <button class="filter-btn" id="btnSubtabAdminRules" onclick="switchAdminResultsSubtab('rules')">
+            <i class="fa-solid fa-scale-balanced"></i> Scoring Rules Engine
+          </button>
+          <button class="filter-btn" id="btnSubtabAdminPlayerStats" onclick="switchAdminResultsSubtab('playerstats')">
+            <i class="fa-solid fa-users-viewfinder"></i> Player Performance & Overall Rankings
+          </button>
+          <button class="filter-btn" id="btnSubtabAdminAuditHistory" onclick="switchAdminResultsSubtab('audithistory')">
+            <i class="fa-solid fa-clock-rotate-left"></i> Correction Audit Ledger
+          </button>
+        </div>
+
+        <!-- SUBTAB 1: STANDINGS & LIVE SCORING -->
+        <div id="subtabAdminLeaderboard">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:12px; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:260px;">
+              <label style="font-size:11px; color:var(--text-secondary); white-space:nowrap;">Select Match:</label>
+              <select id="adminResultsTourneySelect" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px; background:#090c13;" onchange="onAdminTourneySelectChange()">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-secondary" style="font-size:11px; padding:6px 12px;" onclick="recalculateCurrentTournamentScores()">
+                <i class="fa-solid fa-arrows-rotate"></i> Recalculate Scores
+              </button>
+              <button class="btn btn-primary" style="font-size:11px; padding:6px 12px;" onclick="verifyAndFinalizeTournamentResults()">
+                <i class="fa-solid fa-stamp"></i> Verify & Finalize Standings
+              </button>
+            </div>
+          </div>
+
+          <!-- Tournament Metadata Banner -->
+          <div id="adminTourneyMetaBanner" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-bottom:14px;">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Filter & Search Toolbar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+            <div style="display:flex; gap:6px;">
+              <button class="filter-btn active" id="filterStatusAll" onclick="setAdminResultsStatusFilter('ALL')">All Participants</button>
+              <button class="filter-btn" id="filterStatusProvisional" onclick="setAdminResultsStatusFilter('PROVISIONAL')">Provisional (Live)</button>
+              <button class="filter-btn" id="filterStatusVerified" onclick="setAdminResultsStatusFilter('VERIFIED')">Verified Official</button>
+            </div>
+            <div style="min-width:200px;">
+              <input type="text" id="adminResultsSearchInput" class="btn-secondary" style="width:100%; padding:6px 10px; border-radius:6px; font-size:11px;" placeholder="Search participant IGN or UID..." oninput="renderAdminTourneyStandings()">
+            </div>
+          </div>
+
+          <div id="adminTourneyStandingsList">
+            <!-- Standings Table Rendered Dynamically -->
+          </div>
+        </div>
+
+        <!-- SUBTAB 2: DISPUTES -->
+        <div id="subtabAdminDisputes" style="display:none;">
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+            Review match result disputes submitted by registered tournament players. Arbiters can review uploaded evidence, resolve legitimate claims, or dismiss malicious reports with a penalty.
+          </p>
+          <div id="adminDisputesList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- SUBTAB 3: SCORING RULES ENGINE -->
+        <div id="subtabAdminRules" style="display:none;">
+          <form onsubmit="saveScoringRules(event)" style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:14px;">
+            <h4 style="font-size:14px; color:#fff; margin-bottom:6px;"><i class="fa-solid fa-sliders" style="color:var(--neon-cyan);"></i> Tournament Scoring Engine Configuration</h4>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+              Configure points per kill, placement matrix (#1 to #10), and tie-breaker precedence. Formula: Total Score = Kill Points + Placement Points + Bonus Points.
+            </p>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Points Per Elimination Kill *</label>
+                <input type="number" id="rulePerKill" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="25" min="1" required>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Booyah #1 Bonus Points</label>
+                <input type="number" id="ruleBooyahBonus" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="5" min="0" required>
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Tie-Breaker Rule Precedence *</label>
+              <select id="ruleTieBreaker" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px; background:#090c13;">
+                <option value="KILLS_FIRST">1. Higher Kills > 2. Better Placement > 3. Earlier Registration</option>
+                <option value="PLACEMENT_FIRST">1. Better Placement > 2. Higher Kills > 3. Earlier Registration</option>
+              </select>
+            </div>
+
+            <h5 style="font-size:12px; color:var(--neon-orange); margin-bottom:8px;">Placement Points Matrix</h5>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap:8px; margin-bottom:16px;">
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#1 Booyah</label>
+                <input type="number" id="placePt1" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="12">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#2 Place</label>
+                <input type="number" id="placePt2" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="9">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#3 Place</label>
+                <input type="number" id="placePt3" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="8">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#4 Place</label>
+                <input type="number" id="placePt4" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="7">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#5 Place</label>
+                <input type="number" id="placePt5" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="6">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#6 Place</label>
+                <input type="number" id="placePt6" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="5">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#7 Place</label>
+                <input type="number" id="placePt7" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="4">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#8 Place</label>
+                <input type="number" id="placePt8" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="3">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#9 Place</label>
+                <input type="number" id="placePt9" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="2">
+              </div>
+              <div>
+                <label style="font-size:10px; color:var(--text-muted); display:block;">#10 Place</label>
+                <input type="number" id="placePt10" class="btn-secondary" style="width:100%; padding:6px; border-radius:4px;" value="1">
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i> Save Rules & Recalculate Active Tournaments
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- SUBTAB 4: OVERALL PLAYER RANKINGS & STATS -->
+        <div id="subtabAdminPlayerStats" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+            <p style="font-size:12px; color:var(--text-secondary); margin:0;">
+              All-time competitive standings calculated strictly from verified tournament outcomes.
+            </p>
+            <div style="min-width:220px;">
+              <input type="text" id="adminPlayerStatsSearch" class="btn-secondary" style="width:100%; padding:6px 10px; border-radius:6px; font-size:11px;" placeholder="Search player name or UID..." oninput="renderAdminPlayerStats()">
+            </div>
+          </div>
+          <div id="adminPlayerStatsList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- SUBTAB 5: CORRECTION AUDIT LEDGER -->
+        <div id="subtabAdminAuditHistory" style="display:none;">
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+            Immutable ledger tracking every manual score correction, arbiter override, previous vs new values, admin ID, and reason.
+          </p>
+          <div id="adminResultCorrectionsAuditList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: GATEWAYS & SETTINGS -->
+    <div id="tab-settings" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-sliders" style="color:var(--neon-cyan);"></i>
+          Payment Gateways & System Parameters
+        </h3>
+        <form onsubmit="saveGatewaySettings(event)">
+          <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:14px; margin-bottom:14px;">
+            <h4 style="font-size:13px; color:#ba68c8; margin-bottom:10px;"><i class="fa-solid fa-credit-card"></i> Khalti Configuration</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Khalti Account / ID</label>
+                <input type="text" id="settingKhaltiId" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="9801234567">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Account Name</label>
+                <input type="text" id="settingKhaltiName" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="FREE FIRE ARENA KHALTI OFFICIAL">
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:14px; margin-bottom:14px;">
+            <h4 style="font-size:13px; color:#4caf50; margin-bottom:10px;"><i class="fa-solid fa-wallet"></i> eSewa Configuration</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">eSewa ID / Number</label>
+                <input type="text" id="settingEsewaId" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="9812345678">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Account Name</label>
+                <input type="text" id="settingEsewaName" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="FREE FIRE ARENA OFFICIAL">
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:14px; margin-bottom:14px;">
+            <h4 style="font-size:13px; color:var(--neon-cyan); margin-bottom:10px;"><i class="fa-solid fa-coins"></i> App Rules</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Minimum Redeem Coins</label>
+                <input type="number" id="settingMinRedeem" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="100">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Referral Bonus Coins</label>
+                <input type="number" id="settingRefBonus" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="50">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Save Settings
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 5: AUDIT LOG -->
+    <div id="tab-audit" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-clock-rotate-left" style="color:var(--neon-purple);"></i>
+          Administrative Financial & Moderation Audit Logs
+        </h3>
+        <div id="adminAuditList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ANNOUNCEMENTS MANAGEMENT -->
+    <div id="tab-announcements" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-bullhorn" style="color:var(--neon-cyan);"></i>
+          Broadcast Home Announcements
+        </h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Broadcast urgent banners, tournament notifications, and updates to all player devices.
+        </p>
+
+        <form onsubmit="postAdminAnnouncement(event)" style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:14px; margin-bottom:16px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Announcement Title</label>
+            <input type="text" id="announcementTitle" class="admin-input" placeholder="e.g. GRAND FINALS REGISTRATION IS LIVE!" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Message Details</label>
+            <textarea id="announcementBody" class="admin-input" rows="2" placeholder="Match begins at 8:00 PM. Room ID releases 15 mins prior..." required style="resize:none;"></textarea>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+              <label class="admin-input-label">Priority Type</label>
+              <select id="announcementType" class="admin-input" style="background:#090c13;">
+                <option value="INFO">Information (Blue)</option>
+                <option value="LIVE">Live Match (Red Glow)</option>
+                <option value="WARNING">Important Notice (Amber)</option>
+                <option value="SUCCESS">Prize Announcement (Green)</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-input-label">Target Link / Tab</label>
+              <select id="announcementTarget" class="admin-input" style="background:#090c13;">
+                <option value="tournaments">Tournaments Screen</option>
+                <option value="my-games">My Games Screen</option>
+                <option value="wallet">Wallet Screen</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-paper-plane"></i> Publish Live Announcement
+          </button>
+        </form>
+
+        <div id="adminAnnouncementsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SUPPORT & INQUIRIES -->
+    <div id="tab-support" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-headset" style="color:var(--neon-green);"></i>
+          Player Inquiries & Helpdesk
+        </h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Direct communication tickets from player profile screens regarding payouts, room passwords, or match queries.
+        </p>
+        <div id="adminSupportList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SETUP DOCS & PLAY STORE READINESS -->
+    <div id="tab-config-docs" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-file-shield" style="color:var(--neon-purple);"></i>
+          Play Store Readiness & Security Configuration
+        </h3>
+        <div style="font-size:12px; line-height:1.6; color:var(--text-secondary);">
+          <div style="background:rgba(0, 230, 118, 0.08); border:1px solid rgba(0, 230, 118, 0.25); border-radius:10px; padding:12px; margin-bottom:14px;">
+            <strong style="color:var(--neon-green);"><i class="fa-solid fa-circle-check"></i> Play Store Policy Compliance:</strong>
+            <ul style="margin-left:18px; margin-top:6px;">
+              <li>Zero broad storage permissions requested. Zero-permission Photo Picker used for QR screenshots.</li>
+              <li>Edge-to-edge UI with window insets fully respected.</li>
+              <li>Material 3 design guidelines and minimum 48dp touch targets satisfied.</li>
+              <li>App label "Free Fire Arena" meets Google Play 30-char title restriction without prohibited promotional words.</li>
+            </ul>
+          </div>
+
+          <div style="background:rgba(0, 229, 255, 0.08); border:1px solid rgba(0, 229, 255, 0.25); border-radius:10px; padding:12px; margin-bottom:14px;">
+            <strong style="color:var(--neon-cyan);"><i class="fa-solid fa-database"></i> Firebase Security Rules Template:</strong>
+            <pre style="background:#090c13; padding:10px; border-radius:8px; margin-top:8px; overflow-x:auto; font-size:11px; color:#a7ffeb;">
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "usernames": {
+      ".read": true,
+      "$username": {
+        ".write": "auth != null && !data.exists()"
+      }
+    },
+    "tournaments": {
+      ".read": true,
+      ".write": "root.child('admins').child(auth.uid).val() === true"
+    },
+    "tournamentChats": {
+      "$tourneyId": {
+        ".read": "auth != null",
+        "$msgId": {
+          ".write": "auth != null && (!data.exists() || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+    "tournamentAnnouncements": {
+      "$tourneyId": {
+        ".read": "auth != null",
+        ".write": "root.child('admins').child(auth.uid).val() === true"
+      }
+    },
+    "communityChats": {
+      ".read": "auth != null",
+      "$msgId": {
+        ".write": "auth != null && (!data.exists() || root.child('admins').child(auth.uid).val() === true)"
+      }
+    },
+    "chatReports": {
+      ".read": "root.child('admins').child(auth.uid).val() === true",
+      "$reportId": {
+        ".write": "auth != null && !data.exists()"
+      }
+    },
+    "chatBlocks": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "chatMutes": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "chatPresence": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "chatModeration": {
+      ".read": "root.child('admins').child(auth.uid).val() === true",
+      ".write": "root.child('admins').child(auth.uid).val() === true"
+    },
+    "redeems": {
+      "$redeemId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
+            </pre>
+          </div>
+
+          <div style="background:rgba(255, 152, 0, 0.08); border:1px solid rgba(255, 152, 0, 0.25); border-radius:10px; padding:12px;">
+            <strong style="color:var(--neon-amber);"><i class="fa-brands fa-google"></i> Google Sign-In Setup in Firebase Console:</strong>
+            <ol style="margin-left:18px; margin-top:6px;">
+              <li>Go to Firebase Console &gt; Build &gt; Authentication &gt; Sign-in method.</li>
+              <li>Enable "Google" provider and configure support email.</li>
+              <li>Add your SHA-1 / SHA-256 fingerprint from Android Studio release keystore.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: CREATE / EDIT TOURNAMENT -->
+  <div class="admin-modal-backdrop" id="modalAdminTournament">
+    <div class="admin-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-family:var(--font-heading); font-size:16px; color:#fff;" id="modalTourneyHeading">Create Tournament</h3>
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminTournament')" style="padding:4px 8px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="adminTourneyForm" onsubmit="saveAdminTournament(event)">
+        <input type="hidden" id="adminTourneyId">
+        <div class="admin-input-group">
+          <label class="admin-input-label">Tournament Title</label>
+          <input type="text" id="adminTourneyTitle" class="admin-input" placeholder="e.g. Bermuda Pro Solo Bounty" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Mode</label>
+            <select id="adminTourneyMode" class="admin-input" style="background:#090c13;">
+              <option value="Solo">Solo</option>
+              <option value="Duo">Duo</option>
+              <option value="Squad">Squad</option>
+            </select>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Map</label>
+            <select id="adminTourneyMap" class="admin-input" style="background:#090c13;">
+              <option value="Bermuda">Bermuda</option>
+              <option value="Purgatory">Purgatory</option>
+              <option value="Kalahari">Kalahari</option>
+              <option value="Alpine">Alpine</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Date</label>
+            <input type="date" id="adminTourneyDate" class="admin-input" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Time</label>
+            <input type="text" id="adminTourneyTime" class="admin-input" placeholder="e.g. 7:00 PM" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Entry Fee (Coins / ₹)</label>
+            <input type="number" id="adminTourneyFee" class="admin-input" value="0" min="0" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Total Player Slots</label>
+            <input type="number" id="adminTourneySlots" class="admin-input" value="48" min="2" max="100" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">1st Place</label>
+            <input type="number" id="adminTourneyPrize1" class="admin-input" value="300" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">2nd Place</label>
+            <input type="number" id="adminTourneyPrize2" class="admin-input" value="150" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Per Kill</label>
+            <input type="number" id="adminTourneyPerKill" class="admin-input" value="15" required>
+          </div>
+        </div>
+        <div class="admin-input-group">
+          <label class="admin-input-label">Banner Image URL</label>
+          <input type="url" id="adminTourneyBanner" class="admin-input" value="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; justify-content:center; margin-top:6px;">
+          <i class="fa-solid fa-floppy-disk"></i> Save Tournament
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RELEASE ROOM ID & PASSWORD -->
+  <div class="admin-modal-backdrop" id="modalAdminRoomRelease">
+    <div class="admin-modal-content" style="max-width:440px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-family:var(--font-heading); font-size:16px; color:#fff;"><i class="fa-solid fa-key" style="color:var(--neon-green);"></i> Release Custom Room</h3>
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminRoomRelease')" style="padding:4px 8px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="adminRoomForm" onsubmit="executeRoomRelease(event)">
+        <input type="hidden" id="releaseTourneyId">
+        <div style="font-size:13px; font-weight:700; color:var(--neon-orange); margin-bottom:12px;" id="releaseTourneyName">Match</div>
+        <div class="admin-input-group">
+          <label class="admin-input-label">Free Fire Custom Room ID *</label>
+          <input type="text" id="releaseRoomId" class="admin-input" placeholder="e.g. 8920149" required>
+        </div>
+        <div class="admin-input-group">
+          <label class="admin-input-label">Room Password *</label>
+          <input type="text" id="releaseRoomPass" class="admin-input" placeholder="e.g. 7788" required>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">
+          Releasing room information notifies all registered players instantly and shows details under "My Games".
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; justify-content:center;">
+          <i class="fa-solid fa-tower-broadcast"></i> Broadcast Room Credentials
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REDEEM DETAILS & TIMELINE -->
+  <div class="admin-modal-backdrop" id="modalAdminRedeemDetail">
+    <div class="admin-modal-content" style="max-width:520px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-family:var(--font-heading); font-size:16px; color:#fff;" id="detRedeemTitle">Redeem Details</h3>
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminRedeemDetail')" style="padding:4px 8px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="detRedeemBody">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QR ZOOM FULL PREVIEW -->
+  <div class="admin-modal-backdrop" id="modalQRZoom" onclick="closeAdminModal('modalQRZoom')">
+    <div style="max-width:90vw; max-height:90vh; text-align:center;" onclick="event.stopPropagation()">
+      <img id="zoomQRImg" src="" style="max-width:100%; max-height:80vh; object-fit:contain; border-radius:12px; border:2px solid var(--neon-cyan); box-shadow:0 0 30px rgba(0,229,255,0.4);" alt="Wallet QR Screenshot">
+      <div style="margin-top:10px;">
+        <button class="btn btn-secondary" onclick="closeAdminModal('modalQRZoom')">
+          <i class="fa-solid fa-xmark"></i> Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN CORRECT RESULT & OVERRIDE -->
+  <div class="admin-modal-backdrop" id="modalAdminCorrectResult">
+    <div class="admin-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-family:var(--font-heading); font-size:16px; color:#fff;">
+          <i class="fa-solid fa-pen-to-square" style="color:var(--neon-orange); margin-right:6px;"></i>
+          Correct & Override Match Result
+        </h3>
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminCorrectResult')" style="padding:4px 8px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="adminCorrectResultForm" onsubmit="submitAdminResultCorrection(event)">
+        <input type="hidden" id="correctTourneyId">
+        <input type="hidden" id="correctPlayerUid">
+
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:10px; padding:10px 12px; margin-bottom:12px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Player:</span>
+            <strong id="correctPlayerName" style="color:#fff;">ViperKing</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Free Fire UID:</span>
+            <strong id="correctPlayerUidDisplay" style="color:var(--neon-cyan);">7812904812</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Current Recorded Score:</span>
+            <strong id="correctCurrentScoreDisplay" style="color:var(--neon-orange);">225 Pts (9 Kills, #1 Placement)</strong>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">New Kills *</label>
+            <input type="number" id="correctNewKills" class="admin-input" min="0" max="99" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">New Placement *</label>
+            <input type="number" id="correctNewPlacement" class="admin-input" min="1" max="48" required>
+          </div>
+        </div>
+
+        <div class="admin-input-group">
+          <label class="admin-input-label">Bonus Points (Booyah/MVP)</label>
+          <input type="number" id="correctNewBonus" class="admin-input" min="0" max="100" value="0">
+        </div>
+
+        <div class="admin-input-group">
+          <label class="admin-input-label">Mandatory Reason for Correction *</label>
+          <textarea id="correctReason" class="admin-input" rows="3" placeholder="State specific reason (e.g. Arbiter video telemetry confirmed 2 extra kills at 14:15)..." required minlength="8"></textarea>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">
+            This justification will be permanently written to the audit ledger with your Admin UID and timestamp.
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminCorrectResult')">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-arrows-rotate"></i> Recalculate & Commit Override
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Clearly marked Firebase Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    let firebaseInitialized = false;
+    let database = null;
+
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        database = firebase.database();
+        firebaseInitialized = true;
+        console.log("Admin panel connected to Firebase.");
+      } catch (e) {
+        console.warn("Admin Firebase init error:", e);
+      }
+    }
+
+    // Shared State Repositories
+    let allPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [];
+    let allRedeems = JSON.parse(localStorage.getItem('ffa_redeems')) || [];
+    let allReports = JSON.parse(localStorage.getItem('ffa_reports')) || [];
+    let allDisputes = JSON.parse(localStorage.getItem('ffa_disputes')) || [];
+    let auditLogs = JSON.parse(localStorage.getItem('ffa_audit_logs')) || [
+      {
+        action: "SYSTEM_INITIALIZED",
+        details: "Free Fire Arena Part 3 Engine activated with Khalti, Reports & Gateways.",
+        admin: "system",
+        timestamp: new Date().toISOString()
+      }
+    ];
+
+    let currentAdminPaymentFilter = 'ALL';
+    let currentAdminRedeemFilter = 'ALL';
+    let currentAdminTourneyFilter = 'ALL';
+
+    // Admin Auth State
+    let currentAdminUser = JSON.parse(localStorage.getItem('ffa_admin_auth')) || null;
+
+    function checkAdminAuth() {
+      const overlay = document.getElementById("adminAuthOverlay");
+      const logoutBtn = document.getElementById("btnAdminLogout");
+      if (!overlay) return;
+
+      if (currentAdminUser && currentAdminUser.isAuthorized) {
+        overlay.style.display = "none";
+        if (logoutBtn) logoutBtn.style.display = "inline-flex";
+      } else {
+        overlay.style.display = "flex";
+        if (logoutBtn) logoutBtn.style.display = "none";
+      }
+    }
+
+    function toggleAdminPassVisibility(iconElem) {
+      const field = document.getElementById("adminPasswordInput");
+      if (!field) return;
+      if (field.type === 'password') {
+        field.type = 'text';
+        iconElem.classList.remove('fa-eye');
+        iconElem.classList.add('fa-eye-slash');
+      } else {
+        field.type = 'password';
+        iconElem.classList.remove('fa-eye-slash');
+        iconElem.classList.add('fa-eye');
+      }
+    }
+
+    function handleAdminLogin(event) {
+      if (event) event.preventDefault();
+      const email = document.getElementById("adminEmailInput").value.trim();
+      const pass = document.getElementById("adminPasswordInput").value.trim();
+      const errBox = document.getElementById("adminAuthError");
+      const btn = document.getElementById("btnAdminSignIn");
+
+      errBox.style.display = "none";
+
+      if (!email || !pass) {
+        errBox.style.display = "block";
+        errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Please enter both administrator email and security key.`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Authenticating Arbiter Credentials...`;
+
+      // Authorized email patterns or Firebase
+      const isEmailAuthorized = email.includes("admin") || email.includes("arbiter") || email === "ramitraut6@gmail.com";
+
+      if (firebaseInitialized && firebase.auth) {
+        firebase.auth().signInWithEmailAndPassword(email, pass)
+          .then((userCred) => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
+            currentAdminUser = {
+              uid: userCred.user.uid,
+              email: email,
+              role: "SUPER_ADMIN",
+              isAuthorized: true,
+              loginAt: new Date().toISOString()
+            };
+            localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+            recordAudit("ADMIN_LOGIN", `Admin ${email} signed in via Firebase Auth.`);
+            checkAdminAuth();
+            renderAdminData();
+          })
+          .catch((err) => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
+            errBox.style.display = "block";
+            errBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${err.message}`;
+          });
+      } else {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
+          if (isEmailAuthorized) {
+            currentAdminUser = {
+              uid: "adm-" + Math.floor(1000 + Math.random() * 9000),
+              email: email,
+              role: "SUPER_ADMIN",
+              isAuthorized: true,
+              loginAt: new Date().toISOString()
+            };
+            localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+            recordAudit("ADMIN_LOGIN", `Admin ${email} signed into Admin Console.`);
+            checkAdminAuth();
+            renderAdminData();
+          } else {
+            errBox.style.display = "block";
+            errBox.innerHTML = `<i class="fa-solid fa-ban"></i> Access Denied: "${email}" is not on the Esports Arbiter authorization allowlist.`;
+          }
+        }, 600);
+      }
+    }
+
+    function quickDemoAdminLogin() {
+      currentAdminUser = {
+        uid: "adm-arbiter-01",
+        email: "arbiter@freefirearena.com",
+        role: "HEAD_ARBITER",
+        isAuthorized: true,
+        loginAt: new Date().toISOString()
+      };
+      localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+      recordAudit("DEMO_ADMIN_LOGIN", `Authorized Sandbox Arbiter session started.`);
+      checkAdminAuth();
+      renderAdminData();
+    }
+
+    function adminLogout() {
+      if (confirm("Sign out of the Admin Control Center?")) {
+        currentAdminUser = null;
+        localStorage.removeItem('ffa_admin_auth');
+        checkAdminAuth();
+      }
+    }
+
+    function adminForgotPassword() {
+      const email = prompt("Enter Administrator email address to receive password reset key:");
+      if (email && email.trim()) {
+        alert(`Admin security reset instructions dispatched to: ${email.trim()}`);
+      }
+    }
+
+    // Modal Helpers
+    function openAdminModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) m.classList.add("active");
+    }
+
+    function closeAdminModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) m.classList.remove("active");
+    }
+
+    function switchAdminTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      if (targetTab) targetTab.classList.add('active');
+
+      const matchingBtn = Array.from(document.querySelectorAll('.admin-tab-btn')).find(b => b.innerText.toLowerCase().includes(tabId.slice(0, 4)));
+      if (matchingBtn) matchingBtn.classList.add('active');
+
+      renderAdminData();
+    }
+
+    function setAdminPaymentFilter(filter) {
+      currentAdminPaymentFilter = filter;
+      ['All', 'Khalti', 'Esewa'].forEach(m => {
+        const btn = document.getElementById(`payFilter${m}`);
+        if (btn) btn.classList.toggle('active', m.toUpperCase() === filter.toUpperCase());
+      });
+      renderPaymentsTab();
+    }
+
+    function setAdminRedeemFilter(filter) {
+      currentAdminRedeemFilter = filter;
+      ['All', 'Khalti', 'Esewa'].forEach(m => {
+        const btn = document.getElementById(`redFilter${m}`);
+        if (btn) btn.classList.toggle('active', m.toUpperCase() === filter.toUpperCase());
+      });
+      renderRedeemsTab();
+    }
+
+    function renderAdminData() {
+      allPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [];
+      allRedeems = JSON.parse(localStorage.getItem('ffa_redeems')) || [];
+      allReports = JSON.parse(localStorage.getItem('ffa_reports')) || [];
+      allDisputes = JSON.parse(localStorage.getItem('ffa_disputes')) || [];
+      allChatReports = JSON.parse(localStorage.getItem('ffa_chat_reports')) || [];
+      auditLogs = JSON.parse(localStorage.getItem('ffa_audit_logs')) || [];
+
+      // Badges & Counters
+      const pendingPayCount = allPayments.filter(p => p.status === 'PENDING').length;
+      const pendingRedeemCount = allRedeems.filter(r => r.status === 'PENDING').length;
+      const pendingReportCount = allReports.filter(rep => rep.status === 'UNDER_REVIEW' || rep.status === 'PENDING').length;
+      const pendingChatReportsCount = allChatReports.filter(r => r.status === 'PENDING').length;
+
+      document.getElementById("statPendingPayments").innerText = pendingPayCount;
+      document.getElementById("badgePendingPayments").innerText = pendingPayCount;
+      document.getElementById("statPendingRedeems").innerText = pendingRedeemCount;
+      document.getElementById("badgePendingRedeems").innerText = pendingRedeemCount;
+      document.getElementById("statPendingReports").innerText = pendingReportCount;
+      document.getElementById("badgePendingReports").innerText = pendingReportCount;
+      const badgeChat = document.getElementById("badgePendingChatReports");
+      if (badgeChat) badgeChat.innerText = pendingChatReportsCount;
+      const statChat = document.getElementById("statPendingChatReports");
+      if (statChat) statChat.innerText = pendingChatReportsCount;
+
+      renderPaymentsTab();
+      renderRedeemsTab();
+      renderAdminTournaments();
+      renderAdminUsers();
+      renderAdminAnnouncements();
+      renderAdminSupport();
+      renderReportsTab();
+      renderChatModTab();
+      renderResultsCenter();
+      renderAuditTab();
+    }
+
+    function renderPaymentsTab() {
+      const container = document.getElementById("adminPaymentsList");
+      let filtered = allPayments;
+      if (currentAdminPaymentFilter !== 'ALL') {
+        filtered = allPayments.filter(p => p.paymentMethod && p.paymentMethod.toLowerCase() === currentAdminPaymentFilter.toLowerCase());
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No payment requests matching filter (${currentAdminPaymentFilter}).</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div>
+              <strong style="font-size:14px; color:#fff;">User ID: ${p.userId}</strong>
+              <div style="font-size:11px; color:var(--text-muted);">
+                <span class="status-badge" style="background:${p.paymentMethod === 'Khalti' ? 'rgba(186,104,200,0.2)' : 'rgba(76,175,80,0.2)'}; color:${p.paymentMethod === 'Khalti' ? '#ba68c8' : '#81c784'};">${p.paymentMethod}</span>
+                Ref: <strong>${p.transactionReference}</strong>
+              </div>
+            </div>
+            <div>
+              <span class="status-badge ${p.status.toLowerCase()}">${p.status}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0; font-size:12px;">
+            <span>Amount: <strong>₹${p.amount} (${p.coinAmount} Coins)</strong></span>
+            <span style="color:var(--text-muted); font-size:11px;">${new Date(p.createdAt).toLocaleString()}</span>
+          </div>
+
+          <div style="font-size:11px; color:var(--text-secondary); margin-bottom:10px;">Note: ${p.note || 'None'}</div>
+
+          ${p.status === 'PENDING' ? `
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-approve" onclick="approvePayment('${p.paymentId}')">
+                <i class="fa-solid fa-check"></i> Approve & Credit ${p.coinAmount} Coins
+              </button>
+              <button class="btn btn-reject" onclick="rejectPayment('${p.paymentId}')">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+            </div>
+          ` : `
+            <div style="font-size:11px; color:var(--text-muted);">Resolved by Admin</div>
+          `}
+        </div>
+      `).join('');
+    }
+
+    function approvePayment(paymentId) {
+      const payIndex = allPayments.findIndex(p => p.paymentId === paymentId);
+      if (payIndex === -1) return;
+
+      const payment = allPayments[payIndex];
+      if (payment.status !== 'PENDING') return;
+
+      if (!confirm(`Confirm approval for deposit TX ${paymentId}? This will credit ${payment.coinAmount} coins to user ${payment.userId}.`)) return;
+
+      payment.status = 'APPROVED';
+      payment.updatedAt = new Date().toISOString();
+      allPayments[payIndex] = payment;
+      localStorage.setItem('ffa_payments', JSON.stringify(allPayments));
+
+      // Credit User Coins & create transaction
+      let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
+      if (currentUser && currentUser.uid === payment.userId) {
+        currentUser.coins = (currentUser.coins || 0) + payment.coinAmount;
+        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+
+        let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+        userTransactions.unshift({
+          transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
+          userId: payment.userId,
+          type: "ADD_COINS",
+          amount: payment.coinAmount,
+          coinAmount: payment.coinAmount,
+          status: "Completed",
+          referenceId: payment.paymentId,
+          description: `Deposit via ${payment.paymentMethod}`,
+          createdAt: new Date().toISOString()
+        });
+        localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+      }
+
+      recordAudit("PAYMENT_APPROVED", `Approved ${payment.paymentMethod} payment ${paymentId} (+${payment.coinAmount} Coins) for ${payment.userId}`);
+      renderAdminData();
+      alert(`Payment ${paymentId} approved! ${payment.coinAmount} Coins credited.`);
+    }
+
+    function rejectPayment(paymentId) {
+      const payIndex = allPayments.findIndex(p => p.paymentId === paymentId);
+      if (payIndex === -1) return;
+
+      const payment = allPayments[payIndex];
+      if (payment.status !== 'PENDING') return;
+
+      const reason = prompt("Enter reason for rejecting payment (invalid ref, fake screenshot, etc.):");
+      if (reason === null) return;
+
+      payment.status = 'REJECTED';
+      payment.rejectReason = reason || "Unverified payment reference";
+      payment.updatedAt = new Date().toISOString();
+      allPayments[payIndex] = payment;
+      localStorage.setItem('ffa_payments', JSON.stringify(allPayments));
+
+      recordAudit("PAYMENT_REJECTED", `Rejected ${payment.paymentMethod} payment ${paymentId} (Ref: ${payment.transactionReference}, Reason: ${payment.rejectReason})`);
+      renderAdminData();
+      alert(`Payment ${paymentId} rejected.`);
+    }
+
+    function renderRedeemsTab() {
+      const container = document.getElementById("adminRedeemsList");
+      let filtered = allRedeems;
+      if (currentAdminRedeemFilter !== 'ALL') {
+        filtered = allRedeems.filter(r => r.method && r.method.toLowerCase() === currentAdminRedeemFilter.toLowerCase());
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No redeem requests matching filter (${currentAdminRedeemFilter}).</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(r => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div>
+              <strong style="font-size:14px; color:#fff;">Redeem: ${r.redeemId}</strong>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                User: <strong>${r.userName || r.userId}</strong> (Player UID: ${r.playerUID || 'N/A'})
+              </div>
+            </div>
+            <div>
+              <span class="status-badge ${r.status.toLowerCase()}">${r.status}</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin:8px 0; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; font-size:12px;">
+            <div>
+              <span style="color:var(--text-muted); font-size:11px;">Payout Wallet:</span>
+              <div style="font-weight:700; color:${r.method === 'Khalti' ? '#ba68c8' : r.method === 'eSewa' ? '#81c784' : '#ff4081'};">
+                ${r.method} • ${r.account}
+              </div>
+            </div>
+            <div>
+              <span style="color:var(--text-muted); font-size:11px;">Withdrawable Cash:</span>
+              <div style="font-weight:800; color:var(--neon-green);">
+                ₹${r.amount} (${r.coins} Coins)
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Screenshot preview if present -->
+          ${r.qrUrl ? `
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; background:rgba(0,229,255,0.05); border:1px solid rgba(0,229,255,0.2); border-radius:8px; padding:6px 10px;">
+              <img src="${r.qrUrl}" style="width:40px; height:40px; object-fit:contain; border-radius:6px; cursor:pointer;" onclick="zoomQRImage('${r.qrUrl}')" alt="QR">
+              <div style="flex:1; font-size:11px;">
+                <span style="color:var(--neon-cyan); font-weight:700;">Wallet QR Attached</span>
+                <span style="color:var(--text-muted); display:block;">Tap image to zoom and scan</span>
+              </div>
+              <button class="btn btn-secondary" style="font-size:10px; padding:4px 8px;" onclick="zoomQRImage('${r.qrUrl}')">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View QR
+              </button>
+            </div>
+          ` : ''}
+
+          ${r.adminNote ? `
+            <div style="font-size:11px; color:var(--neon-amber); margin-bottom:8px;">
+              <i class="fa-solid fa-note-sticky"></i> Note: ${r.adminNote}
+            </div>
+          ` : ''}
+
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="openRedeemDetailModal('${r.redeemId}')">
+              <i class="fa-solid fa-clock-rotate-left"></i> Timeline & Details
+            </button>
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="addRedeemAdminNote('${r.redeemId}')">
+              <i class="fa-solid fa-pen"></i> Add Note
+            </button>
+
+            ${r.status === 'PENDING' ? `
+              <button class="btn btn-approve" onclick="markRedeemPaid('${r.redeemId}')">
+                <i class="fa-solid fa-circle-check"></i> Mark Paid (Cash Sent)
+              </button>
+              <button class="btn btn-reject" onclick="rejectAndRefundRedeem('${r.redeemId}')">
+                <i class="fa-solid fa-rotate-left"></i> Reject & Refund
+              </button>
+            ` : `
+              <span style="font-size:11px; color:var(--text-muted); align-self:center; margin-left:auto;">Settled: ${r.status}</span>
+            `}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function zoomQRImage(url) {
+      if (!url) return;
+      document.getElementById("zoomQRImg").src = url;
+      openAdminModal("modalQRZoom");
+    }
+
+    function openRedeemDetailModal(redeemId) {
+      const r = allRedeems.find(x => x.redeemId === redeemId);
+      if (!r) return;
+
+      document.getElementById("detRedeemTitle").innerText = `Redeem #${r.redeemId}`;
+      document.getElementById("detRedeemBody").innerHTML = `
+        <div style="background:#090c13; padding:12px; border-radius:10px; border:1px solid var(--surface-border); margin-bottom:12px; font-size:12px; line-height:1.6;">
+          <div><strong>Player Username:</strong> ${r.userName || 'N/A'}</div>
+          <div><strong>User UID:</strong> ${r.userId}</div>
+          <div><strong>Free Fire Player ID:</strong> ${r.playerUID || 'N/A'}</div>
+          <div><strong>Requested Amount:</strong> <span style="color:var(--neon-green); font-weight:700;">₹${r.amount} (${r.coins} Coins)</span></div>
+          <div><strong>Wallet Provider:</strong> ${r.method}</div>
+          <div><strong>Payout Phone / ID:</strong> ${r.account}</div>
+          <div><strong>Requested At:</strong> ${new Date(r.createdAt).toLocaleString()}</div>
+          <div><strong>Current Status:</strong> <span class="status-badge ${r.status.toLowerCase()}">${r.status}</span></div>
+          ${r.adminNote ? `<div style="color:var(--neon-amber);"><strong>Admin Note:</strong> ${r.adminNote}</div>` : ''}
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <h4 style="font-size:12px; font-weight:700; color:var(--neon-cyan); margin-bottom:8px;">Status Timeline</h4>
+          <div style="font-size:11px; color:var(--text-secondary); border-left:2px solid var(--neon-purple); padding-left:10px;">
+            <div style="margin-bottom:6px;">• <strong>Submitted:</strong> ${new Date(r.createdAt).toLocaleTimeString()} - Requested payout via ${r.method}</div>
+            <div style="margin-bottom:6px;">• <strong>Under Review:</strong> Verified with available withdrawable coin balance</div>
+            ${r.status === 'PAID' ? `<div style="color:var(--neon-green); font-weight:700;">• <strong>Paid:</strong> ${r.processedAt ? new Date(r.processedAt).toLocaleTimeString() : 'Completed'} - Manual transfer executed by Arbiter</div>` : ''}
+            ${r.status === 'REJECTED' ? `<div style="color:var(--neon-red); font-weight:700;">• <strong>Rejected & Refunded:</strong> ${r.rejectReason || 'Details could not be verified'}. Coins returned to player wallet.</div>` : ''}
+          </div>
+        </div>
+
+        ${r.qrUrl ? `
+          <div style="text-align:center; margin-bottom:14px;">
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Wallet QR Code:</div>
+            <img src="${r.qrUrl}" style="max-height:120px; border-radius:8px; border:1px solid var(--neon-cyan); cursor:pointer;" onclick="zoomQRImage('${r.qrUrl}')">
+          </div>
+        ` : ''}
+
+        ${r.status === 'PENDING' ? `
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-approve" style="flex:1; justify-content:center;" onclick="closeAdminModal('modalAdminRedeemDetail'); markRedeemPaid('${r.redeemId}')">
+              <i class="fa-solid fa-check"></i> Mark as Paid
+            </button>
+            <button class="btn btn-reject" style="flex:1; justify-content:center;" onclick="closeAdminModal('modalAdminRedeemDetail'); rejectAndRefundRedeem('${r.redeemId}')">
+              <i class="fa-solid fa-rotate-left"></i> Reject & Refund
+            </button>
+          </div>
+        ` : ''}
+      `;
+      openAdminModal("modalAdminRedeemDetail");
+    }
+
+    function addRedeemAdminNote(redeemId) {
+      const index = allRedeems.findIndex(r => r.redeemId === redeemId);
+      if (index === -1) return;
+      const note = prompt("Enter administrative note for this payout:", allRedeems[index].adminNote || "");
+      if (note !== null) {
+        allRedeems[index].adminNote = note.trim();
+        localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
+        recordAudit("REDEEM_NOTE", `Added note to redeem ${redeemId}: ${note.trim()}`);
+        renderAdminData();
+      }
+    }
+
+    function markRedeemPaid(redeemId) {
+      const index = allRedeems.findIndex(r => r.redeemId === redeemId);
+      if (index === -1) return;
+
+      allRedeems[index].status = 'PAID';
+      allRedeems[index].processedAt = new Date().toISOString();
+      localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
+
+      recordAudit("REDEEM_PAID", `Marked redeem ${redeemId} as PAID for ${allRedeems[index].userId}`);
+      renderAdminData();
+      alert(`Redeem ${redeemId} marked as PAID.`);
+    }
+
+    function rejectAndRefundRedeem(redeemId) {
+      const index = allRedeems.findIndex(r => r.redeemId === redeemId);
+      if (index === -1) return;
+
+      const redeem = allRedeems[index];
+      redeem.status = 'REJECTED';
+      redeem.processedAt = new Date().toISOString();
+      localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
+
+      // Refund reserved coins once
+      let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
+      if (currentUser && currentUser.uid === redeem.userId) {
+        currentUser.coins = (currentUser.coins || 0) + redeem.coins;
+        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+
+        let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+        userTransactions.unshift({
+          transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
+          userId: redeem.userId,
+          type: "REDEEM_REFUND",
+          amount: redeem.coins,
+          coinAmount: redeem.coins,
+          status: "Completed",
+          referenceId: redeem.redeemId,
+          description: `Refund for rejected redeem ${redeem.redeemId}`,
+          createdAt: new Date().toISOString()
+        });
+        localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+      }
+
+      recordAudit("REDEEM_REJECTED", `Rejected redeem ${redeemId} and refunded ${redeem.coins} coins to ${redeem.userId}`);
+      renderAdminData();
+      alert(`Redeem ${redeemId} rejected. ${redeem.coins} Coins refunded.`);
+    }
+
+    // ==========================================
+    // PART 3: REPORTS & FAIR PLAY MODERATION
+    // ==========================================
+    function renderReportsTab() {
+      const container = document.getElementById("adminReportsList");
+      if (!container) return;
+
+      if (allReports.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No fair play reports found.</div>`;
+        return;
+      }
+
+      container.innerHTML = allReports.map(rep => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div>
+              <strong style="font-size:14px; color:#fff;">Reported Player: ${rep.reportedPlayer}</strong>
+              <div style="font-size:11px; color:var(--text-muted);">Match: ${rep.matchRef} • By: ${rep.reporterId}</div>
+            </div>
+            <div>
+              <span class="status-badge ${rep.status === 'ACTION_TAKEN' ? 'approved' : rep.status === 'DISMISSED' ? 'rejected' : 'pending'}">${rep.status}</span>
+            </div>
+          </div>
+
+          <div style="font-size:12px; color:var(--neon-orange); font-weight:700; margin:6px 0;">
+            <i class="fa-solid fa-flag"></i> Reason: ${rep.reason}
+          </div>
+
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">${rep.description}</p>
+
+          ${rep.adminNotes ? `
+            <div style="background:rgba(0, 230, 118, 0.08); border:1px solid rgba(0, 230, 118, 0.25); border-radius:8px; padding:6px 10px; font-size:11px; color:var(--neon-green); margin-bottom:10px;">
+              <strong>Admin Decision:</strong> ${rep.adminNotes}
+            </div>
+          ` : ''}
+
+          ${rep.status === 'UNDER_REVIEW' || rep.status === 'PENDING' ? `
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="btn btn-reject" onclick="resolveReport('${rep.id}', 'WARN')">
+                <i class="fa-solid fa-triangle-exclamation"></i> Issue Warning
+              </button>
+              <button class="btn btn-reject" style="background:rgba(255,23,68,0.3);" onclick="resolveReport('${rep.id}', 'BAN')">
+                <i class="fa-solid fa-ban"></i> Ban Player Account
+              </button>
+              <button class="btn btn-secondary" onclick="resolveReport('${rep.id}', 'DISMISS')">
+                <i class="fa-solid fa-xmark"></i> Dismiss (No Violation)
+              </button>
+            </div>
+          ` : `
+            <div style="font-size:11px; color:var(--text-muted);">Report ticket closed.</div>
+          `}
+        </div>
+      `).join('');
+    }
+
+    function resolveReport(repId, action) {
+      const repIndex = allReports.findIndex(r => r.id === repId);
+      if (repIndex === -1) return;
+
+      const rep = allReports[repIndex];
+      let notes = "";
+
+      if (action === 'WARN') {
+        rep.status = "ACTION_TAKEN";
+        notes = "Official warning recorded against player profile for unfair gameplay.";
+      } else if (action === 'BAN') {
+        rep.status = "ACTION_TAKEN";
+        notes = "Player confirmed using prohibited assistance/scripts. Permanent tournament suspension applied.";
+      } else {
+        rep.status = "DISMISSED";
+        notes = "Insufficient evidence or standard gameplay confirmed by match arbiter. No penalty.";
+      }
+
+      rep.adminNotes = notes;
+      rep.resolvedAt = new Date().toISOString();
+      allReports[repIndex] = rep;
+      localStorage.setItem('ffa_reports', JSON.stringify(allReports));
+
+      recordAudit("REPORT_RESOLVED", `Resolved report ${repId} (${action}) against ${rep.reportedPlayer}`);
+      renderAdminData();
+      alert(`Report ${repId} updated: ${notes}`);
+    }
+
+    // ==========================================
+    // CHAT & COMMUNITY MODERATION LOGIC
+    // ==========================================
+    let currentChatModSubtab = 'reports';
+
+    function switchChatModSubtab(subtab) {
+      currentChatModSubtab = subtab;
+      ['reports', 'explorer', 'announce'].forEach(s => {
+        const btn = document.getElementById(`chatSubtab${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        const view = document.getElementById(`chatModView${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        if (btn) btn.classList.toggle('active', s === subtab);
+        if (view) view.style.display = s === subtab ? 'block' : 'none';
+      });
+      if (subtab === 'explorer') filterAdminLiveChat();
+    }
+
+    function renderChatModTab() {
+      allChatReports = JSON.parse(localStorage.getItem('ffa_chat_reports')) || [];
+      const container = document.getElementById("adminChatReportsList");
+      if (!container) return;
+
+      if (allChatReports.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:30px; color:var(--text-muted); font-size:12px;">
+            <i class="fa-solid fa-circle-check" style="font-size:28px; color:var(--neon-green); margin-bottom:8px; display:block;"></i>
+            No reported messages in queue. Tournament & community chats are in good order.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = allChatReports.map(rep => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div>
+              <strong style="font-size:14px; color:#fff;">Report: ${rep.reportId}</strong>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                Reported User: <strong style="color:var(--neon-orange);">${rep.targetPlayerName}</strong> (UID: ${rep.targetUid})
+                • Channel/Match: <strong>${rep.channel}</strong>
+              </div>
+            </div>
+            <div>
+              <span class="status-badge ${rep.status === 'ACTION_TAKEN' ? 'approved' : rep.status === 'DISMISSED' ? 'rejected' : 'pending'}">${rep.status}</span>
+            </div>
+          </div>
+
+          <div style="background:rgba(255,23,68,0.08); border:1px solid rgba(255,23,68,0.25); border-radius:8px; padding:8px 10px; margin:8px 0; font-size:12px;">
+            <div style="color:#ff5252; font-weight:700; margin-bottom:2px;"><i class="fa-solid fa-flag"></i> ${rep.category}</div>
+            <div style="color:#e0e0e0; font-style:italic;">"${rep.messageSnippet}"</div>
+            ${rep.details ? `<div style="color:var(--text-secondary); font-size:11px; margin-top:4px;">Reporter Note: ${rep.details}</div>` : ''}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); margin-bottom:8px;">
+            <span>Reported by: <strong>${rep.reporterName}</strong></span>
+            <span>${new Date(rep.createdAt).toLocaleString()}</span>
+          </div>
+
+          ${rep.status === 'PENDING' ? `
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="btn btn-reject" onclick="adminDeleteReportedMessage('${rep.reportId}', '${rep.channel}', '${rep.targetMsgId}')">
+                <i class="fa-solid fa-trash-can"></i> Delete Message & Warn
+              </button>
+              <button class="btn btn-reject" style="background:rgba(255,23,68,0.3);" onclick="adminMuteUserFromChat('${rep.targetUid}', '${rep.targetPlayerName}')">
+                <i class="fa-solid fa-comment-slash"></i> Mute User From Chat
+              </button>
+              <button class="btn btn-secondary" onclick="adminDismissChatReport('${rep.reportId}')">
+                <i class="fa-solid fa-xmark"></i> Dismiss Report
+              </button>
+            </div>
+          ` : `
+            <div style="font-size:11px; color:var(--text-muted);">Case settled: ${rep.status} (${rep.resolutionNote || 'Resolved'})</div>
+          `}
+        </div>
+      `).join('');
+    }
+
+    function filterAdminLiveChat() {
+      const container = document.getElementById("adminLiveChatExplorerList");
+      if (!container) return;
+
+      const query = (document.getElementById("adminChatSearchInput") ? document.getElementById("adminChatSearchInput").value.toLowerCase().trim() : "");
+      const channelFilter = document.getElementById("adminChatChannelSelect") ? document.getElementById("adminChatChannelSelect").value : "ALL";
+
+      let allMessages = [];
+
+      const commChats = JSON.parse(localStorage.getItem('ffa_community_chats')) || [];
+      commChats.forEach(m => {
+        allMessages.push({ ...m, source: "Community Chat", channelName: "community", tourneyId: null });
+      });
+
+      ['ff-tourney-1', 'ff-tourney-2', 'ff-tourney-3'].forEach(tid => {
+        const tMsgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tid}`)) || [];
+        tMsgs.forEach(m => {
+          allMessages.push({ ...m, source: `Tournament: ${tid}`, channelName: tid, tourneyId: tid });
+        });
+      });
+
+      let filtered = allMessages.filter(m => {
+        if (channelFilter === 'COMMUNITY' && m.channelName !== 'community') return false;
+        if (channelFilter !== 'ALL' && channelFilter !== 'COMMUNITY' && m.channelName !== channelFilter) return false;
+        if (query) {
+          const matchText = m.text && m.text.toLowerCase().includes(query);
+          const matchSender = m.senderUsername && m.senderUsername.toLowerCase().includes(query);
+          return matchText || matchSender;
+        }
+        return true;
+      });
+
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No messages matching filter criteria.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(m => `
+        <div class="admin-table-item" style="padding:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <strong style="color:#fff; font-size:13px;">${m.senderUsername}</strong>
+              <span class="status-badge" style="font-size:9px; background:rgba(0,229,255,0.15); color:var(--neon-cyan);">${m.source}</span>
+              ${m.deleted ? `<span class="status-badge rejected" style="font-size:9px;">DELETED</span>` : ''}
+            </div>
+            <span style="font-size:10px; color:var(--text-muted);">${new Date(m.createdAt).toLocaleTimeString()}</span>
+          </div>
+
+          <div style="font-size:12px; color:${m.deleted ? 'var(--text-muted)' : '#e0e0e0'}; margin:4px 0; ${m.deleted ? 'font-style:italic;' : ''}">
+            ${m.deleted ? `[Message deleted by arbiters]` : m.text}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+            <span style="font-size:10px; color:var(--text-muted);">UID: ${m.senderUid}</span>
+            ${!m.deleted ? `
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-reject" style="font-size:10px; padding:3px 8px;" onclick="adminDirectDeleteMessage('${m.channelName}', '${m.tourneyId}', '${m.messageId}')">
+                  <i class="fa-solid fa-trash-can"></i> Delete
+                </button>
+                <button class="btn btn-secondary" style="font-size:10px; padding:3px 8px;" onclick="adminMuteUserFromChat('${m.senderUid}', '${m.senderUsername}')">
+                  <i class="fa-solid fa-comment-slash"></i> Mute User
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adminDirectDeleteMessage(channelName, tourneyId, msgId) {
+      if (!confirm(`Delete message ${msgId}?`)) return;
+
+      if (channelName === 'community') {
+        const commChats = JSON.parse(localStorage.getItem('ffa_community_chats')) || [];
+        const idx = commChats.findIndex(m => m.messageId === msgId);
+        if (idx !== -1) {
+          commChats[idx].deleted = true;
+          commChats[idx].deletedBy = "ADMIN";
+          commChats[idx].deletedAt = new Date().toISOString();
+          localStorage.setItem('ffa_community_chats', JSON.stringify(commChats));
+        }
+        if (database && firebaseInitialized) {
+          database.ref(`communityChats/${msgId}/deleted`).set(true);
+          database.ref(`communityChats/${msgId}/deletedBy`).set("ADMIN");
+        }
+      } else if (tourneyId) {
+        const tMsgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tourneyId}`)) || [];
+        const idx = tMsgs.findIndex(m => m.messageId === msgId);
+        if (idx !== -1) {
+          tMsgs[idx].deleted = true;
+          tMsgs[idx].deletedBy = "ADMIN";
+          tMsgs[idx].deletedAt = new Date().toISOString();
+          localStorage.setItem(`ffa_tourney_messages_${tourneyId}`, JSON.stringify(tMsgs));
+        }
+        if (database && firebaseInitialized) {
+          database.ref(`tournamentChats/${tourneyId}/${msgId}/deleted`).set(true);
+          database.ref(`tournamentChats/${tourneyId}/${msgId}/deletedBy`).set("ADMIN");
+        }
+      }
+
+      recordAudit("CHAT_MODERATION", `Deleted message ${msgId} in ${channelName}`);
+      filterAdminLiveChat();
+      alert(`Message ${msgId} deleted successfully.`);
+    }
+
+    function adminDeleteReportedMessage(reportId, channel, msgId) {
+      const rep = allChatReports.find(r => r.reportId === reportId);
+      if (rep) {
+        rep.status = "ACTION_TAKEN";
+        rep.resolutionNote = "Message deleted and warning issued.";
+        localStorage.setItem('ffa_chat_reports', JSON.stringify(allChatReports));
+      }
+
+      if (channel === 'community') {
+        const commChats = JSON.parse(localStorage.getItem('ffa_community_chats')) || [];
+        const idx = commChats.findIndex(m => m.messageId === msgId);
+        if (idx !== -1) {
+          commChats[idx].deleted = true;
+          commChats[idx].deletedBy = "ADMIN";
+          localStorage.setItem('ffa_community_chats', JSON.stringify(commChats));
+        }
+        if (database && firebaseInitialized) {
+          database.ref(`communityChats/${msgId}/deleted`).set(true);
+        }
+      } else {
+        const tid = rep && rep.channel !== 'community' ? rep.channel : "ff-tourney-1";
+        const tMsgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tid}`)) || [];
+        const idx = tMsgs.findIndex(m => m.messageId === msgId);
+        if (idx !== -1) {
+          tMsgs[idx].deleted = true;
+          tMsgs[idx].deletedBy = "ADMIN";
+          localStorage.setItem(`ffa_tourney_messages_${tid}`, JSON.stringify(tMsgs));
+        }
+        if (database && firebaseInitialized) {
+          database.ref(`tournamentChats/${tid}/${msgId}/deleted`).set(true);
+        }
+      }
+
+      recordAudit("REPORT_ACTIONED", `Deleted reported message ${msgId} for report ${reportId}`);
+      renderAdminData();
+      alert(`Report ${reportId} resolved: Message removed and player flagged.`);
+    }
+
+    function adminMuteUserFromChat(uid, username) {
+      if (!confirm(`Restrict chat permissions for player ${username} (${uid})?`)) return;
+      localStorage.setItem(`ffa_chat_muted_${uid}`, 'true');
+
+      if (database && firebaseInitialized) {
+        database.ref(`chatRestrictions/${uid}`).set({
+          muted: true,
+          mutedBy: "ADMIN",
+          mutedAt: new Date().toISOString()
+        });
+      }
+
+      recordAudit("USER_MUTED", `Restricted chat access for player ${username} (${uid})`);
+      alert(`Player ${username} (${uid}) has been restricted from sending chat messages.`);
+      renderAdminData();
+    }
+
+    function adminDismissChatReport(reportId) {
+      const rep = allChatReports.find(r => r.reportId === reportId);
+      if (rep) {
+        rep.status = "DISMISSED";
+        rep.resolutionNote = "Report reviewed by arbiter and dismissed (no violation).";
+        localStorage.setItem('ffa_chat_reports', JSON.stringify(allChatReports));
+      }
+      recordAudit("REPORT_DISMISSED", `Dismissed chat report ${reportId}`);
+      renderAdminData();
+      alert(`Chat report ${reportId} dismissed.`);
+    }
+
+    function adminBroadcastTournamentNotice(event) {
+      event.preventDefault();
+      const tourneyId = document.getElementById("adminNoticeTourneyId").value;
+      const type = document.getElementById("adminNoticeType").value;
+      const title = document.getElementById("adminNoticeTitle").value.trim();
+      const text = document.getElementById("adminNoticeText").value.trim();
+
+      if (!title || !text) {
+        alert("Please enter title and announcement details.");
+        return;
+      }
+
+      const annId = "ANN-" + Date.now();
+      const newAnn = {
+        announcementId: annId,
+        tournamentId: tourneyId,
+        type: type,
+        title: title,
+        text: text,
+        postedBy: "Head Arbiter (Admin)",
+        createdAt: new Date().toISOString()
+      };
+
+      let anns = JSON.parse(localStorage.getItem(`ffa_tourney_announcements_${tourneyId}`)) || [];
+      anns.unshift(newAnn);
+      localStorage.setItem(`ffa_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
+
+      if (database && firebaseInitialized) {
+        database.ref(`tournamentAnnouncements/${tourneyId}/${annId}`).set(newAnn);
+      }
+
+      recordAudit("ANNOUNCEMENT_POSTED", `Broadcasted pinned notice to tournament ${tourneyId}: ${title}`);
+      alert(`Announcement published to tournament ${tourneyId}!`);
+      document.getElementById("adminNoticeTitle").value = "";
+      document.getElementById("adminNoticeText").value = "";
+    }
+
+    function saveGatewaySettings(event) {
+      event.preventDefault();
+      const khaltiId = document.getElementById("settingKhaltiId").value.trim();
+      const esewaId = document.getElementById("settingEsewaId").value.trim();
+      const minRedeem = parseInt(document.getElementById("settingMinRedeem").value) || 100;
+      const refBonus = parseInt(document.getElementById("settingRefBonus").value) || 50;
+
+      const settings = {
+        khalti: { id: khaltiId },
+        esewa: { id: esewaId },
+        minRedeem: minRedeem,
+        refBonus: refBonus,
+        updatedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('ffa_gateway_settings', JSON.stringify(settings));
+      recordAudit("SETTINGS_SAVED", `Updated Khalti/eSewa payment gateway configuration.`);
+      alert("Payment Gateways and App Rules saved successfully!");
+    }
+
+    // ==========================================
+    // TOURNAMENT RESULTS, STANDINGS & SCORING ENGINE
+    // ==========================================
+    let currentAdminResultsTourneyId = "T-101";
+    let currentAdminResultsStatusFilter = "ALL";
+    let currentAdminResultsSubtab = "leaderboard";
+
+    function switchAdminResultsSubtab(subtab) {
+      currentAdminResultsSubtab = subtab;
+      const subtabs = ['leaderboard', 'disputes', 'rules', 'playerstats', 'audithistory'];
+      subtabs.forEach(s => {
+        const btn = document.getElementById(`btnSubtabAdmin${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        const pane = document.getElementById(`subtabAdmin${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        if (btn) btn.classList.toggle('active', s === subtab);
+        if (pane) pane.style.display = (s === subtab) ? 'block' : 'none';
+      });
+
+      if (subtab === 'leaderboard') renderAdminTourneyStandings();
+      if (subtab === 'disputes') renderDisputesTab();
+      if (subtab === 'rules') loadScoringRulesToForm();
+      if (subtab === 'playerstats') renderAdminPlayerStats();
+      if (subtab === 'audithistory') renderAdminResultCorrectionsAudit();
+    }
+
+    function setAdminResultsStatusFilter(filter) {
+      currentAdminResultsStatusFilter = filter;
+      ['All', 'Provisional', 'Verified'].forEach(f => {
+        const btn = document.getElementById(`filterStatus${f}`);
+        if (btn) btn.classList.toggle('active', f.toUpperCase() === filter.toUpperCase());
+      });
+      renderAdminTourneyStandings();
+    }
+
+    function onAdminTourneySelectChange() {
+      const sel = document.getElementById("adminResultsTourneySelect");
+      if (sel) {
+        currentAdminResultsTourneyId = sel.value;
+        renderAdminTourneyStandings();
+        renderAdminTourneyMetaBanner();
+      }
+    }
+
+    function getAdminScoringRules() {
+      const saved = JSON.parse(localStorage.getItem('ffa_scoring_rules'));
+      if (saved) return saved;
+      return {
+        perKill: 25,
+        booyahBonus: 5,
+        tieBreaker: "KILLS_FIRST",
+        placementPointsMap: { 1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1 }
+      };
+    }
+
+    function loadScoringRulesToForm() {
+      const rules = getAdminScoringRules();
+      const perKillInput = document.getElementById("rulePerKill");
+      if (perKillInput) perKillInput.value = rules.perKill || 25;
+      const booyahInput = document.getElementById("ruleBooyahBonus");
+      if (booyahInput) booyahInput.value = rules.booyahBonus || 5;
+      const tbSelect = document.getElementById("ruleTieBreaker");
+      if (tbSelect) tbSelect.value = rules.tieBreaker || "KILLS_FIRST";
+
+      for (let i = 1; i <= 10; i++) {
+        const pInput = document.getElementById(`placePt${i}`);
+        if (pInput && rules.placementPointsMap) {
+          pInput.value = rules.placementPointsMap[i] !== undefined ? rules.placementPointsMap[i] : (11 - i);
+        }
+      }
+    }
+
+    function saveScoringRules(event) {
+      event.preventDefault();
+      const perKill = parseInt(document.getElementById("rulePerKill").value) || 25;
+      const booyahBonus = parseInt(document.getElementById("ruleBooyahBonus").value) || 0;
+      const tieBreaker = document.getElementById("ruleTieBreaker").value;
+
+      const placementPointsMap = {};
+      for (let i = 1; i <= 10; i++) {
+        const pInput = document.getElementById(`placePt${i}`);
+        placementPointsMap[i] = pInput ? (parseInt(pInput.value) || 0) : 0;
+      }
+
+      const rules = {
+        perKill,
+        booyahBonus,
+        tieBreaker,
+        placementPointsMap,
+        updatedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('ffa_scoring_rules', JSON.stringify(rules));
+      recordAudit("SCORING_RULES_UPDATED", `Configured tournament scoring engine: 1 Kill = ${perKill} Pts, Booyah Bonus = ${booyahBonus} Pts, Tie-breaker = ${tieBreaker}`);
+
+      recalculateCurrentTournamentScores(true);
+      alert("Tournament Scoring Rules saved successfully! Active tournament scores have been recalculated.");
+    }
+
+    function getTourneyStandings(tourneyId) {
+      let standings = JSON.parse(localStorage.getItem(`ffa_tourney_leaderboard_${tourneyId}`));
+      if (!standings || standings.length === 0) {
+        // Generate initial standings for tournament
+        const t = (getAdminTournaments() || []).find(x => x.id === tourneyId) || { id: tourneyId, perKill: 25, prizeFirst: 1000, prizeSecond: 500, prizeThird: 300 };
+        const rules = getAdminScoringRules();
+        const base = [
+          { uid: "7812904812", name: "ViperKing", kills: 9, placement: 1, bonusPoints: rules.booyahBonus, status: "PROVISIONAL", isLive: true },
+          { uid: "789102451", name: "ApexPredator", kills: 7, placement: 2, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "672910481", name: "FlameSniper", kills: 6, placement: 3, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "6829401827", name: "ShadowHunter", kills: 5, placement: 4, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "891029481", name: "ThunderBolt", kills: 4, placement: 5, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "551029384", name: "IronClad", kills: 3, placement: 6, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "991024810", name: "GhostNinja", kills: 2, placement: 7, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "441029481", name: "NightStalker", kills: 2, placement: 8, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "331029481", name: "BlazeMaster", kills: 1, placement: 9, bonusPoints: 0, status: "PROVISIONAL", isLive: true },
+          { uid: "221029481", name: "CyberWolf", kills: 1, placement: 10, bonusPoints: 0, status: "PROVISIONAL", isLive: true }
+        ];
+
+        standings = base.map(p => {
+          const killPts = p.kills * (t.perKill || rules.perKill);
+          const placePts = rules.placementPointsMap[p.placement] || 0;
+          const totalPoints = killPts + placePts + (p.bonusPoints || 0);
+          let prizeWon = 0;
+          if (p.placement === 1) prizeWon = t.prizeFirst || 1000;
+          else if (p.placement === 2) prizeWon = t.prizeSecond || 500;
+          else if (p.placement === 3) prizeWon = t.prizeThird || 300;
+          return {
+            ...p,
+            killPoints: killPts,
+            placementPoints: placePts,
+            totalPoints,
+            prizeWon
+          };
+        });
+        localStorage.setItem(`ffa_tourney_leaderboard_${tourneyId}`, JSON.stringify(standings));
+      }
+      return standings;
+    }
+
+    function renderAdminTourneyMetaBanner() {
+      const banner = document.getElementById("adminTourneyMetaBanner");
+      if (!banner) return;
+      const tourneys = getAdminTournaments();
+      const t = tourneys.find(x => x.id === currentAdminResultsTourneyId) || tourneys[0];
+      const standings = getTourneyStandings(currentAdminResultsTourneyId);
+
+      const totalParticipants = standings.length;
+      const isVerified = standings.every(s => s.status === 'VERIFIED');
+      const topPlayer = standings.reduce((max, p) => (p.totalPoints > (max ? max.totalPoints : -1)) ? p : max, null);
+      const totalPrizes = standings.reduce((sum, p) => sum + (p.prizeWon || 0), 0);
+
+      banner.innerHTML = `
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:10px; padding:10px; text-align:center;">
+          <span style="font-size:10px; color:var(--text-muted); display:block;">Participants</span>
+          <strong style="font-size:16px; color:#fff;">${totalParticipants} Players</strong>
+        </div>
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:10px; padding:10px; text-align:center;">
+          <span style="font-size:10px; color:var(--text-muted); display:block;">Verification Status</span>
+          <span class="status-badge ${isVerified ? 'approved' : 'pending'}" style="margin-top:2px; display:inline-block;">
+            ${isVerified ? 'Official Verified' : 'Provisional (Live)'}
+          </span>
+        </div>
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:10px; padding:10px; text-align:center;">
+          <span style="font-size:10px; color:var(--text-muted); display:block;">Current Leader / MVP</span>
+          <strong style="font-size:14px; color:var(--neon-cyan);">${topPlayer ? topPlayer.name : 'N/A'} (${topPlayer ? topPlayer.totalPoints : 0}p)</strong>
+        </div>
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:10px; padding:10px; text-align:center;">
+          <span style="font-size:10px; color:var(--text-muted); display:block;">Prize Pool Allocation</span>
+          <strong style="font-size:15px; color:var(--neon-green);">₹${totalPrizes.toLocaleString()}</strong>
+        </div>
+      `;
+    }
+
+    function renderAdminTourneyStandings() {
+      const container = document.getElementById("adminTourneyStandingsList");
+      if (!container) return;
+
+      const searchVal = (document.getElementById("adminResultsSearchInput")?.value || "").trim().toLowerCase();
+      let standings = getTourneyStandings(currentAdminResultsTourneyId);
+      const rules = getAdminScoringRules();
+
+      // Filter by search
+      if (searchVal) {
+        standings = standings.filter(p => p.name.toLowerCase().includes(searchVal) || String(p.uid).includes(searchVal));
+      }
+
+      // Filter by status
+      if (currentAdminResultsStatusFilter !== 'ALL') {
+        standings = standings.filter(p => (p.status || 'PROVISIONAL').toUpperCase() === currentAdminResultsStatusFilter.toUpperCase());
+      }
+
+      // Sort deterministically
+      standings.sort((a, b) => {
+        if (rules.tieBreaker === 'PLACEMENT_FIRST') {
+          const placeDiff = (a.placement || 99) - (b.placement || 99);
+          if (placeDiff !== 0) return placeDiff;
+          return (b.kills || 0) - (a.kills || 0);
+        }
+        const ptsDiff = (b.totalPoints || 0) - (a.totalPoints || 0);
+        if (ptsDiff !== 0) return ptsDiff;
+        const killDiff = (b.kills || 0) - (a.kills || 0);
+        if (killDiff !== 0) return killDiff;
+        return (a.placement || 99) - (b.placement || 99);
+      });
+
+      if (standings.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:12px;">No participants match filter criteria.</div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
+            <thead>
+              <tr style="background:#090c13; color:var(--text-muted); border-bottom:1px solid var(--surface-border);">
+                <th style="padding:10px 8px;">Rank</th>
+                <th style="padding:10px 8px;">Player / IGN</th>
+                <th style="padding:10px 8px;">Free Fire UID</th>
+                <th style="padding:10px 8px;">Kills</th>
+                <th style="padding:10px 8px;">Placement</th>
+                <th style="padding:10px 8px;">Bonus</th>
+                <th style="padding:10px 8px;">Total Score</th>
+                <th style="padding:10px 8px;">Prize</th>
+                <th style="padding:10px 8px;">Status</th>
+                <th style="padding:10px 8px; text-align:right;">Admin Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${standings.map((p, idx) => {
+                const rank = idx + 1;
+                const isVerified = p.status === 'VERIFIED';
+                return `
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <td style="padding:10px 8px; font-weight:800; color:${rank === 1 ? '#ffd700' : rank <= 3 ? 'var(--neon-cyan)' : '#fff'};">#${rank}</td>
+                    <td style="padding:10px 8px; font-weight:700; color:#fff;">${p.name}</td>
+                    <td style="padding:10px 8px; color:var(--text-secondary); font-family:monospace;">${p.uid}</td>
+                    <td style="padding:10px 8px; color:var(--neon-orange);">${p.kills} (${p.killPoints || p.kills * rules.perKill}p)</td>
+                    <td style="padding:10px 8px; color:var(--neon-cyan);">#${p.placement} (${p.placementPoints || 0}p)</td>
+                    <td style="padding:10px 8px; color:#ffd700;">+${p.bonusPoints || 0}p</td>
+                    <td style="padding:10px 8px; font-weight:800; font-size:13px; color:var(--neon-green);">${p.totalPoints} Pts</td>
+                    <td style="padding:10px 8px; color:var(--neon-green);">${p.prizeWon > 0 ? `₹${p.prizeWon}` : '-'}</td>
+                    <td style="padding:10px 8px;">
+                      <span class="status-badge ${isVerified ? 'approved' : 'pending'}" style="font-size:9px;">
+                        ${isVerified ? 'Verified' : 'Provisional'}
+                      </span>
+                    </td>
+                    <td style="padding:10px 8px; text-align:right;">
+                      <button class="btn btn-secondary" style="font-size:10px; padding:4px 8px;" onclick="openAdminCorrectResultModal('${p.uid}', '${p.name}')">
+                        <i class="fa-solid fa-pen-to-square"></i> Correct
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function verifyAndFinalizeTournamentResults() {
+      if (!confirm(`Verify and finalize official results for tournament ${currentAdminResultsTourneyId}? This will lock the standings and verify prize payouts.`)) return;
+
+      let standings = getTourneyStandings(currentAdminResultsTourneyId);
+      standings = standings.map(p => ({
+        ...p,
+        status: "VERIFIED",
+        isLive: false,
+        verifiedAt: new Date().toISOString()
+      }));
+
+      localStorage.setItem(`ffa_tourney_leaderboard_${currentAdminResultsTourneyId}`, JSON.stringify(standings));
+
+      if (database && firebaseInitialized) {
+        const updates = {};
+        standings.forEach(p => {
+          updates[`tournamentLeaderboards/${currentAdminResultsTourneyId}/${p.uid}`] = p;
+        });
+        database.ref().update(updates);
+      }
+
+      recordAudit("VERIFIED_STANDINGS", `Finalized and locked official leaderboard results for tournament ${currentAdminResultsTourneyId}`);
+      renderAdminTourneyStandings();
+      renderAdminTourneyMetaBanner();
+      alert(`Tournament ${currentAdminResultsTourneyId} standings have been verified and officially published!`);
+    }
+
+    function recalculateCurrentTournamentScores(silent = false) {
+      const rules = getAdminScoringRules();
+      const tourneys = getAdminTournaments();
+      const t = tourneys.find(x => x.id === currentAdminResultsTourneyId) || { perKill: rules.perKill, prizeFirst: 1000, prizeSecond: 500, prizeThird: 300 };
+
+      let standings = getTourneyStandings(currentAdminResultsTourneyId);
+      standings = standings.map(p => {
+        const killPoints = p.kills * (t.perKill || rules.perKill);
+        const placementPoints = rules.placementPointsMap[p.placement] || 0;
+        const totalPoints = killPoints + placementPoints + (p.bonusPoints || 0);
+
+        let prizeWon = 0;
+        if (p.placement === 1) prizeWon = t.prizeFirst || 1000;
+        else if (p.placement === 2) prizeWon = t.prizeSecond || 500;
+        else if (p.placement === 3) prizeWon = t.prizeThird || 300;
+
+        return {
+          ...p,
+          killPoints,
+          placementPoints,
+          totalPoints,
+          prizeWon
+        };
+      });
+
+      localStorage.setItem(`ffa_tourney_leaderboard_${currentAdminResultsTourneyId}`, JSON.stringify(standings));
+
+      if (database && firebaseInitialized) {
+        const updates = {};
+        standings.forEach(p => {
+          updates[`tournamentLeaderboards/${currentAdminResultsTourneyId}/${p.uid}`] = p;
+        });
+        database.ref().update(updates);
+      }
+
+      recordAudit("RECALCULATED_SCORES", `Recalculated scores for tournament ${currentAdminResultsTourneyId} with active scoring rules (1 Kill = ${rules.perKill} Pts).`);
+      renderAdminTourneyStandings();
+      renderAdminTourneyMetaBanner();
+
+      if (!silent) {
+        alert(`Standings and scores for tournament ${currentAdminResultsTourneyId} have been recalculated with active scoring rules.`);
+      }
+    }
+
+    function openAdminCorrectResultModal(playerUid, playerName) {
+      const standings = getTourneyStandings(currentAdminResultsTourneyId);
+      const p = standings.find(x => x.uid === playerUid);
+      if (!p) {
+        alert("Player not found in tournament standings.");
+        return;
+      }
+
+      document.getElementById("correctTourneyId").value = currentAdminResultsTourneyId;
+      document.getElementById("correctPlayerUid").value = playerUid;
+      document.getElementById("correctPlayerName").innerText = p.name;
+      document.getElementById("correctPlayerUidDisplay").innerText = p.uid;
+      document.getElementById("correctCurrentScoreDisplay").innerText = `${p.totalPoints} Pts (${p.kills} Kills, #${p.placement} Placement)`;
+      document.getElementById("correctNewKills").value = p.kills;
+      document.getElementById("correctNewPlacement").value = p.placement;
+      document.getElementById("correctNewBonus").value = p.bonusPoints || 0;
+      document.getElementById("correctReason").value = "";
+
+      openAdminModal("modalAdminCorrectResult");
+    }
+
+    function submitAdminResultCorrection(event) {
+      event.preventDefault();
+      const tourneyId = document.getElementById("correctTourneyId").value;
+      const playerUid = document.getElementById("correctPlayerUid").value;
+      const newKills = parseInt(document.getElementById("correctNewKills").value);
+      const newPlacement = parseInt(document.getElementById("correctNewPlacement").value);
+      const newBonus = parseInt(document.getElementById("correctNewBonus").value) || 0;
+      const reason = document.getElementById("correctReason").value.trim();
+
+      if (!reason || reason.length < 8) {
+        alert("Please provide a mandatory, detailed justification reason for this score override.");
+        return;
+      }
+
+      let standings = getTourneyStandings(tourneyId);
+      const idx = standings.findIndex(x => x.uid === playerUid);
+      if (idx === -1) {
+        alert("Target participant not found.");
+        return;
+      }
+
+      const oldPlayer = standings[idx];
+      const rules = getAdminScoringRules();
+      const tourneys = getAdminTournaments();
+      const t = tourneys.find(x => x.id === tourneyId) || { perKill: rules.perKill };
+
+      const previousValues = {
+        kills: oldPlayer.kills,
+        placement: oldPlayer.placement,
+        bonusPoints: oldPlayer.bonusPoints || 0,
+        totalPoints: oldPlayer.totalPoints,
+        status: oldPlayer.status
+      };
+
+      const newKillPoints = newKills * (t.perKill || rules.perKill);
+      const newPlacePoints = rules.placementPointsMap[newPlacement] || 0;
+      const newTotalPoints = newKillPoints + newPlacePoints + newBonus;
+
+      let prizeWon = 0;
+      if (newPlacement === 1) prizeWon = t.prizeFirst || 1000;
+      else if (newPlacement === 2) prizeWon = t.prizeSecond || 500;
+      else if (newPlacement === 3) prizeWon = t.prizeThird || 300;
+
+      const newValues = {
+        kills: newKills,
+        placement: newPlacement,
+        bonusPoints: newBonus,
+        totalPoints: newTotalPoints,
+        prizeWon
+      };
+
+      standings[idx] = {
+        ...oldPlayer,
+        kills: newKills,
+        placement: newPlacement,
+        bonusPoints: newBonus,
+        killPoints: newKillPoints,
+        placementPoints: newPlacePoints,
+        totalPoints: newTotalPoints,
+        prizeWon,
+        status: "VERIFIED",
+        lastCorrectedAt: new Date().toISOString(),
+        correctedBy: "admin-auth"
+      };
+
+      localStorage.setItem(`ffa_tourney_leaderboard_${tourneyId}`, JSON.stringify(standings));
+
+      // Create Audit Log with mandatory tracking fields
+      const auditEntry = {
+        action: "RESULT_CORRECTION",
+        details: `Manual score override for ${oldPlayer.name} (UID: ${playerUid}) in ${tourneyId}: Kills ${previousValues.kills}->${newKills}, Placement #${previousValues.placement}->#${newPlacement}, Points ${previousValues.totalPoints}->${newTotalPoints}. Reason: ${reason}`,
+        adminUid: "admin-master-uid",
+        admin: "admin-auth",
+        tournamentId: tourneyId,
+        playerId: playerUid,
+        previousValues: previousValues,
+        newValues: newValues,
+        reason: reason,
+        timestamp: new Date().toISOString()
+      };
+
+      auditLogs.unshift(auditEntry);
+      localStorage.setItem('ffa_audit_logs', JSON.stringify(auditLogs));
+
+      if (database && firebaseInitialized) {
+        database.ref(`auditLogs/${Date.now()}`).set(auditEntry);
+        database.ref(`tournamentLeaderboards/${tourneyId}/${playerUid}`).set(standings[idx]);
+      }
+
+      closeAdminModal("modalAdminCorrectResult");
+      renderAdminTourneyStandings();
+      renderAdminTourneyMetaBanner();
+      renderAdminResultCorrectionsAudit();
+      alert(`Result for ${oldPlayer.name} updated and audit log committed successfully!`);
+    }
+
+    function renderAdminPlayerStats() {
+      const container = document.getElementById("adminPlayerStatsList");
+      if (!container) return;
+
+      const searchVal = (document.getElementById("adminPlayerStatsSearch")?.value || "").trim().toLowerCase();
+      const players = [
+        { rank: 1, name: "ViperKing", uid: "7812904812", tourneys: 32, wins: 28, top3: 31, kills: 342, points: 2840, earnings: 4200, tier: "Elite" },
+        { rank: 2, name: "ApexPredator", uid: "789102451", tourneys: 29, wins: 23, top3: 27, kills: 295, points: 2410, earnings: 3500, tier: "Elite" },
+        { rank: 3, name: "FlameSniper", uid: "672910481", tourneys: 25, wins: 19, top3: 23, kills: 260, points: 2150, earnings: 2900, tier: "Pro" },
+        { rank: 4, name: "ThunderBolt", uid: "891029481", tourneys: 22, wins: 17, top3: 20, kills: 230, points: 1980, earnings: 2400, tier: "Pro" },
+        { rank: 5, name: "GhostNinja", uid: "991024810", tourneys: 20, wins: 15, top3: 18, kills: 215, points: 1820, earnings: 2100, tier: "Pro" },
+        { rank: 6, name: "IronClad", uid: "551029384", tourneys: 18, wins: 14, top3: 17, kills: 185, points: 1690, earnings: 1800, tier: "Pro" },
+        { rank: 7, name: "ShadowHunter", uid: "6829401827", tourneys: 16, wins: 12, top3: 15, kills: 148, points: 1520, earnings: 1450, tier: "Pro" },
+        { rank: 8, name: "NightStalker", uid: "441029481", tourneys: 14, wins: 11, top3: 13, kills: 135, points: 1390, earnings: 1200, tier: "Rising" },
+        { rank: 9, name: "BlazeMaster", uid: "331029481", tourneys: 12, wins: 10, top3: 11, kills: 128, points: 1280, earnings: 1050, tier: "Rising" },
+        { rank: 10, name: "CyberWolf", uid: "221029481", tourneys: 10, wins: 9, top3: 10, kills: 110, points: 1150, earnings: 900, tier: "Rising" }
+      ];
+
+      const filtered = players.filter(p => !searchVal || p.name.toLowerCase().includes(searchVal) || String(p.uid).includes(searchVal));
+
+      container.innerHTML = `
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
+            <thead>
+              <tr style="background:#090c13; color:var(--text-muted); border-bottom:1px solid var(--surface-border);">
+                <th style="padding:10px 8px;">Overall Rank</th>
+                <th style="padding:10px 8px;">Player / IGN</th>
+                <th style="padding:10px 8px;">FF UID</th>
+                <th style="padding:10px 8px;">Matches</th>
+                <th style="padding:10px 8px;">Wins</th>
+                <th style="padding:10px 8px;">Top 3</th>
+                <th style="padding:10px 8px;">Kills</th>
+                <th style="padding:10px 8px;">Total Points</th>
+                <th style="padding:10px 8px;">Verified Winnings</th>
+                <th style="padding:10px 8px;">Skill Tier</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map(p => `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <td style="padding:10px 8px; font-weight:800; color:${p.rank === 1 ? '#ffd700' : 'var(--neon-cyan)'};">#${p.rank}</td>
+                  <td style="padding:10px 8px; font-weight:700; color:#fff;">${p.name}</td>
+                  <td style="padding:10px 8px; color:var(--text-secondary); font-family:monospace;">${p.uid}</td>
+                  <td style="padding:10px 8px;">${p.tourneys}</td>
+                  <td style="padding:10px 8px; color:#ffd700; font-weight:700;">${p.wins}</td>
+                  <td style="padding:10px 8px; color:var(--neon-cyan);">${p.top3}</td>
+                  <td style="padding:10px 8px; color:var(--neon-orange);">${p.kills}</td>
+                  <td style="padding:10px 8px; font-weight:800; color:var(--neon-green);">${p.points} Pts</td>
+                  <td style="padding:10px 8px; color:var(--neon-green);">₹${p.earnings.toLocaleString()}</td>
+                  <td style="padding:10px 8px;"><span class="status-badge" style="background:rgba(0,229,255,0.15); color:var(--neon-cyan);">${p.tier}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderAdminResultCorrectionsAudit() {
+      const container = document.getElementById("adminResultCorrectionsAuditList");
+      if (!container) return;
+
+      const corrections = auditLogs.filter(l => l.action === "RESULT_CORRECTION");
+      if (corrections.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No result corrections recorded yet. All results match original arbiter room recordings.</div>`;
+        return;
+      }
+
+      container.innerHTML = corrections.map(c => `
+        <div class="admin-table-item" style="border-left:3px solid var(--neon-orange); margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <strong style="color:#fff; font-size:13px;">${c.details}</strong>
+            <span style="font-size:10px; color:var(--text-muted);">${new Date(c.timestamp).toLocaleString()}</span>
+          </div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:6px; padding:8px; margin:6px 0; font-size:11px;">
+            <div style="color:var(--neon-orange); font-weight:700; margin-bottom:2px;">
+              <i class="fa-solid fa-circle-info"></i> Reason: "${c.reason || 'Manual Arbiter Correction'}"
+            </div>
+            <div style="color:var(--text-secondary);">
+              Admin: <span style="color:#fff;">${c.admin || 'admin-auth'}</span> • Tourney: <span style="color:var(--neon-cyan);">${c.tournamentId}</span> • Player UID: <span style="color:#fff;">${c.playerId}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderResultsCenter() {
+      // 1. Populate dropdown
+      const sel = document.getElementById("adminResultsTourneySelect");
+      if (sel) {
+        const tourneys = getAdminTournaments();
+        sel.innerHTML = tourneys.map(t => `
+          <option value="${t.id}" ${t.id === currentAdminResultsTourneyId ? 'selected' : ''}>
+            ${t.id}: ${t.title} (${t.mode} • ${t.date})
+          </option>
+        `).join('');
+      }
+
+      // 2. Render subtabs
+      renderAdminTourneyMetaBanner();
+      renderAdminTourneyStandings();
+      renderDisputesTab();
+      loadScoringRulesToForm();
+      renderAdminPlayerStats();
+      renderAdminResultCorrectionsAudit();
+
+      const disputeBadge = document.getElementById("badgeAdminDisputes");
+      if (disputeBadge) {
+        disputeBadge.innerText = (allDisputes || []).filter(d => d.status === 'UNDER_REVIEW' || d.status === 'PENDING').length;
+      }
+    }
+
+    function renderDisputesTab() {
+      const container = document.getElementById("adminDisputesList");
+      if (!container) return;
+      if (allDisputes.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No active dispute tickets.</div>`;
+        return;
+      }
+
+      container.innerHTML = allDisputes.map(d => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <strong style="font-size:13px; color:#fff;">Ticket: ${d.disputeId} • Match: ${d.matchId}</strong>
+            <span class="status-badge pending">${d.status}</span>
+          </div>
+          <div style="font-size:12px; color:var(--neon-orange); font-weight:700;">Reason: ${d.reason}</div>
+          <p style="font-size:12px; color:var(--text-secondary); margin:6px 0;">${d.description}</p>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Ref Evidence: ${d.evidenceRef || 'None'} • By: ${d.userId}</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary" style="font-size:10px; padding:4px 10px;" onclick="resolveDisputeTicket('${d.disputeId}')">
+              <i class="fa-solid fa-check"></i> Accept Dispute
+            </button>
+            <button class="btn btn-secondary" style="font-size:10px; padding:4px 10px;" onclick="dismissDisputeTicket('${d.disputeId}')">
+              <i class="fa-solid fa-xmark"></i> Dismiss Claim
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function resolveDisputeTicket(disputeId) {
+      const d = allDisputes.find(x => x.disputeId === disputeId);
+      if (!d) return;
+      d.status = "RESOLVED";
+      localStorage.setItem('ffa_disputes', JSON.stringify(allDisputes));
+      recordAudit("DISPUTE_RESOLVED", `Resolved match dispute ${disputeId} for ${d.matchId}`);
+      renderResultsCenter();
+      alert(`Dispute ${disputeId} accepted. You can now use the Correct Result tool to adjust the match standing.`);
+    }
+
+    function dismissDisputeTicket(disputeId) {
+      const d = allDisputes.find(x => x.disputeId === disputeId);
+      if (!d) return;
+      d.status = "REJECTED";
+      localStorage.setItem('ffa_disputes', JSON.stringify(allDisputes));
+      recordAudit("DISPUTE_DISMISSED", `Dismissed dispute ticket ${disputeId} for ${d.matchId}`);
+      renderResultsCenter();
+      alert(`Dispute ticket ${disputeId} dismissed.`);
+    }
+
+    function renderAuditTab() {
+      const container = document.getElementById("adminAuditList");
+      if (auditLogs.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No audit records.</div>`;
+        return;
+      }
+
+      container.innerHTML = auditLogs.map(l => `
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--surface-border); font-size:12px;">
+          <div>
+            <strong style="color:var(--neon-cyan);">${l.action}</strong>
+            <span style="color:var(--text-secondary); margin-left:6px;">${l.details}</span>
+          </div>
+          <span style="color:var(--text-muted); font-size:11px;">${new Date(l.timestamp).toLocaleTimeString()}</span>
+        </div>
+      `).join('');
+    }
+
+    function recordAudit(action, details) {
+      auditLogs.unshift({
+        action: action,
+        details: details,
+        admin: "admin-auth",
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('ffa_audit_logs', JSON.stringify(auditLogs));
+    }
+
+    // ==========================================
+    // TOURNAMENT MANAGEMENT
+    // ==========================================
+    function getAdminTournaments() {
+      return JSON.parse(localStorage.getItem('ffa_tournaments')) || [
+        {
+          id: "T-101",
+          title: "Bermuda Clash Squad Masters",
+          mode: "Squad",
+          map: "Bermuda",
+          date: "Tonight",
+          time: "7:00 PM",
+          entryFee: 50,
+          totalSlots: 48,
+          filledSlots: 42,
+          prizePool: 2000,
+          prizeFirst: 1000,
+          prizeSecond: 500,
+          perKill: 25,
+          status: "REGISTRATION_OPEN",
+          banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80",
+          roomId: "",
+          roomPassword: ""
+        },
+        {
+          id: "T-102",
+          title: "Purgatory Duo Headshot Cup",
+          mode: "Duo",
+          map: "Purgatory",
+          date: "Tomorrow",
+          time: "5:00 PM",
+          entryFee: 30,
+          totalSlots: 50,
+          filledSlots: 50,
+          prizePool: 1200,
+          prizeFirst: 600,
+          prizeSecond: 300,
+          perKill: 15,
+          status: "CHECKIN_OPEN",
+          banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
+          roomId: "8912401",
+          roomPassword: "8899"
+        },
+        {
+          id: "T-103",
+          title: "Kalahari Solo Survival Cup",
+          mode: "Solo",
+          map: "Kalahari",
+          date: "Saturday",
+          time: "8:30 PM",
+          entryFee: 0,
+          totalSlots: 48,
+          filledSlots: 26,
+          prizePool: 500,
+          prizeFirst: 250,
+          prizeSecond: 150,
+          perKill: 5,
+          status: "REGISTRATION_OPEN",
+          banner: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80",
+          roomId: "",
+          roomPassword: ""
+        }
+      ];
+    }
+
+    function renderAdminTournaments() {
+      const container = document.getElementById("adminTournamentsList");
+      if (!container) return;
+
+      let tourneys = getAdminTournaments();
+      if (currentAdminTourneyFilter !== 'ALL') {
+        tourneys = tourneys.filter(t => t.status.includes(currentAdminTourneyFilter));
+      }
+
+      if (tourneys.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No tournaments in this category.</div>`;
+        return;
+      }
+
+      container.innerHTML = tourneys.map(t => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+            <div>
+              <strong style="font-size:15px; color:#fff;">${t.title}</strong>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                ID: <code>${t.id}</code> • Mode: <strong style="color:var(--neon-cyan);">${t.mode}</strong> • Map: <strong>${t.map}</strong> • Schedule: ${t.date} ${t.time}
+              </div>
+            </div>
+            <div>
+              <span class="status-badge ${t.status.includes('OPEN') ? 'approved' : t.status === 'LIVE' ? 'rejected' : 'pending'}">${t.status}</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:6px; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; font-size:11px; margin-bottom:10px;">
+            <div>Slots: <strong>${t.filledSlots} / ${t.totalSlots}</strong></div>
+            <div>Entry Fee: <strong style="color:var(--neon-amber);">${t.entryFee === 0 ? 'FREE' : t.entryFee + ' Coins'}</strong></div>
+            <div>Prize: <strong style="color:var(--neon-green);">${t.prizePool} Coins</strong></div>
+            <div>Per Kill: <strong>+${t.perKill}</strong></div>
+            <div>Room Info: <strong style="color:${t.roomId ? 'var(--neon-cyan)' : 'var(--text-muted)'};">${t.roomId ? 'ID ' + t.roomId + ' / ' + t.roomPassword : 'Not Released'}</strong></div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="openRoomReleaseModal('${t.id}')">
+              <i class="fa-solid fa-key" style="color:var(--neon-green);"></i> Release Room ID
+            </button>
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="openCreateTournamentModal('${t.id}')">
+              <i class="fa-solid fa-pen"></i> Edit
+            </button>
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="toggleTournamentStatus('${t.id}', 'LIVE')">
+              <i class="fa-solid fa-tower-broadcast" style="color:var(--neon-red);"></i> Set Live
+            </button>
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="toggleTournamentStatus('${t.id}', 'COMPLETED')">
+              <i class="fa-solid fa-flag-checkered"></i> Complete
+            </button>
+            <button class="btn btn-reject" style="font-size:11px;" onclick="cancelTournamentWithRefund('${t.id}')">
+              <i class="fa-solid fa-ban"></i> Cancel & Auto-Refund
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterAdminTournaments(filter) {
+      currentAdminTourneyFilter = filter;
+      ['All', 'Reg', 'Checkin', 'Live', 'Completed'].forEach(k => {
+        const btn = document.getElementById(`tourneyFilter${k}`);
+        if (btn) btn.classList.toggle('active', k.toUpperCase() === filter.toUpperCase());
+      });
+      renderAdminTournaments();
+    }
+
+    function openCreateTournamentModal(tourneyId) {
+      const tourneys = getAdminTournaments();
+      const t = tourneyId ? tourneys.find(x => x.id === tourneyId) : null;
+
+      document.getElementById("modalTourneyHeading").innerText = t ? "Edit Tournament" : "Create Tournament";
+      document.getElementById("adminTourneyId").value = t ? t.id : "";
+      document.getElementById("adminTourneyTitle").value = t ? t.title : "";
+      document.getElementById("adminTourneyMode").value = t ? t.mode : "Solo";
+      document.getElementById("adminTourneyMap").value = t ? t.map : "Bermuda";
+      document.getElementById("adminTourneyDate").value = t && t.date && t.date.includes('-') ? t.date : new Date().toISOString().split('T')[0];
+      document.getElementById("adminTourneyTime").value = t ? t.time : "7:00 PM";
+      document.getElementById("adminTourneyFee").value = t ? t.entryFee : 0;
+      document.getElementById("adminTourneySlots").value = t ? t.totalSlots : 48;
+      document.getElementById("adminTourneyPrize1").value = t ? t.prizeFirst : 300;
+      document.getElementById("adminTourneyPrize2").value = t ? t.prizeSecond : 150;
+      document.getElementById("adminTourneyPerKill").value = t ? t.perKill : 15;
+      document.getElementById("adminTourneyBanner").value = t ? t.banner : "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80";
+
+      openAdminModal("modalAdminTournament");
+    }
+
+    function saveAdminTournament(event) {
+      event.preventDefault();
+      const id = document.getElementById("adminTourneyId").value || "T-" + Math.floor(100 + Math.random() * 900);
+      const title = document.getElementById("adminTourneyTitle").value.trim();
+      const mode = document.getElementById("adminTourneyMode").value;
+      const map = document.getElementById("adminTourneyMap").value;
+      const date = document.getElementById("adminTourneyDate").value;
+      const time = document.getElementById("adminTourneyTime").value.trim();
+      const entryFee = parseInt(document.getElementById("adminTourneyFee").value) || 0;
+      const totalSlots = parseInt(document.getElementById("adminTourneySlots").value) || 48;
+      const prize1 = parseInt(document.getElementById("adminTourneyPrize1").value) || 300;
+      const prize2 = parseInt(document.getElementById("adminTourneyPrize2").value) || 150;
+      const perKill = parseInt(document.getElementById("adminTourneyPerKill").value) || 15;
+      const banner = document.getElementById("adminTourneyBanner").value;
+
+      let tourneys = getAdminTournaments();
+      const existingIdx = tourneys.findIndex(x => x.id === id);
+
+      const tourneyObj = {
+        id: id,
+        title: title,
+        mode: mode,
+        map: map,
+        date: date,
+        time: time,
+        entryFee: entryFee,
+        totalSlots: totalSlots,
+        filledSlots: existingIdx >= 0 ? tourneys[existingIdx].filledSlots : 0,
+        prizePool: prize1 + prize2 + (perKill * 20),
+        prizeFirst: prize1,
+        prizeSecond: prize2,
+        perKill: perKill,
+        status: existingIdx >= 0 ? tourneys[existingIdx].status : "REGISTRATION_OPEN",
+        banner: banner,
+        roomId: existingIdx >= 0 ? tourneys[existingIdx].roomId : "",
+        roomPassword: existingIdx >= 0 ? tourneys[existingIdx].roomPassword : ""
+      };
+
+      if (existingIdx >= 0) {
+        tourneys[existingIdx] = tourneyObj;
+      } else {
+        tourneys.unshift(tourneyObj);
+      }
+
+      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      recordAudit("TOURNAMENT_SAVED", `Saved tournament ${id}: ${title} (${mode}, ${map})`);
+      closeAdminModal("modalAdminTournament");
+      renderAdminTournaments();
+      alert(`Tournament "${title}" saved successfully!`);
+    }
+
+    function openRoomReleaseModal(tourneyId) {
+      const tourneys = getAdminTournaments();
+      const t = tourneys.find(x => x.id === tourneyId);
+      if (!t) return;
+
+      document.getElementById("releaseTourneyId").value = t.id;
+      document.getElementById("releaseTourneyName").innerText = `${t.title} (${t.id})`;
+      document.getElementById("releaseRoomId").value = t.roomId || "";
+      document.getElementById("releaseRoomPass").value = t.roomPassword || "";
+
+      openAdminModal("modalAdminRoomRelease");
+    }
+
+    function executeRoomRelease(event) {
+      event.preventDefault();
+      const id = document.getElementById("releaseTourneyId").value;
+      const roomId = document.getElementById("releaseRoomId").value.trim();
+      const roomPass = document.getElementById("releaseRoomPass").value.trim();
+
+      let tourneys = getAdminTournaments();
+      const idx = tourneys.findIndex(x => x.id === id);
+      if (idx === -1) return;
+
+      tourneys[idx].roomId = roomId;
+      tourneys[idx].roomPassword = roomPass;
+      tourneys[idx].status = "CHECKIN_OPEN";
+      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+
+      // Also dispatch alert to shared emergency room node
+      const emergencyAlert = {
+        tournamentId: id,
+        tournamentTitle: tourneys[idx].title,
+        newRoomId: roomId,
+        newRoomPass: roomPass,
+        reason: "Official room credentials published by Arbiter",
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('ffa_emergency_room_change', JSON.stringify(emergencyAlert));
+
+      recordAudit("ROOM_RELEASED", `Released Room ID ${roomId} for match ${id}`);
+      closeAdminModal("modalAdminRoomRelease");
+      renderAdminTournaments();
+      alert(`Room credentials released! All registered players alerted.`);
+    }
+
+    function toggleTournamentStatus(tourneyId, newStatus) {
+      let tourneys = getAdminTournaments();
+      const idx = tourneys.findIndex(x => x.id === tourneyId);
+      if (idx === -1) return;
+
+      tourneys[idx].status = newStatus;
+      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      recordAudit("TOURNAMENT_STATUS", `Changed tournament ${tourneyId} status to ${newStatus}`);
+      renderAdminTournaments();
+      alert(`Tournament status set to ${newStatus}`);
+    }
+
+    function cancelTournamentWithRefund(tourneyId) {
+      if (!confirm(`Are you sure you want to cancel tournament ${tourneyId}? This will automatically refund the entry fee to all registered players.`)) return;
+
+      let tourneys = getAdminTournaments();
+      const idx = tourneys.findIndex(x => x.id === tourneyId);
+      if (idx === -1) return;
+
+      const t = tourneys[idx];
+      t.status = "CANCELLED";
+      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+
+      // Process automatic entry fee refund
+      if (t.entryFee > 0) {
+        let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
+        if (currentUser) {
+          currentUser.coins = (currentUser.coins || 0) + t.entryFee;
+          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        }
+      }
+
+      recordAudit("TOURNAMENT_CANCELLED", `Cancelled tournament ${tourneyId} and processed player refunds.`);
+      renderAdminTournaments();
+      alert(`Tournament ${tourneyId} has been cancelled and player funds refunded.`);
+    }
+
+    // ==========================================
+    // USER ROSTER & COINS MODERATION
+    // ==========================================
+    function getAdminUsers() {
+      const activeUser = JSON.parse(localStorage.getItem('ffa_user'));
+      const sampleUsers = [
+        {
+          uid: "user-101",
+          username: "ShadowHunter",
+          displayName: "ShadowHunter",
+          playerId: "6829401827",
+          email: "shadow@freefirearena.com",
+          coins: 250,
+          matches: 34,
+          wins: 12,
+          kills: 148,
+          status: "ACTIVE"
+        },
+        {
+          uid: "user-102",
+          username: "ApexPredator",
+          displayName: "ApexPredator",
+          playerId: "789102451",
+          email: "apex@freefirearena.com",
+          coins: 520,
+          matches: 48,
+          wins: 23,
+          kills: 295,
+          status: "ACTIVE"
+        },
+        {
+          uid: "user-103",
+          username: "ViperKing",
+          displayName: "ViperKing",
+          playerId: "7812904812",
+          email: "viper@freefirearena.com",
+          coins: 980,
+          matches: 62,
+          wins: 28,
+          kills: 342,
+          status: "ACTIVE"
+        },
+        {
+          uid: "user-104",
+          username: "Hacker_Speed",
+          displayName: "Hacker_Speed",
+          playerId: "991024810",
+          email: "cheat@test.com",
+          coins: 10,
+          matches: 3,
+          wins: 3,
+          kills: 45,
+          status: "BANNED"
+        }
+      ];
+
+      if (activeUser && !sampleUsers.some(u => u.uid === activeUser.uid)) {
+        sampleUsers.unshift({
+          uid: activeUser.uid,
+          username: activeUser.username || activeUser.displayName || "Player",
+          displayName: activeUser.displayName || "Player",
+          playerId: activeUser.playerId || activeUser.ffUID || "N/A",
+          email: activeUser.email || "player@arena.com",
+          coins: activeUser.coins || 0,
+          matches: activeUser.matches || 0,
+          wins: activeUser.wins || 0,
+          kills: activeUser.kills || 0,
+          status: "ACTIVE"
+        });
+      }
+      return sampleUsers;
+    }
+
+    function renderAdminUsers() {
+      const container = document.getElementById("adminUsersList");
+      if (!container) return;
+
+      const q = (document.getElementById("adminUserSearchInput") ? document.getElementById("adminUserSearchInput").value : "").toLowerCase().trim();
+      let users = getAdminUsers();
+
+      if (q) {
+        users = users.filter(u => 
+          (u.username && u.username.toLowerCase().includes(q)) ||
+          (u.playerId && u.playerId.includes(q)) ||
+          (u.email && u.email.toLowerCase().includes(q)) ||
+          (u.uid && u.uid.toLowerCase().includes(q))
+        );
+      }
+
+      if (users.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No players matching "${q}".</div>`;
+        return;
+      }
+
+      container.innerHTML = users.map(u => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div>
+              <strong style="font-size:14px; color:#fff;">${u.username}</strong>
+              <div style="font-size:11px; color:var(--text-muted);">
+                UID: <code>${u.uid}</code> • Free Fire UID: <strong style="color:var(--neon-cyan);">${u.playerId}</strong> • ${u.email}
+              </div>
+            </div>
+            <div>
+              <span class="status-badge ${u.status === 'ACTIVE' ? 'approved' : 'rejected'}">${u.status}</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
+            <div>Balance: <strong style="color:var(--neon-green);">${u.coins} Coins</strong></div>
+            <div>Matches: <strong>${u.matches}</strong></div>
+            <div>Wins: <strong>${u.wins}</strong></div>
+            <div>Kills: <strong>${u.kills}</strong></div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="adminAdjustUserCoins('${u.uid}', true)">
+              <i class="fa-solid fa-plus" style="color:var(--neon-green);"></i> Add Coins
+            </button>
+            <button class="btn btn-secondary" style="font-size:11px;" onclick="adminAdjustUserCoins('${u.uid}', false)">
+              <i class="fa-solid fa-minus" style="color:var(--neon-amber);"></i> Deduct Coins
+            </button>
+            <button class="btn ${u.status === 'ACTIVE' ? 'btn-reject' : 'btn-approve'}" style="font-size:11px;" onclick="adminToggleBanUser('${u.uid}', '${u.status}')">
+              <i class="fa-solid ${u.status === 'ACTIVE' ? 'fa-ban' : 'fa-unlock'}"></i> ${u.status === 'ACTIVE' ? 'Ban Player' : 'Lift Ban'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterAdminUsers(q) {
+      renderAdminUsers();
+    }
+
+    function adminAdjustUserCoins(uid, isAdd) {
+      const amountStr = prompt(`Enter number of coins to ${isAdd ? 'CREDIT to' : 'DEDUCT from'} user ${uid}:`);
+      if (!amountStr) return;
+      const amount = parseInt(amountStr);
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid positive number.");
+        return;
+      }
+
+      const reason = prompt("Enter mandatory audit justification reason for this coin adjustment:");
+      if (!reason || !reason.trim()) {
+        alert("Adjustment cancelled. Audit reason is mandatory.");
+        return;
+      }
+
+      let activeUser = JSON.parse(localStorage.getItem('ffa_user'));
+      if (activeUser && activeUser.uid === uid) {
+        activeUser.coins = isAdd ? (activeUser.coins || 0) + amount : Math.max(0, (activeUser.coins || 0) - amount);
+        localStorage.setItem('ffa_user', JSON.stringify(activeUser));
+      }
+
+      recordAudit("MANUAL_BALANCE_ADJUST", `${isAdd ? 'Credited' : 'Deducted'} ${amount} coins for user ${uid}. Reason: ${reason.trim()}`);
+      renderAdminUsers();
+      alert(`User balance updated: ${isAdd ? '+' : '-'}${amount} Coins.`);
+    }
+
+    function adminToggleBanUser(uid, currentStatus) {
+      const newStatus = currentStatus === 'ACTIVE' ? 'BANNED' : 'ACTIVE';
+      const reason = prompt(`Enter reason for ${newStatus === 'BANNED' ? 'banning' : 'unbanning'} player ${uid}:`);
+      if (!reason) return;
+
+      recordAudit(newStatus === 'BANNED' ? "PLAYER_BANNED" : "PLAYER_UNBANNED", `Player ${uid} set to ${newStatus}. Reason: ${reason}`);
+      alert(`Player status updated to ${newStatus}.`);
+      renderAdminUsers();
+    }
+
+    // ==========================================
+    // ANNOUNCEMENTS MANAGEMENT
+    // ==========================================
+    function getAdminAnnouncements() {
+      return JSON.parse(localStorage.getItem('ffa_announcements')) || [
+        {
+          id: "ANN-1",
+          title: "SEASON 4 GRAND FINALS REGISTRATION IS OPEN!",
+          message: "Squad registrations now live. 2,000 Coins prize pool. Join before slots close!",
+          type: "LIVE",
+          target: "tournaments",
+          createdAt: new Date().toISOString()
+        }
+      ];
+    }
+
+    function renderAdminAnnouncements() {
+      const container = document.getElementById("adminAnnouncementsList");
+      if (!container) return;
+
+      const items = getAdminAnnouncements();
+      if (items.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:12px;">No active announcements published.</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(a => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <strong style="color:var(--neon-cyan); font-size:13px;">${a.title}</strong>
+            <button class="btn btn-reject" style="font-size:10px; padding:2px 8px;" onclick="deleteAdminAnnouncement('${a.id}')">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </div>
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">${a.message}</p>
+          <div style="font-size:10px; color:var(--text-muted);">
+            Type: <strong>${a.type}</strong> • Target: <strong>${a.target}</strong> • ${new Date(a.createdAt).toLocaleString()}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function postAdminAnnouncement(event) {
+      event.preventDefault();
+      const title = document.getElementById("announcementTitle").value.trim();
+      const body = document.getElementById("announcementBody").value.trim();
+      const type = document.getElementById("announcementType").value;
+      const target = document.getElementById("announcementTarget").value;
+
+      const items = getAdminAnnouncements();
+      const newAnn = {
+        id: "ANN-" + Math.floor(100 + Math.random() * 900),
+        title: title,
+        message: body,
+        type: type,
+        target: target,
+        createdAt: new Date().toISOString()
+      };
+
+      items.unshift(newAnn);
+      localStorage.setItem('ffa_announcements', JSON.stringify(items));
+      recordAudit("ANNOUNCEMENT_POSTED", `Published live banner: "${title}"`);
+      document.getElementById("announcementTitle").value = "";
+      document.getElementById("announcementBody").value = "";
+      renderAdminAnnouncements();
+      alert("Live announcement published to all player home screens!");
+    }
+
+    function deleteAdminAnnouncement(id) {
+      let items = getAdminAnnouncements();
+      items = items.filter(x => x.id !== id);
+      localStorage.setItem('ffa_announcements', JSON.stringify(items));
+      recordAudit("ANNOUNCEMENT_DELETED", `Removed announcement ${id}`);
+      renderAdminAnnouncements();
+    }
+
+    // ==========================================
+    // SUPPORT & INQUIRIES
+    // ==========================================
+    function renderAdminSupport() {
+      const container = document.getElementById("adminSupportList");
+      if (!container) return;
+
+      const tickets = JSON.parse(localStorage.getItem('ffa_support_tickets')) || [
+        {
+          id: "SUP-101",
+          userId: "user-102",
+          username: "ApexPredator",
+          subject: "Custom Room Entry Assistance",
+          message: "Need confirmation regarding slot #4 in Bermuda match tonight.",
+          status: "OPEN",
+          createdAt: new Date().toISOString()
+        }
+      ];
+
+      container.innerHTML = tickets.map(t => `
+        <div class="admin-table-item">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <strong style="color:#fff; font-size:13px;">${t.subject} (#${t.id})</strong>
+            <span class="status-badge ${t.status === 'OPEN' ? 'pending' : 'approved'}">${t.status}</span>
+          </div>
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">${t.message}</p>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11px; color:var(--text-muted);">From: ${t.username} (${t.userId})</span>
+            <button class="btn btn-secondary" style="font-size:11px; padding:4px 8px;" onclick="replyAdminSupport('${t.id}')">
+              <i class="fa-solid fa-reply"></i> Mark Resolved
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function replyAdminSupport(id) {
+      alert(`Support ticket #${id} marked as resolved.`);
+      recordAudit("SUPPORT_RESOLVED", `Resolved support ticket ${id}`);
+      renderAdminSupport();
+    }
+
+    // ==========================================
+    // AI ADMIN ASSISTANT
+    // ==========================================
+    function runAiQuickPrompt(promptText) {
+      document.getElementById("aiInputPrompt").value = promptText;
+      handleAiPromptSubmit();
+    }
+
+    function handleAiPromptSubmit(event) {
+      if (event) event.preventDefault();
+      const input = document.getElementById("aiInputPrompt");
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      const chatBox = document.getElementById("aiChatHistory");
+      chatBox.innerHTML += `
+        <div style="color:#fff; margin:8px 0; text-align:right;">
+          <strong>Arbiter:</strong> ${prompt}
+        </div>
+        <div style="color:var(--text-muted); font-size:11px;" id="aiLoadingIndicator">
+          <i class="fa-solid fa-spinner fa-spin"></i> AI analyzing tournament telemetry...
+        </div>
+      `;
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+
+      setTimeout(() => {
+        const loader = document.getElementById("aiLoadingIndicator");
+        if (loader) loader.remove();
+
+        let response = "";
+        const lower = prompt.toLowerCase();
+        if (lower.includes("financial") || lower.includes("payout") || lower.includes("queue")) {
+          const pending = allRedeems.filter(r => r.status === 'PENDING');
+          const totalCash = pending.reduce((sum, r) => sum + (r.amount || 0), 0);
+          response = `Found <strong>${pending.length} pending withdrawal requests</strong> totaling <strong>₹${totalCash}</strong>. Recommended action: Verify Khalti and eSewa accounts in the Redeems tab, issue manual payouts, and mark PAID once external confirmation is received.`;
+        } else if (lower.includes("room") || lower.includes("broadcast") || lower.includes("alert")) {
+          response = `Draft announcement ready: <em>"Attention Warriors! Room ID & Password for tonight's tournament have been published. Head to 'My Games' &gt; 'Room Details', copy the credentials, and join lobby within 10 minutes. Check-in is mandatory!"</em>`;
+        } else if (lower.includes("anti-cheat") || lower.includes("ban") || lower.includes("fraud")) {
+          response = `Anti-Cheat Analysis: 1 high-priority player report flagged for impossible headshot ratio (>85% over 3 matches). Arbiter action: Recommend issuing official match disqualification and 7-day tournament suspension.`;
+        } else if (lower.includes("point") || lower.includes("tie")) {
+          response = `Standard Free Fire Esports Rulebook: 1st Place = 12 Pts, 2nd = 9 Pts, 3rd = 8 Pts, 4th = 7 Pts, per kill = +1 Pt. Tie-breaker hierarchy: (1) Total kill points, (2) Highest single-round placement, (3) Damage dealt.`;
+        } else {
+          response = `Arbiter prompt evaluated: "${prompt}". Operating parameters are optimal. No critical match violations or anomalous balance changes detected. Ready for your next directive.`;
+        }
+
+        chatBox.innerHTML += `
+          <div style="color:var(--neon-cyan); margin:8px 0; background:rgba(0,229,255,0.04); border-left:2px solid var(--neon-cyan); padding:8px 10px; border-radius:6px;">
+            <i class="fa-solid fa-robot"></i> <strong>AI Assistant:</strong> ${response}
+          </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 700);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAdminAuth();
+      renderAdminData();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        ".validate": "root.child('users').child(auth.uid).child('isAdmin').val() === true || ((!data.exists() || (newData.child('isAdmin').val() === data.child('isAdmin').val() && newData.child('role').val() === data.child('role').val() && newData.child('coins').val() === data.child('coins').val())) && (!newData.hasChild('isAdmin') || newData.child('isAdmin').val() === false))"
+      }
+    },
+    "tournaments": {
+      ".read": "auth != null",
+      "$tournamentId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    "registrations": {
+      ".read": "auth != null",
+      "$regId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (!data.exists() && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('userId').val() === auth.uid && newData.child('userId').val() === auth.uid))"
+      }
+    },
+    "teams": {
+      ".read": "auth != null",
+      "$teamId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (!data.exists() && newData.child('captainId').val() === auth.uid) || (data.exists() && (data.child('captainId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)))"
+      }
+    },
+    "results": {
+      ".read": "auth != null",
+      "$matchId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || root.child('users').child(auth.uid).child('role').val() === 'Arbiter')"
+      }
+    },
+    "transactions": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "$txId": {
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+        }
+      }
+    },
+    "payments": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "$paymentId": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (auth.uid === $userId && (!data.exists() && newData.child('status').val() === 'PENDING' && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('status').val() === 'PENDING' && newData.child('status').val() === data.child('status').val() && newData.child('userId').val() === data.child('userId').val() && newData.child('paymentId').val() === data.child('paymentId').val() && newData.child('amount').val() === data.child('amount').val() && newData.child('coinAmount').val() === data.child('coinAmount').val())))"
+        }
+      }
+    },
+    "redeems": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "$redeemId": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (auth.uid === $userId && (!data.exists() && newData.child('status').val() === 'PENDING' && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('status').val() === 'PENDING' && newData.child('status').val() === data.child('status').val() && newData.child('userId').val() === data.child('userId').val() && newData.child('redeemId').val() === data.child('redeemId').val() && newData.child('amount').val() === data.child('amount').val())))"
+        }
+      }
+    },
+    "disputes": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "$disputeId": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (auth.uid === $uid && (!data.exists() && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('userId').val() === auth.uid && newData.child('userId').val() === auth.uid)))"
+        }
+      }
+    },
+    "reports": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true",
+      "$reportId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (!data.exists() && newData.child('reporterId').val() === auth.uid))"
+      }
+    },
+    "communityChats": {
+      ".read": "auth != null",
+      "$messageId": {
+        ".write": "auth != null && !root.child('chatRestrictions').child(auth.uid).child('muted').exists() && (newData.child('senderUid').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        ".validate": "newData.hasChildren(['messageId', 'senderUid', 'text', 'createdAt']) && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 250"
+      }
+    },
+    "tournamentChats": {
+      "$tournamentId": {
+        ".read": "auth != null",
+        "$messageId": {
+          ".write": "auth != null && !root.child('chatRestrictions').child(auth.uid).child('muted').exists() && (newData.child('senderUid').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+          ".validate": "newData.hasChildren(['messageId', 'senderUid', 'text', 'createdAt']) && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 250"
+        }
+      }
+    },
+    "notifications": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        "$notificationId": {
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+        }
+      }
+    },
+    "announcements": {
+      ".read": "auth != null",
+      "$announcementId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    "favoritePlayers": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$favId": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+    "paymentConfig": {
+      ".read": "auth != null",
+      "$method": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    "auditLogs": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true",
+      "$logId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    }
+  }
+}
