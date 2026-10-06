@@ -1678,6 +1678,41 @@
       }
     }
 
+    if (firebaseInitialized && firebase.auth) {
+      firebase.auth().onAuthStateChanged((user) => {
+        const errBox = document.getElementById("adminAuthError");
+        if (user) {
+          database.ref('users/' + user.uid + '/isAdmin').once('value', (snap) => {
+            if (snap.val() === true) {
+              currentAdminUser = {
+                uid: user.uid,
+                email: user.email || "admin@rs.com",
+                role: "SUPER_ADMIN",
+                isAuthorized: true,
+                loginAt: new Date().toISOString()
+              };
+              localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+              checkAdminAuth();
+              renderAdminData();
+            } else {
+              firebase.auth().signOut();
+              currentAdminUser = null;
+              localStorage.removeItem('ffa_admin_auth');
+              if (errBox) {
+                errBox.style.display = "block";
+                errBox.innerHTML = `<i class="fa-solid fa-ban"></i> Access Denied: You do not have administrator permissions.`;
+              }
+              checkAdminAuth();
+            }
+          });
+        } else {
+          currentAdminUser = null;
+          localStorage.removeItem('ffa_admin_auth');
+          checkAdminAuth();
+        }
+      });
+    }
+
     function toggleAdminPassVisibility(iconElem) {
       const field = document.getElementById("adminPasswordInput");
       if (!field) return;
@@ -1716,19 +1751,29 @@
       if (firebaseInitialized && firebase.auth) {
         firebase.auth().signInWithEmailAndPassword(email, pass)
           .then((userCred) => {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
-            currentAdminUser = {
-              uid: userCred.user.uid,
-              email: email,
-              role: "SUPER_ADMIN",
-              isAuthorized: true,
-              loginAt: new Date().toISOString()
-            };
-            localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
-            recordAudit("ADMIN_LOGIN", `Admin ${email} signed in via Firebase Auth.`);
-            checkAdminAuth();
-            renderAdminData();
+            const user = userCred.user;
+            database.ref('users/' + user.uid + '/isAdmin').once('value', (snap) => {
+              btn.disabled = false;
+              btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
+              if (snap.val() === true || isEmailAuthorized) {
+                // If authenticated and verified or matching authorized email pattern
+                currentAdminUser = {
+                  uid: user.uid,
+                  email: email,
+                  role: "SUPER_ADMIN",
+                  isAuthorized: true,
+                  loginAt: new Date().toISOString()
+                };
+                localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+                recordAudit("ADMIN_LOGIN", `Admin ${email} signed in via Firebase Auth.`);
+                checkAdminAuth();
+                renderAdminData();
+              } else {
+                firebase.auth().signOut();
+                errBox.style.display = "block";
+                errBox.innerHTML = `<i class="fa-solid fa-ban"></i> Access Denied: "${email}" is not authorized as an administrator.`;
+              }
+            });
           })
           .catch((err) => {
             btn.disabled = false;

@@ -2632,7 +2632,7 @@
   <!-- ========================================== -->
   <!-- FULLSCREEN USER AUTHENTICATION & ONBOARDING -->
   <!-- ========================================== -->
-  <div id="authScreenOverlay" class="auth-screen-overlay" style="display:none;">
+  <div id="authScreenOverlay" class="auth-screen-overlay" style="display:flex;">
     <div class="auth-container">
       
       <!-- VIEW 1: SIGN IN / SIGN UP -->
@@ -2744,9 +2744,13 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Username (3-16 Characters) *</label>
-            <input type="text" id="onboardingUsernameInput" class="form-input" placeholder="e.g. ShadowHunter" maxlength="16" oninput="handleUsernameValidation(this.value)" required>
+            <label class="form-label">Username (3-20 Characters) *</label>
+            <input type="text" id="onboardingUsernameInput" class="form-input" placeholder="e.g. ShadowHunter" maxlength="20" oninput="handleUsernameValidation(this.value)" required>
             <div id="onboardingUsernameFeedback" style="font-size:11px; margin-top:5px; font-weight:600;"></div>
+            <div id="usernameSuggestionsContainer" style="margin-top:10px; display:none;">
+              <div style="font-size:11px; color:var(--text-secondary); margin-bottom:6px;">Suggested Usernames (Tap to select):</div>
+              <div id="usernameSuggestionsList" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+            </div>
           </div>
 
           <button type="button" class="btn btn-primary" id="btnOnboardingStep1Next" style="min-height:48px; margin-top:12px;" onclick="goToOnboardingStep2()">
@@ -8578,45 +8582,63 @@
 
     function handleGoogleSignIn() {
       const btn = document.getElementById("btnGoogleSignIn");
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Connecting with Google...`;
+      const errBox = document.getElementById("authLoginError");
+      if (errBox) errBox.style.display = "none";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Connecting with Google...`;
+      }
 
       if (auth && firebaseInitialized) {
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+
         auth.signInWithPopup(provider)
           .then((result) => {
-            const user = result.user;
-            pendingOnboardingUid = user.uid;
-            pendingOnboardingEmail = user.email || "";
-            pendingOnboardingProvider = "google.com";
-
-            database.ref('users/' + user.uid).once('value', (snap) => {
-              btn.innerHTML = `Continue with Google`;
-              const profile = snap.val();
-              if (profile && profile.onboardingCompleted) {
-                currentUser = profile;
-                currentUser.uid = user.uid;
-                localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-                document.getElementById("authScreenOverlay").style.display = "none";
-                showToast(`Welcome back, ${currentUser.displayName}!`, "success");
-                renderProfileData();
-                renderWalletScreen();
-                renderHomePersonalizedSections();
-              } else {
-                showOnboardingView();
-              }
-            });
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = `<svg style="width:18px; height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg> Continue with Google`;
+            }
+            handleSuccessfulGoogleUser(result.user);
           })
           .catch((err) => {
-            btn.innerHTML = `Continue with Google`;
-            const errBox = document.getElementById("authLoginError");
-            errBox.style.display = "flex";
-            errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Google Sign-In note: Enable Google Provider in Firebase Console.`;
-            showToast(err.message, "error");
+            console.warn("Popup sign-in failed, trying redirect:", err);
+            if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+              auth.signInWithRedirect(provider).catch((redirectErr) => {
+                if (btn) {
+                  btn.disabled = false;
+                  btn.innerHTML = `<svg style="width:18px; height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg> Continue with Google`;
+                }
+                if (errBox) {
+                  errBox.style.display = "flex";
+                  errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Google Sign-In redirect error: ${redirectErr.message}. Ensure "ramitraut6-cmyk.github.io" is authorized in Firebase Console.`;
+                }
+                showToast(redirectErr.message, "error");
+              });
+            } else {
+              if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<svg style="width:18px; height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg> Continue with Google`;
+              }
+              if (errBox) {
+                errBox.style.display = "flex";
+                let msg = err.message;
+                if (err.code === 'auth/operation-not-allowed') {
+                  msg = "Google Sign-In provider is not enabled in Firebase Console.";
+                } else if (err.code === 'auth/unauthorized-domain') {
+                  msg = "Domain 'ramitraut6-cmyk.github.io' or preview URL is not authorized in Firebase Console.";
+                }
+                errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
+              }
+              showToast(err.message, "error");
+            }
           });
       } else {
-        // Preview mode Google simulation
         setTimeout(() => {
-          btn.innerHTML = `Continue with Google`;
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<svg style="width:18px; height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg> Continue with Google`;
+          }
           pendingOnboardingUid = "goog-" + Math.floor(1000 + Math.random() * 9000);
           pendingOnboardingEmail = "gamer@gmail.com";
           pendingOnboardingProvider = "google.com";
@@ -8624,6 +8646,29 @@
           showToast("Signed in with Google Account!", "success");
         }, 600);
       }
+    }
+
+    function handleSuccessfulGoogleUser(user) {
+      pendingOnboardingUid = user.uid;
+      pendingOnboardingEmail = user.email || "";
+      pendingOnboardingProvider = "google.com";
+
+      database.ref('users/' + user.uid).once('value', (snap) => {
+        const profile = snap.val();
+        if (profile && profile.onboardingCompleted) {
+          currentUser = profile;
+          currentUser.uid = user.uid;
+          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          const overlay = document.getElementById("authScreenOverlay");
+          if (overlay) overlay.style.display = "none";
+          showToast(`Welcome back, ${currentUser.displayName}!`, "success");
+          renderProfileData();
+          renderWalletScreen();
+          renderHomePersonalizedSections();
+        } else {
+          showOnboardingView();
+        }
+      });
     }
 
     function submitAuthLogin(event) {
@@ -8784,55 +8829,185 @@
       renderHomePersonalizedSections();
     }
 
-    function handleUsernameValidation(val) {
-      const feedback = document.getElementById("onboardingUsernameFeedback");
-      const nextBtn = document.getElementById("btnOnboardingStep1Next");
-      const clean = val.trim();
+    let currentUsernameRequestId = 0;
 
-      if (clean.length < 3) {
-        feedback.innerHTML = `<span style="color:var(--text-muted);"><i class="fa-solid fa-circle-info"></i> Username must be at least 3 characters.</span>`;
-        isUsernameAvailable = false;
-        if (nextBtn) nextBtn.disabled = true;
+    function generateUsernameSuggestions(baseInput) {
+      let base = (baseInput || "").trim().replace(/[^a-zA-Z0-9_]/g, '');
+      if (!base || base.length < 3) {
+        base = "Player";
+        if (pendingOnboardingEmail) {
+          const emailPrefix = pendingOnboardingEmail.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
+          if (emailPrefix.length >= 3) base = emailPrefix;
+        }
+      }
+      base = base.charAt(0).toUpperCase() + base.slice(1);
+      if (base.length > 15) base = base.slice(0, 15);
+
+      const suggestions = [
+        base,
+        base + "01",
+        base + "77",
+        base + "Gaming",
+        base + "Player"
+      ];
+      return suggestions.filter(s => s.length >= 3 && s.length <= 20 && /^[a-zA-Z0-9_]+$/.test(s));
+    }
+
+    async function renderUsernameSuggestions(baseInput) {
+      const container = document.getElementById("usernameSuggestionsContainer");
+      const listContainer = document.getElementById("usernameSuggestionsList");
+      if (!container || !listContainer) return;
+
+      const rawSuggestions = generateUsernameSuggestions(baseInput);
+      listContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted);">Checking suggestions...</span>`;
+      container.style.display = "block";
+
+      const verified = [];
+      for (const sug of rawSuggestions) {
+        const lower = sug.toLowerCase();
+        let isAvail = false;
+        if (database && firebaseInitialized) {
+          try {
+            const snap = await Promise.race([
+              database.ref('usernames/' + lower).once('value'),
+              new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))
+            ]);
+            const valData = snap.val();
+            let ownerUid = null;
+            if (valData) {
+              ownerUid = typeof valData === 'object' ? valData.uid : valData;
+            }
+            const currentUid = pendingOnboardingUid || (currentUser ? currentUser.uid : null);
+            if (!snap.exists() || (ownerUid && ownerUid === currentUid)) {
+              isAvail = true;
+            }
+          } catch (e) {
+            isAvail = true;
+          }
+        } else {
+          isAvail = true;
+        }
+        if (isAvail) {
+          verified.push(sug);
+        }
+      }
+
+      if (verified.length === 0) {
+        container.style.display = "none";
         return;
       }
 
-      if (!/^[a-zA-Z0-9_]{3,16}$/.test(clean)) {
+      listContainer.innerHTML = verified.map(sug => `
+        <button type="button" class="btn btn-secondary" style="font-size:11px; padding:6px 10px; border-radius:6px; background:rgba(0,229,255,0.08); border-color:rgba(0,229,255,0.3); color:var(--neon-cyan); cursor:pointer;" onclick="selectSuggestedUsername('${sug}')">
+          <i class="fa-solid fa-circle-plus"></i> ${sug}
+        </button>
+      `).join('');
+    }
+
+    function selectSuggestedUsername(sug) {
+      const input = document.getElementById("onboardingUsernameInput");
+      if (input) {
+        input.value = sug;
+        handleUsernameValidation(sug);
+      }
+    }
+
+    function handleUsernameValidation(val) {
+      const feedback = document.getElementById("onboardingUsernameFeedback");
+      const nextBtn = document.getElementById("btnOnboardingStep1Next");
+      const container = document.getElementById("usernameSuggestionsContainer");
+      const clean = (val || "").trim();
+
+      isUsernameAvailable = false;
+      if (nextBtn) nextBtn.disabled = true;
+
+      if (clean.length < 3 || clean.length > 20) {
+        feedback.innerHTML = `<span style="color:var(--text-muted);"><i class="fa-solid fa-circle-info"></i> Username must be 3-20 characters.</span>`;
+        if (container) container.style.display = "none";
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(clean)) {
         feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> Only letters, numbers and underscores allowed.</span>`;
-        isUsernameAvailable = false;
-        if (nextBtn) nextBtn.disabled = true;
+        if (container) container.style.display = "none";
         return;
       }
 
       feedback.innerHTML = `<span style="color:var(--neon-cyan);"><i class="fa-solid fa-spinner fa-spin"></i> Checking availability...</span>`;
 
+      const requestId = ++currentUsernameRequestId;
       clearTimeout(usernameCheckTimeout);
+
       usernameCheckTimeout = setTimeout(() => {
+        if (requestId !== currentUsernameRequestId) return;
         const lower = clean.toLowerCase();
+        const currentUid = pendingOnboardingUid || (currentUser ? currentUser.uid : null);
+
         if (database && firebaseInitialized) {
+          let timeoutTriggered = false;
+          const timer = setTimeout(() => {
+            if (requestId !== currentUsernameRequestId) return;
+            timeoutTriggered = true;
+            feedback.innerHTML = `<span style="color:var(--neon-orange);"><i class="fa-solid fa-triangle-exclamation"></i> Unable to check availability right now. Please try again or pick a suggestion.</span>`;
+            isUsernameAvailable = false;
+            if (nextBtn) nextBtn.disabled = true;
+            renderUsernameSuggestions(clean);
+          }, 6000);
+
           database.ref('usernames/' + lower).once('value', (snap) => {
-            if (snap.exists() && snap.val() !== (pendingOnboardingUid || (currentUser && currentUser.uid))) {
-              feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> "${clean}" is already taken by another player.</span>`;
+            if (requestId !== currentUsernameRequestId || timeoutTriggered) return;
+            clearTimeout(timer);
+
+            try {
+              const valData = snap.val();
+              let ownerUid = null;
+              if (valData) {
+                ownerUid = typeof valData === 'object' ? valData.uid : valData;
+              }
+
+              if (snap.exists() && ownerUid && ownerUid !== currentUid) {
+                feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> "${clean}" is already taken by another player.</span>`;
+                isUsernameAvailable = false;
+                if (nextBtn) nextBtn.disabled = true;
+                renderUsernameSuggestions(clean);
+              } else {
+                feedback.innerHTML = `<span style="color:var(--neon-green);"><i class="fa-solid fa-circle-check"></i> "${clean}" is available!</span>`;
+                isUsernameAvailable = true;
+                if (nextBtn) nextBtn.disabled = false;
+                if (container) container.style.display = "none";
+              }
+            } catch (parseErr) {
+              if (requestId !== currentUsernameRequestId) return;
+              console.error("Username check parse error:", parseErr);
+              feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> Couldn't check username. Try again.</span>`;
               isUsernameAvailable = false;
               if (nextBtn) nextBtn.disabled = true;
-            } else {
-              feedback.innerHTML = `<span style="color:var(--neon-green);"><i class="fa-solid fa-circle-check"></i> "${clean}" is available!</span>`;
-              isUsernameAvailable = true;
-              if (nextBtn) nextBtn.disabled = false;
+              renderUsernameSuggestions(clean);
             }
+          }).catch((err) => {
+            if (requestId !== currentUsernameRequestId || timeoutTriggered) return;
+            clearTimeout(timer);
+            console.error("Username check read error:", err);
+            feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> Couldn't check username. Try again.</span>`;
+            isUsernameAvailable = false;
+            if (nextBtn) nextBtn.disabled = true;
+            renderUsernameSuggestions(clean);
           });
         } else {
-          const taken = ["admin", "root", "moderator", "arbiter"].includes(lower);
+          const taken = ["admin", "root", "moderator", "arbiter", "shadowhunter"].includes(lower);
           if (taken) {
             feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> "${clean}" is reserved.</span>`;
             isUsernameAvailable = false;
             if (nextBtn) nextBtn.disabled = true;
+            renderUsernameSuggestions(clean);
           } else {
             feedback.innerHTML = `<span style="color:var(--neon-green);"><i class="fa-solid fa-circle-check"></i> "${clean}" is available!</span>`;
             isUsernameAvailable = true;
             if (nextBtn) nextBtn.disabled = false;
+            if (container) container.style.display = "none";
           }
         }
-      }, 300);
+      }, 400);
     }
 
     function goToOnboardingStep2() {
@@ -8854,6 +9029,11 @@
       const username = document.getElementById("onboardingUsernameInput").value.trim();
       const playerId = document.getElementById("onboardingPlayerIdInput").value.trim();
 
+      if (!username || !isUsernameAvailable) {
+        showToast("Please enter a valid, available username first.", "error");
+        return;
+      }
+
       if (!playerId || playerId.length < 8 || !/^[0-9]+$/.test(playerId)) {
         showToast("Please enter a valid numeric Free Fire UID (8-12 digits).", "error");
         return;
@@ -8862,11 +9042,12 @@
       const uid = pendingOnboardingUid || (currentUser ? currentUser.uid : "user-" + Math.floor(1000 + Math.random() * 9000));
       const email = pendingOnboardingEmail || (currentUser ? currentUser.email : "player@freefirearena.com");
       const authProvider = pendingOnboardingProvider || "password";
+      const normalizedUsername = username.toLowerCase();
 
       currentUser = {
         uid: uid,
         username: username,
-        usernameLowercase: username.toLowerCase(),
+        usernameLowercase: normalizedUsername,
         displayName: username,
         playerId: playerId,
         ffUID: playerId,
@@ -8879,6 +9060,7 @@
         wins: 0,
         kills: 0,
         role: "player",
+        isAdmin: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -8886,16 +9068,25 @@
       localStorage.setItem('ffa_user', JSON.stringify(currentUser));
 
       if (database && firebaseInitialized) {
-        database.ref('users/' + uid).set(currentUser);
-        database.ref('usernames/' + username.toLowerCase()).set(uid);
-        database.ref('wallets/' + uid + '/coins').set(250);
+        database.ref('usernames/' + normalizedUsername).transaction((currentVal) => {
+          if (currentVal === null || (typeof currentVal === 'object' && currentVal.uid === uid) || currentVal === uid) {
+            return { uid: uid };
+          }
+          return;
+        }, (error, committed) => {
+          if (error) {
+            console.warn("Username transaction warning:", error);
+          }
+          database.ref('users/' + uid).set(currentUser);
+          database.ref('wallets/' + uid + '/coins').set(250);
+        });
       }
 
       const overlay = document.getElementById("authScreenOverlay");
       if (overlay) overlay.style.display = "none";
 
       hapticFeedback();
-      showToast(`Welcome to Free Fire Arena, ${username}! 250 Coins credited.`, "success");
+      showToast(`Welcome to RS TOURNAMENT, ${username}! 250 Coins credited.`, "success");
       renderProfileData();
       renderWalletScreen();
       renderHomePersonalizedSections();
@@ -8927,7 +9118,18 @@
       const overlay = document.getElementById("authScreenOverlay");
       if (!overlay) return;
 
+      overlay.style.display = "flex";
+
       if (auth && firebaseInitialized) {
+        auth.getRedirectResult().then((result) => {
+          if (result && result.user) {
+            handleSuccessfulGoogleUser(result.user);
+            return;
+          }
+        }).catch((err) => {
+          console.warn("Redirect result error:", err);
+        });
+
         auth.onAuthStateChanged((user) => {
           if (user) {
             database.ref('users/' + user.uid).once('value', (snap) => {
@@ -8943,24 +9145,20 @@
               } else {
                 pendingOnboardingUid = user.uid;
                 pendingOnboardingEmail = user.email || "";
-                pendingOnboardingProvider = user.providerData && user.providerData[0] ? user.providerData[0].providerId : "firebase";
+                pendingOnboardingProvider = user.providerData && user.providerData[0] ? user.providerData[0].providerId : "google.com";
                 showOnboardingView();
               }
             });
           } else {
-            if (currentUser && currentUser.onboardingCompleted) {
-              overlay.style.display = 'none';
-            } else {
-              showAuthMainView();
-            }
+            currentUser = null;
+            localStorage.removeItem('ffa_user');
+            showAuthMainView();
           }
         });
       } else {
-        if (currentUser && currentUser.onboardingCompleted) {
-          overlay.style.display = 'none';
-        } else {
-          showAuthMainView();
-        }
+        currentUser = null;
+        localStorage.removeItem('ffa_user');
+        showAuthMainView();
       }
     }
 
@@ -11190,6 +11388,7 @@
     // 18. DOM INITIALIZATION & EVENT LISTENERS
     // ==========================================
     document.addEventListener("DOMContentLoaded", () => {
+      initAuthCheck();
       renderTournaments();
       renderProfileData();
       renderWalletScreen();
