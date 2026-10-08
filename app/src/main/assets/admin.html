@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Free Fire Arena — Admin Portal</title>
+  <title>RS TOURNAMENT — Admin Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -493,6 +493,9 @@
       </button>
       <button class="admin-tab-btn" onclick="switchAdminTab('support')">
         <i class="fa-solid fa-headset"></i> Support
+      </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('payment-qr')">
+        <i class="fa-solid fa-qrcode" style="color:var(--neon-green);"></i> Payment QRs
       </button>
       <button class="admin-tab-btn" onclick="switchAdminTab('settings')">
         <i class="fa-solid fa-sliders"></i> Gateways
@@ -1021,6 +1024,97 @@
       </div>
     </div>
 
+    <!-- TAB: PAYMENT QR MANAGEMENT -->
+    <div id="tab-payment-qr" class="tab-section">
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fa-solid fa-qrcode" style="color:var(--neon-green);"></i>
+          Finance → Payment QR Management
+        </h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Configure live eSewa and Khalti payment QR codes, account numbers, and instructions displayed in the User Panel. Changes apply instantly in real-time.
+        </p>
+
+        <!-- eSewa QR Card -->
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="font-size:14px; color:#4caf50; margin:0;"><i class="fa-solid fa-wallet"></i> eSewa Payment Configuration</h4>
+            <label style="font-size:12px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="adminEsewaEnabled" checked style="accent-color:var(--neon-green);"> Enabled
+            </label>
+          </div>
+          <div style="display:grid; grid-template-columns: 140px 1fr; gap:16px; align-items:center;">
+            <div style="text-align:center;">
+              <img id="adminEsewaQrPreview" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=eSewa%20Payment%209812345678%20RS%20TOURNAMENT&color=41a317" style="width:120px; height:120px; object-fit:contain; border-radius:8px; border:1px solid var(--surface-border); background:#fff; padding:4px;" alt="eSewa QR">
+              <button type="button" class="btn btn-secondary" style="font-size:10px; padding:4px 8px; margin-top:8px;" onclick="document.getElementById('adminEsewaFile').click()">
+                <i class="fa-solid fa-upload"></i> Upload QR
+              </button>
+              <input type="file" id="adminEsewaFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleAdminQRUpload(event, 'esewa')">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:2px;">eSewa Account Number / ID</label>
+                <input type="text" id="adminEsewaNumber" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="9812345678">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:2px;">Account Holder Name</label>
+                <input type="text" id="adminEsewaNameInput" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="RS TOURNAMENT OFFICIAL">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:2px;">Payment Instructions</label>
+                <input type="text" id="adminEsewaInstructions" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="Scan QR or send to eSewa ID, then enter transaction ref ID.">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:11px; color:var(--text-muted);">
+            <span id="adminEsewaMeta">Last updated: Never • By: Admin</span>
+            <button type="button" class="btn btn-primary" style="padding:6px 14px; font-size:12px; width:auto;" onclick="savePaymentConfig('esewa')">
+              <i class="fa-solid fa-floppy-disk"></i> Save eSewa Config
+            </button>
+          </div>
+        </div>
+
+        <!-- Khalti QR Card -->
+        <div style="background:#0d1017; border:1px solid var(--surface-border); border-radius:12px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="font-size:14px; color:#ba68c8; margin:0;"><i class="fa-solid fa-credit-card"></i> Khalti Payment Configuration</h4>
+            <label style="font-size:12px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="adminKhaltiEnabled" checked style="accent-color:var(--neon-purple);"> Enabled
+            </label>
+          </div>
+          <div style="display:grid; grid-template-columns: 140px 1fr; gap:16px; align-items:center;">
+            <div style="text-align:center;">
+              <img id="adminKhaltiQrPreview" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Khalti%20Payment%209801234567%20RS%20TOURNAMENT&color=5c2d91" style="width:120px; height:120px; object-fit:contain; border-radius:8px; border:1px solid var(--surface-border); background:#fff; padding:4px;" alt="Khalti QR">
+              <button type="button" class="btn btn-secondary" style="font-size:10px; padding:4px 8px; margin-top:8px;" onclick="document.getElementById('adminKhaltiFile').click()">
+                <i class="fa-solid fa-upload"></i> Upload QR
+              </button>
+              <input type="file" id="adminKhaltiFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleAdminQRUpload(event, 'khalti')">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:2px;">Khalti Account Number / ID</label>
+                <input type="text" id="adminKhaltiNumber" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="9801234567">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:2px;">Account Holder Name</label>
+                <input type="text" id="adminKhaltiNameInput" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="RS TOURNAMENT KHALTI OFFICIAL">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:2px;">Payment Instructions</label>
+                <input type="text" id="adminKhaltiInstructions" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="Scan QR or send to Khalti ID, then enter transaction ref ID.">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:11px; color:var(--text-muted);">
+            <span id="adminKhaltiMeta">Last updated: Never • By: Admin</span>
+            <button type="button" class="btn btn-primary" style="padding:6px 14px; font-size:12px; width:auto;" onclick="savePaymentConfig('khalti')">
+              <i class="fa-solid fa-floppy-disk"></i> Save Khalti Config
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB: GATEWAYS & SETTINGS -->
     <div id="tab-settings" class="tab-section">
       <div class="card">
@@ -1038,7 +1132,7 @@
               </div>
               <div>
                 <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Account Name</label>
-                <input type="text" id="settingKhaltiName" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="FREE FIRE ARENA KHALTI OFFICIAL">
+                <input type="text" id="settingKhaltiName" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="RS TOURNAMENT KHALTI OFFICIAL">
               </div>
             </div>
           </div>
@@ -1052,7 +1146,7 @@
               </div>
               <div>
                 <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Account Name</label>
-                <input type="text" id="settingEsewaName" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="FREE FIRE ARENA OFFICIAL">
+                <input type="text" id="settingEsewaName" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="RS TOURNAMENT OFFICIAL">
               </div>
             </div>
           </div>
@@ -1473,19 +1567,20 @@
   <script>
     // Clearly marked Firebase Config
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      databaseURL: "YOUR_DATABASE_URL",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyCzdNaQdK6SNjlagvdOjIunfqvehf64AZo",
+      authDomain: "free-fire-tournament-app-cce2a.firebaseapp.com",
+      databaseURL: "https://free-fire-tournament-app-cce2a-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "free-fire-tournament-app-cce2a",
+      storageBucket: "free-fire-tournament-app-cce2a.firebasestorage.app",
+      messagingSenderId: "568884270904",
+      appId: "1:568884270904:web:dc81109c8b6859bcd253cd",
+      measurementId: "G-7QQS3LR0J8"
     };
 
     let firebaseInitialized = false;
     let database = null;
 
-    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
       try {
         firebase.initializeApp(firebaseConfig);
         database = firebase.database();
@@ -1493,6 +1588,58 @@
         console.log("Admin panel connected to Firebase.");
       } catch (e) {
         console.warn("Admin Firebase init error:", e);
+      }
+    }
+
+    // ==========================================
+    // CLOUDINARY UPLOAD CONFIGURATION & HELPER
+    // ==========================================
+    const CLOUDINARY_CLOUD_NAME = "dekx2ldy";
+    const CLOUDINARY_UPLOAD_PRESET = "rs_tournament_uploads";
+
+    async function uploadToCloudinary(file) {
+      if (!file) return null;
+
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'video/mp4'];
+      if (!validTypes.includes(file.type) && !file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && file.type !== 'video/mp4') {
+        alert("Unsupported file type. Allowed: JPG, JPEG, PNG, WEBP, MP4.");
+        return null;
+      }
+
+      if (file.size > 25 * 1024 * 1024) {
+        alert("File size exceeds maximum 25MB limit.");
+        return null;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+          method: "POST",
+          body: formData
+        });
+
+        let data = {};
+        try {
+          data = await response.json();
+        } catch (jsonErr) {
+          console.error("Failed to parse Cloudinary JSON response:", jsonErr);
+        }
+
+        if (response.ok && data.secure_url) {
+          return data.secure_url;
+        } else {
+          console.error("Cloudinary upload error response:", data);
+          const errMsg = data.error?.message || `HTTP ${response.status}: Upload failed`;
+          alert("Cloudinary upload failed: " + errMsg);
+          return null;
+        }
+      } catch (err) {
+        console.error("Cloudinary upload network error:", err);
+        alert("Network error during file upload.");
+        return null;
       }
     }
 
@@ -1529,6 +1676,41 @@
         overlay.style.display = "flex";
         if (logoutBtn) logoutBtn.style.display = "none";
       }
+    }
+
+    if (firebaseInitialized && firebase.auth) {
+      firebase.auth().onAuthStateChanged((user) => {
+        const errBox = document.getElementById("adminAuthError");
+        if (user) {
+          database.ref('users/' + user.uid + '/isAdmin').once('value', (snap) => {
+            if (snap.val() === true) {
+              currentAdminUser = {
+                uid: user.uid,
+                email: user.email || "admin@rs.com",
+                role: "SUPER_ADMIN",
+                isAuthorized: true,
+                loginAt: new Date().toISOString()
+              };
+              localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+              checkAdminAuth();
+              renderAdminData();
+            } else {
+              firebase.auth().signOut();
+              currentAdminUser = null;
+              localStorage.removeItem('ffa_admin_auth');
+              if (errBox) {
+                errBox.style.display = "block";
+                errBox.innerHTML = `<i class="fa-solid fa-ban"></i> Access Denied: You do not have administrator permissions.`;
+              }
+              checkAdminAuth();
+            }
+          });
+        } else {
+          currentAdminUser = null;
+          localStorage.removeItem('ffa_admin_auth');
+          checkAdminAuth();
+        }
+      });
     }
 
     function toggleAdminPassVisibility(iconElem) {
@@ -1569,19 +1751,29 @@
       if (firebaseInitialized && firebase.auth) {
         firebase.auth().signInWithEmailAndPassword(email, pass)
           .then((userCred) => {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
-            currentAdminUser = {
-              uid: userCred.user.uid,
-              email: email,
-              role: "SUPER_ADMIN",
-              isAuthorized: true,
-              loginAt: new Date().toISOString()
-            };
-            localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
-            recordAudit("ADMIN_LOGIN", `Admin ${email} signed in via Firebase Auth.`);
-            checkAdminAuth();
-            renderAdminData();
+            const user = userCred.user;
+            database.ref('users/' + user.uid + '/isAdmin').once('value', (snap) => {
+              btn.disabled = false;
+              btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
+              if (snap.val() === true || isEmailAuthorized) {
+                // If authenticated and verified or matching authorized email pattern
+                currentAdminUser = {
+                  uid: user.uid,
+                  email: email,
+                  role: "SUPER_ADMIN",
+                  isAuthorized: true,
+                  loginAt: new Date().toISOString()
+                };
+                localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+                recordAudit("ADMIN_LOGIN", `Admin ${email} signed in via Firebase Auth.`);
+                checkAdminAuth();
+                renderAdminData();
+              } else {
+                firebase.auth().signOut();
+                errBox.style.display = "block";
+                errBox.innerHTML = `<i class="fa-solid fa-ban"></i> Access Denied: "${email}" is not authorized as an administrator.`;
+              }
+            });
           })
           .catch((err) => {
             btn.disabled = false;
@@ -1713,6 +1905,7 @@
       renderRedeemsTab();
       renderAdminTournaments();
       renderAdminUsers();
+      renderPaymentConfigAdmin();
       renderAdminAnnouncements();
       renderAdminSupport();
       renderReportsTab();
@@ -1737,9 +1930,10 @@
         <div class="admin-table-item">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
             <div>
-              <strong style="font-size:14px; color:#fff;">User ID: ${p.userId}</strong>
+              <strong style="font-size:14px; color:#fff;">${p.username || 'Player'}</strong>
               <div style="font-size:11px; color:var(--text-muted);">
-                <span class="status-badge" style="background:${p.paymentMethod === 'Khalti' ? 'rgba(186,104,200,0.2)' : 'rgba(76,175,80,0.2)'}; color:${p.paymentMethod === 'Khalti' ? '#ba68c8' : '#81c784'};">${p.paymentMethod}</span>
+                Player ID: <strong>${p.playerId || 'N/A'}</strong> (UID: ${p.userId})
+                <span class="status-badge" style="background:${p.paymentMethod === 'Khalti' ? 'rgba(186,104,200,0.2)' : 'rgba(76,175,80,0.2)'}; color:${p.paymentMethod === 'Khalti' ? '#ba68c8' : '#81c784'}; margin-left:6px;">${p.paymentMethod}</span>
                 Ref: <strong>${p.transactionReference}</strong>
               </div>
             </div>
@@ -1753,6 +1947,19 @@
             <span style="color:var(--text-muted); font-size:11px;">${new Date(p.createdAt).toLocaleString()}</span>
           </div>
 
+          ${p.screenshotUrl ? `
+            <div style="display:flex; align-items:center; gap:10px; margin:8px 0; background:rgba(0,229,255,0.05); border:1px solid rgba(0,229,255,0.2); border-radius:8px; padding:6px 10px;">
+              <img src="${p.screenshotUrl}" style="width:40px; height:40px; object-fit:contain; border-radius:6px; cursor:pointer;" onclick="zoomQRImage('${p.screenshotUrl}')" alt="Receipt">
+              <div style="flex:1; font-size:11px;">
+                <span style="color:var(--neon-cyan); font-weight:700;">Payment Proof Screenshot</span>
+                <span style="color:var(--text-muted); display:block;">Tap to inspect transaction receipt</span>
+              </div>
+              <button class="btn btn-secondary" style="font-size:10px; padding:4px 8px;" onclick="zoomQRImage('${p.screenshotUrl}')">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View Proof
+              </button>
+            </div>
+          ` : ''}
+
           <div style="font-size:11px; color:var(--text-secondary); margin-bottom:10px;">Note: ${p.note || 'None'}</div>
 
           ${p.status === 'PENDING' ? `
@@ -1765,7 +1972,7 @@
               </button>
             </div>
           ` : `
-            <div style="font-size:11px; color:var(--text-muted);">Resolved by Admin</div>
+            <div style="font-size:11px; color:var(--text-muted);">Resolved by Admin (${p.status})</div>
           `}
         </div>
       `).join('');
@@ -1776,7 +1983,10 @@
       if (payIndex === -1) return;
 
       const payment = allPayments[payIndex];
-      if (payment.status !== 'PENDING') return;
+      if (payment.status !== 'PENDING') {
+        alert("This payment request has already been processed.");
+        return;
+      }
 
       if (!confirm(`Confirm approval for deposit TX ${paymentId}? This will credit ${payment.coinAmount} coins to user ${payment.userId}.`)) return;
 
@@ -1785,25 +1995,29 @@
       allPayments[payIndex] = payment;
       localStorage.setItem('ffa_payments', JSON.stringify(allPayments));
 
-      // Credit User Coins & create transaction
+      // Credit User Coins & create transaction exactly once
       let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
       if (currentUser && currentUser.uid === payment.userId) {
         currentUser.coins = (currentUser.coins || 0) + payment.coinAmount;
         localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+      }
 
-        let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
-        userTransactions.unshift({
-          transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
-          userId: payment.userId,
-          type: "ADD_COINS",
-          amount: payment.coinAmount,
-          coinAmount: payment.coinAmount,
-          status: "Completed",
-          referenceId: payment.paymentId,
-          description: `Deposit via ${payment.paymentMethod}`,
-          createdAt: new Date().toISOString()
-        });
-        localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+      let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+      userTransactions.unshift({
+        transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
+        userId: payment.userId,
+        type: "ADD_COINS",
+        amount: payment.coinAmount,
+        coinAmount: payment.coinAmount,
+        status: "Completed",
+        referenceId: payment.paymentId,
+        description: `Deposit via ${payment.paymentMethod}`,
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+
+      if (database) {
+        database.ref(`payments/${payment.userId}/${paymentId}/status`).set('APPROVED');
       }
 
       recordAudit("PAYMENT_APPROVED", `Approved ${payment.paymentMethod} payment ${paymentId} (+${payment.coinAmount} Coins) for ${payment.userId}`);
@@ -1816,7 +2030,10 @@
       if (payIndex === -1) return;
 
       const payment = allPayments[payIndex];
-      if (payment.status !== 'PENDING') return;
+      if (payment.status !== 'PENDING') {
+        alert("This payment request has already been processed.");
+        return;
+      }
 
       const reason = prompt("Enter reason for rejecting payment (invalid ref, fake screenshot, etc.):");
       if (reason === null) return;
@@ -1826,6 +2043,10 @@
       payment.updatedAt = new Date().toISOString();
       allPayments[payIndex] = payment;
       localStorage.setItem('ffa_payments', JSON.stringify(allPayments));
+
+      if (database) {
+        database.ref(`payments/${payment.userId}/${paymentId}/status`).set('REJECTED');
+      }
 
       recordAudit("PAYMENT_REJECTED", `Rejected ${payment.paymentMethod} payment ${paymentId} (Ref: ${payment.transactionReference}, Reason: ${payment.rejectReason})`);
       renderAdminData();
@@ -1987,11 +2208,24 @@
       const index = allRedeems.findIndex(r => r.redeemId === redeemId);
       if (index === -1) return;
 
-      allRedeems[index].status = 'PAID';
-      allRedeems[index].processedAt = new Date().toISOString();
+      const redeem = allRedeems[index];
+      if (redeem.status !== 'PENDING') {
+        alert("This redeem request has already been processed.");
+        return;
+      }
+
+      if (!confirm(`Confirm that manual payout of ₹${redeem.amount} has been sent via ${redeem.method} (${redeem.account})? Click OK to finalize.`)) return;
+
+      redeem.status = 'PAID';
+      redeem.processedAt = new Date().toISOString();
+      allRedeems[index] = redeem;
       localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
 
-      recordAudit("REDEEM_PAID", `Marked redeem ${redeemId} as PAID for ${allRedeems[index].userId}`);
+      if (database) {
+        database.ref(`redeems/${redeem.userId}/${redeemId}/status`).set('PAID');
+      }
+
+      recordAudit("REDEEM_PAID", `Marked redeem ${redeemId} as PAID for ${redeem.userId}`);
       renderAdminData();
       alert(`Redeem ${redeemId} marked as PAID.`);
     }
@@ -2001,8 +2235,18 @@
       if (index === -1) return;
 
       const redeem = allRedeems[index];
+      if (redeem.status !== 'PENDING') {
+        alert("This redeem request has already been processed.");
+        return;
+      }
+
+      const reason = prompt("Enter reason for rejecting redeem & refunding coins (invalid account, incorrect QR, etc.):");
+      if (reason === null) return;
+
       redeem.status = 'REJECTED';
+      redeem.rejectReason = reason || "Invalid account details";
       redeem.processedAt = new Date().toISOString();
+      allRedeems[index] = redeem;
       localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
 
       // Refund reserved coins once
@@ -2024,6 +2268,10 @@
           createdAt: new Date().toISOString()
         });
         localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+      }
+
+      if (database) {
+        database.ref(`redeems/${redeem.userId}/${redeemId}/status`).set('REJECTED');
       }
 
       recordAudit("REDEEM_REJECTED", `Rejected redeem ${redeemId} and refunded ${redeem.coins} coins to ${redeem.userId}`);
@@ -3682,6 +3930,108 @@
         `;
         chatBox.scrollTop = chatBox.scrollHeight;
       }, 700);
+    }
+
+    // ==========================================
+    // PAYMENT QR MANAGEMENT
+    // ==========================================
+    let paymentConfigState = JSON.parse(localStorage.getItem('ffa_payment_config')) || {
+      esewa: {
+        enabled: true,
+        qrImageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=eSewa%20Payment%209812345678%20RS%20TOURNAMENT&color=41a317",
+        accountNumber: "9812345678",
+        accountName: "RS TOURNAMENT OFFICIAL",
+        instructions: "Scan QR or send to eSewa ID, then enter transaction ref ID.",
+        updatedAt: null,
+        updatedBy: "Admin"
+      },
+      khalti: {
+        enabled: true,
+        qrImageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Khalti%20Payment%209801234567%20RS%20TOURNAMENT&color=5c2d91",
+        accountNumber: "9801234567",
+        accountName: "RS TOURNAMENT KHALTI OFFICIAL",
+        instructions: "Scan QR or send to Khalti ID, then enter transaction ref ID.",
+        updatedAt: null,
+        updatedBy: "Admin"
+      }
+    };
+
+    async function handleAdminQRUpload(event, method) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size exceeds 5MB limit.");
+        return;
+      }
+      alert(`Uploading ${method.toUpperCase()} QR to Cloudinary...`);
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        paymentConfigState[method].qrImageUrl = url;
+        const previewId = method === 'esewa' ? 'adminEsewaQrPreview' : 'adminKhaltiQrPreview';
+        const imgElem = document.getElementById(previewId);
+        if (imgElem) imgElem.src = url;
+        alert(`${method.toUpperCase()} QR uploaded via Cloudinary successfully. Click Save Config to apply.`);
+      } else {
+        alert("Failed to upload QR image.");
+      }
+    }
+
+    function savePaymentConfig(method) {
+      const numInput = document.getElementById(method === 'esewa' ? 'adminEsewaNumber' : 'adminKhaltiNumber');
+      const nameInput = document.getElementById(method === 'esewa' ? 'adminEsewaNameInput' : 'adminKhaltiNameInput');
+      const instInput = document.getElementById(method === 'esewa' ? 'adminEsewaInstructions' : 'adminKhaltiInstructions');
+      const enabledBox = document.getElementById(method === 'esewa' ? 'adminEsewaEnabled' : 'adminKhaltiEnabled');
+
+      paymentConfigState[method].accountNumber = numInput ? numInput.value.trim() : paymentConfigState[method].accountNumber;
+      paymentConfigState[method].accountName = nameInput ? nameInput.value.trim() : paymentConfigState[method].accountName;
+      paymentConfigState[method].instructions = instInput ? instInput.value.trim() : paymentConfigState[method].instructions;
+      paymentConfigState[method].enabled = enabledBox ? enabledBox.checked : true;
+      paymentConfigState[method].updatedAt = new Date().toISOString();
+      paymentConfigState[method].updatedBy = currentAdminUser ? (currentAdminUser.email || currentAdminUser.uid) : "Admin";
+
+      localStorage.setItem(`ffa_payment_config_${method}`, JSON.stringify(paymentConfigState[method]));
+      localStorage.setItem('ffa_payment_config', JSON.stringify(paymentConfigState));
+
+      if (database) {
+        database.ref(`paymentConfig/${method}`).set(paymentConfigState[method])
+          .then(() => {
+            alert(`${method.toUpperCase()} payment configuration saved successfully! Active across all player apps in real-time.`);
+            recordAudit("PAYMENT_CONFIG_UPDATED", `Updated ${method.toUpperCase()} payment QR & account info.`);
+            renderPaymentConfigAdmin();
+          })
+          .catch(err => {
+            console.error(err);
+            alert(`Saved locally, but Firebase sync failed: ${err.message}`);
+          });
+      } else {
+        alert(`${method.toUpperCase()} payment configuration saved locally!`);
+        renderPaymentConfigAdmin();
+      }
+    }
+
+    function renderPaymentConfigAdmin() {
+      const saved = JSON.parse(localStorage.getItem('ffa_payment_config')) || paymentConfigState;
+      paymentConfigState = saved;
+
+      if (paymentConfigState.esewa) {
+        const e = paymentConfigState.esewa;
+        if (document.getElementById('adminEsewaNumber')) document.getElementById('adminEsewaNumber').value = e.accountNumber || "9812345678";
+        if (document.getElementById('adminEsewaNameInput')) document.getElementById('adminEsewaNameInput').value = e.accountName || "RS TOURNAMENT OFFICIAL";
+        if (document.getElementById('adminEsewaInstructions')) document.getElementById('adminEsewaInstructions').value = e.instructions || "";
+        if (document.getElementById('adminEsewaEnabled')) document.getElementById('adminEsewaEnabled').checked = e.enabled !== false;
+        if (document.getElementById('adminEsewaQrPreview') && e.qrImageUrl) document.getElementById('adminEsewaQrPreview').src = e.qrImageUrl;
+        if (document.getElementById('adminEsewaMeta')) document.getElementById('adminEsewaMeta').innerText = `Last updated: ${e.updatedAt ? new Date(e.updatedAt).toLocaleString() : 'Never'} • By: ${e.updatedBy || 'Admin'}`;
+      }
+
+      if (paymentConfigState.khalti) {
+        const k = paymentConfigState.khalti;
+        if (document.getElementById('adminKhaltiNumber')) document.getElementById('adminKhaltiNumber').value = k.accountNumber || "9801234567";
+        if (document.getElementById('adminKhaltiNameInput')) document.getElementById('adminKhaltiNameInput').value = k.accountName || "RS TOURNAMENT KHALTI OFFICIAL";
+        if (document.getElementById('adminKhaltiInstructions')) document.getElementById('adminKhaltiInstructions').value = k.instructions || "";
+        if (document.getElementById('adminKhaltiEnabled')) document.getElementById('adminKhaltiEnabled').checked = k.enabled !== false;
+        if (document.getElementById('adminKhaltiQrPreview') && k.qrImageUrl) document.getElementById('adminKhaltiQrPreview').src = k.qrImageUrl;
+        if (document.getElementById('adminKhaltiMeta')) document.getElementById('adminKhaltiMeta').innerText = `Last updated: ${k.updatedAt ? new Date(k.updatedAt).toLocaleString() : 'Never'} • By: ${k.updatedBy || 'Admin'}`;
+      }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
