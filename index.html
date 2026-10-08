@@ -2725,67 +2725,9 @@
           </div>
 
           <button type="submit" class="btn btn-primary" id="btnSubmitSignup" style="min-height:48px; margin-top:8px;">
-            <i class="fa-solid fa-user-plus"></i> Continue to Profile Setup
+            <i class="fa-solid fa-user-plus"></i> Create Account
           </button>
         </form>
-      </div>
-
-      <!-- VIEW 2: FIRST-TIME USER ONBOARDING -->
-      <div id="authOnboardingView" style="display:none;">
-        
-        <!-- Step 1: Choose Username -->
-        <div id="onboardingStep1">
-          <div class="auth-logo-wrap">
-            <div class="auth-logo-badge" style="background:linear-gradient(135deg, var(--neon-cyan), #006064); box-shadow:0 0 20px rgba(0,229,255,0.4);">
-              <i class="fa-solid fa-user-ninja"></i>
-            </div>
-            <h2 class="auth-app-title">Enter Your Username</h2>
-            <p class="auth-app-subtitle">Your unique public gaming handle on leaderboards & matches.</p>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Username (3-20 Characters) *</label>
-            <input type="text" id="onboardingUsernameInput" class="form-input" placeholder="e.g. ShadowHunter" maxlength="20" oninput="handleUsernameValidation(this.value)" required>
-            <div id="onboardingUsernameFeedback" style="font-size:11px; margin-top:5px; font-weight:600;"></div>
-            <div id="usernameSuggestionsContainer" style="margin-top:10px; display:none;">
-              <div style="font-size:11px; color:var(--text-secondary); margin-bottom:6px;">Suggested Usernames (Tap to select):</div>
-              <div id="usernameSuggestionsList" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
-            </div>
-          </div>
-
-          <button type="button" class="btn btn-primary" id="btnOnboardingStep1Next" style="min-height:48px; margin-top:12px;" onclick="goToOnboardingStep2()">
-            Continue <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
-
-        <!-- Step 2: Enter Free Fire Player ID -->
-        <div id="onboardingStep2" style="display:none;">
-          <div class="auth-logo-wrap">
-            <div class="auth-logo-badge" style="background:linear-gradient(135deg, var(--neon-green), #1b5e20); box-shadow:0 0 20px rgba(0,230,118,0.4);">
-              <i class="fa-solid fa-id-card"></i>
-            </div>
-            <h2 class="auth-app-title">Enter Your Free Fire Player ID</h2>
-            <p class="auth-app-subtitle">Numeric UID from your Free Fire profile to receive custom room invites.</p>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Free Fire Numeric UID (8-12 Digits) *</label>
-            <input type="text" id="onboardingPlayerIdInput" class="form-input" placeholder="e.g. 6829401827" maxlength="12" pattern="[0-9]{8,12}" required>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
-              <i class="fa-solid fa-circle-info"></i> In Free Fire: Tap your profile avatar at top-left to copy your UID.
-            </div>
-          </div>
-
-          <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-top:16px;">
-            <button type="button" class="btn btn-secondary" onclick="backToOnboardingStep1()">
-              <i class="fa-solid fa-arrow-left"></i> Back
-            </button>
-            <button type="button" class="btn btn-primary" id="btnFinishOnboarding" onclick="finishFirstTimeOnboarding()">
-              <i class="fa-solid fa-circle-check"></i> Complete & Enter Arena
-            </button>
-          </div>
-        </div>
-
       </div>
 
     </div>
@@ -8544,17 +8486,7 @@
       const overlay = document.getElementById("authScreenOverlay");
       if (overlay) overlay.style.display = "flex";
       document.getElementById("authMainView").style.display = "block";
-      document.getElementById("authOnboardingView").style.display = "none";
       switchAuthTab('login');
-    }
-
-    function showOnboardingView() {
-      const overlay = document.getElementById("authScreenOverlay");
-      if (overlay) overlay.style.display = "flex";
-      document.getElementById("authMainView").style.display = "none";
-      document.getElementById("authOnboardingView").style.display = "block";
-      document.getElementById("onboardingStep1").style.display = "block";
-      document.getElementById("onboardingStep2").style.display = "none";
     }
 
     function switchAuthTab(tab) {
@@ -8580,6 +8512,171 @@
       }
     }
 
+    async function handleUserSession(user) {
+      if (!user) {
+        currentUser = null;
+        localStorage.removeItem('ffa_user');
+        showAuthMainView();
+        return;
+      }
+
+      const uid = user.uid;
+      const email = user.email || "";
+      const authProvider = user.providerData && user.providerData[0] ? user.providerData[0].providerId : "google.com";
+      
+      let rawName = user.displayName;
+      if (!rawName && email) {
+        rawName = email.split('@')[0];
+      }
+      if (!rawName) {
+        rawName = "Player";
+      }
+
+      let baseUsername = rawName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      if (!baseUsername || baseUsername.length < 3) {
+        baseUsername = "player";
+      }
+      if (baseUsername.length > 15) {
+        baseUsername = baseUsername.slice(0, 15);
+      }
+
+      if (database && firebaseInitialized) {
+        try {
+          const snap = await database.ref('users/' + uid).once('value');
+          const profile = snap.val();
+          if (profile && profile.onboardingCompleted && profile.username) {
+            currentUser = profile;
+            currentUser.uid = uid;
+            localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+            const overlay = document.getElementById("authScreenOverlay");
+            if (overlay) overlay.style.display = "none";
+            renderProfileData();
+            renderWalletScreen();
+            renderHomePersonalizedSections();
+            return;
+          }
+
+          let candidate = baseUsername;
+          let suffix = 1;
+          let assigned = false;
+          let finalUsername = baseUsername;
+
+          while (!assigned && suffix < 100) {
+            const checkRef = database.ref('usernames/' + candidate.toLowerCase());
+            const uSnap = await checkRef.once('value');
+            const valData = uSnap.val();
+            let ownerUid = null;
+            if (valData) {
+              ownerUid = typeof valData === 'object' ? valData.uid : valData;
+            }
+
+            if (!uSnap.exists() || ownerUid === uid) {
+              finalUsername = candidate;
+              assigned = true;
+            } else {
+              suffix++;
+              candidate = `${baseUsername}_${suffix}`;
+            }
+          }
+
+          const normalizedUsername = finalUsername.toLowerCase();
+          const playerId = "782" + Math.floor(100000 + Math.random() * 900000);
+
+          const newProfile = {
+            uid: uid,
+            username: finalUsername,
+            usernameLowercase: normalizedUsername,
+            displayName: rawName,
+            playerId: playerId,
+            ffUID: playerId,
+            email: email,
+            authProvider: authProvider,
+            onboardingCompleted: true,
+            coins: 250,
+            skillLevel: "Rising",
+            matches: 0,
+            wins: 0,
+            kills: 0,
+            role: "player",
+            isAdmin: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+
+          await database.ref('usernames/' + normalizedUsername).set({ uid: uid });
+          await database.ref('users/' + uid).set(newProfile);
+          await database.ref('wallets/' + uid + '/coins').set(250);
+
+          currentUser = newProfile;
+          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+
+          const overlay = document.getElementById("authScreenOverlay");
+          if (overlay) overlay.style.display = "none";
+
+          hapticFeedback();
+          showToast(`Welcome to RS TOURNAMENT, ${finalUsername}! 250 Coins credited.`, "success");
+          renderProfileData();
+          renderWalletScreen();
+          renderHomePersonalizedSections();
+
+        } catch (err) {
+          console.warn("Background auto-profile creation error:", err);
+          const fallbackUsername = baseUsername;
+          currentUser = {
+            uid: uid,
+            username: fallbackUsername,
+            usernameLowercase: fallbackUsername.toLowerCase(),
+            displayName: rawName,
+            playerId: "782019481",
+            ffUID: "782019481",
+            email: email,
+            authProvider: authProvider,
+            onboardingCompleted: true,
+            coins: 250,
+            skillLevel: "Rising",
+            matches: 0,
+            wins: 0,
+            kills: 0,
+            role: "player",
+            isAdmin: false
+          };
+          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          const overlay = document.getElementById("authScreenOverlay");
+          if (overlay) overlay.style.display = "none";
+          showToast(`Welcome to RS TOURNAMENT, ${fallbackUsername}!`, "success");
+          renderProfileData();
+          renderWalletScreen();
+          renderHomePersonalizedSections();
+        }
+      } else {
+        currentUser = {
+          uid: uid || "user-" + Math.floor(1000 + Math.random() * 9000),
+          username: baseUsername,
+          usernameLowercase: baseUsername.toLowerCase(),
+          displayName: rawName,
+          playerId: "782019481",
+          ffUID: "782019481",
+          email: email,
+          authProvider: authProvider,
+          onboardingCompleted: true,
+          coins: 250,
+          skillLevel: "Rising",
+          matches: 0,
+          wins: 0,
+          kills: 0,
+          role: "player",
+          isAdmin: true
+        };
+        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        const overlay = document.getElementById("authScreenOverlay");
+        if (overlay) overlay.style.display = "none";
+        showToast(`Welcome to RS TOURNAMENT, ${baseUsername}!`, "success");
+        renderProfileData();
+        renderWalletScreen();
+        renderHomePersonalizedSections();
+      }
+    }
+
     function handleGoogleSignIn() {
       const btn = document.getElementById("btnGoogleSignIn");
       const errBox = document.getElementById("authLoginError");
@@ -8599,7 +8696,7 @@
               btn.disabled = false;
               btn.innerHTML = `<svg style="width:18px; height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg> Continue with Google`;
             }
-            handleSuccessfulGoogleUser(result.user);
+            handleUserSession(result.user);
           })
           .catch((err) => {
             console.warn("Popup sign-in failed, trying redirect:", err);
@@ -8611,7 +8708,7 @@
                 }
                 if (errBox) {
                   errBox.style.display = "flex";
-                  errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Google Sign-In redirect error: ${redirectErr.message}. Ensure "ramitraut6-cmyk.github.io" is authorized in Firebase Console.`;
+                  errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Google Sign-In redirect error: ${redirectErr.message}. Ensure domain is authorized in Firebase Console.`;
                 }
                 showToast(redirectErr.message, "error");
               });
@@ -8626,7 +8723,7 @@
                 if (err.code === 'auth/operation-not-allowed') {
                   msg = "Google Sign-In provider is not enabled in Firebase Console.";
                 } else if (err.code === 'auth/unauthorized-domain') {
-                  msg = "Domain 'ramitraut6-cmyk.github.io' or preview URL is not authorized in Firebase Console.";
+                  msg = "Domain is not authorized in Firebase Console.";
                 }
                 errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
               }
@@ -8639,36 +8736,16 @@
             btn.disabled = false;
             btn.innerHTML = `<svg style="width:18px; height:18px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg> Continue with Google`;
           }
-          pendingOnboardingUid = "goog-" + Math.floor(1000 + Math.random() * 9000);
-          pendingOnboardingEmail = "gamer@gmail.com";
-          pendingOnboardingProvider = "google.com";
-          showOnboardingView();
+          const dummyUser = {
+            uid: "goog-" + Math.floor(1000 + Math.random() * 9000),
+            email: "gamer@gmail.com",
+            displayName: "Gamer Player",
+            providerData: [{ providerId: "google.com" }]
+          };
+          handleUserSession(dummyUser);
           showToast("Signed in with Google Account!", "success");
         }, 600);
       }
-    }
-
-    function handleSuccessfulGoogleUser(user) {
-      pendingOnboardingUid = user.uid;
-      pendingOnboardingEmail = user.email || "";
-      pendingOnboardingProvider = "google.com";
-
-      database.ref('users/' + user.uid).once('value', (snap) => {
-        const profile = snap.val();
-        if (profile && profile.onboardingCompleted) {
-          currentUser = profile;
-          currentUser.uid = user.uid;
-          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-          const overlay = document.getElementById("authScreenOverlay");
-          if (overlay) overlay.style.display = "none";
-          showToast(`Welcome back, ${currentUser.displayName}!`, "success");
-          renderProfileData();
-          renderWalletScreen();
-          renderHomePersonalizedSections();
-        } else {
-          showOnboardingView();
-        }
-      });
     }
 
     function submitAuthLogin(event) {
@@ -8692,27 +8769,9 @@
       if (auth && firebaseInitialized) {
         auth.signInWithEmailAndPassword(email, password)
           .then((userCred) => {
-            const user = userCred.user;
-            database.ref('users/' + user.uid).once('value', (snap) => {
-              btn.disabled = false;
-              btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Sign In to Arena`;
-              const profile = snap.val();
-              if (profile && profile.onboardingCompleted) {
-                currentUser = profile;
-                currentUser.uid = user.uid;
-                localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-                document.getElementById("authScreenOverlay").style.display = "none";
-                showToast(`Welcome back, ${currentUser.displayName}!`, "success");
-                renderProfileData();
-                renderWalletScreen();
-                renderHomePersonalizedSections();
-              } else {
-                pendingOnboardingUid = user.uid;
-                pendingOnboardingEmail = user.email || email;
-                pendingOnboardingProvider = "password";
-                showOnboardingView();
-              }
-            });
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Sign In to Arena`;
+            handleUserSession(userCred.user);
           })
           .catch((err) => {
             btn.disabled = false;
@@ -8725,29 +8784,16 @@
             errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
           });
       } else {
-        // Preview mode login
         setTimeout(() => {
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Sign In to Arena`;
-          currentUser = {
+          const dummyUser = {
             uid: "user-" + Math.floor(1000 + Math.random() * 9000),
             email: email,
             displayName: email.split('@')[0],
-            ffUID: "782019481",
-            coins: 300,
-            skillLevel: "Rising",
-            matches: 12,
-            wins: 4,
-            kills: 45,
-            role: "player",
-            onboardingCompleted: true
+            providerData: [{ providerId: "password" }]
           };
-          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-          document.getElementById("authScreenOverlay").style.display = "none";
-          showToast(`Welcome back, ${currentUser.displayName}!`, "success");
-          renderProfileData();
-          renderWalletScreen();
-          renderHomePersonalizedSections();
+          handleUserSession(dummyUser);
         }, 500);
       }
     }
@@ -8781,15 +8827,12 @@
         auth.createUserWithEmailAndPassword(email, pass)
           .then((userCred) => {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Continue to Profile Setup`;
-            pendingOnboardingUid = userCred.user.uid;
-            pendingOnboardingEmail = email;
-            pendingOnboardingProvider = "password";
-            showOnboardingView();
+            btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create Account`;
+            handleUserSession(userCred.user);
           })
           .catch((err) => {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Continue to Profile Setup`;
+            btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create Account`;
             errBox.style.display = "flex";
             let msg = err.message;
             if (err.code === 'auth/email-already-in-use') msg = "This email is already registered. Please sign in.";
@@ -8798,298 +8841,27 @@
       } else {
         setTimeout(() => {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Continue to Profile Setup`;
-          pendingOnboardingUid = "user-" + Math.floor(1000 + Math.random() * 9000);
-          pendingOnboardingEmail = email;
-          pendingOnboardingProvider = "password";
-          showOnboardingView();
+          btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create Account`;
+          const dummyUser = {
+            uid: "user-" + Math.floor(1000 + Math.random() * 9000),
+            email: email,
+            displayName: email.split('@')[0],
+            providerData: [{ providerId: "password" }]
+          };
+          handleUserSession(dummyUser);
         }, 500);
       }
     }
 
     function quickDemoLogin() {
-      currentUser = {
+      const dummyUser = {
         uid: "user-demo-101",
         email: "player@freefirearena.com",
         displayName: "ShadowHunter",
-        ffUID: "6829401827",
-        coins: 250,
-        skillLevel: "Pro",
-        matches: 34,
-        wins: 12,
-        kills: 148,
-        role: "player",
-        onboardingCompleted: true
+        providerData: [{ providerId: "password" }]
       };
-      localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-      document.getElementById("authScreenOverlay").style.display = "none";
+      handleUserSession(dummyUser);
       showToast("Signed in as Demo Guest Player (ShadowHunter)", "success");
-      renderProfileData();
-      renderWalletScreen();
-      renderHomePersonalizedSections();
-    }
-
-    let currentUsernameRequestId = 0;
-
-    function generateUsernameSuggestions(baseInput) {
-      let base = (baseInput || "").trim().replace(/[^a-zA-Z0-9_]/g, '');
-      if (!base || base.length < 3) {
-        base = "Player";
-        if (pendingOnboardingEmail) {
-          const emailPrefix = pendingOnboardingEmail.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
-          if (emailPrefix.length >= 3) base = emailPrefix;
-        }
-      }
-      base = base.charAt(0).toUpperCase() + base.slice(1);
-      if (base.length > 15) base = base.slice(0, 15);
-
-      const suggestions = [
-        base,
-        base + "01",
-        base + "77",
-        base + "Gaming",
-        base + "Player"
-      ];
-      return suggestions.filter(s => s.length >= 3 && s.length <= 20 && /^[a-zA-Z0-9_]+$/.test(s));
-    }
-
-    async function renderUsernameSuggestions(baseInput) {
-      const container = document.getElementById("usernameSuggestionsContainer");
-      const listContainer = document.getElementById("usernameSuggestionsList");
-      if (!container || !listContainer) return;
-
-      const rawSuggestions = generateUsernameSuggestions(baseInput);
-      listContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted);">Checking suggestions...</span>`;
-      container.style.display = "block";
-
-      const verified = [];
-      for (const sug of rawSuggestions) {
-        const lower = sug.toLowerCase();
-        let isAvail = false;
-        if (database && firebaseInitialized) {
-          try {
-            const snap = await Promise.race([
-              database.ref('usernames/' + lower).once('value'),
-              new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))
-            ]);
-            const valData = snap.val();
-            let ownerUid = null;
-            if (valData) {
-              ownerUid = typeof valData === 'object' ? valData.uid : valData;
-            }
-            const currentUid = pendingOnboardingUid || (currentUser ? currentUser.uid : null);
-            if (!snap.exists() || (ownerUid && ownerUid === currentUid)) {
-              isAvail = true;
-            }
-          } catch (e) {
-            isAvail = true;
-          }
-        } else {
-          isAvail = true;
-        }
-        if (isAvail) {
-          verified.push(sug);
-        }
-      }
-
-      if (verified.length === 0) {
-        container.style.display = "none";
-        return;
-      }
-
-      listContainer.innerHTML = verified.map(sug => `
-        <button type="button" class="btn btn-secondary" style="font-size:11px; padding:6px 10px; border-radius:6px; background:rgba(0,229,255,0.08); border-color:rgba(0,229,255,0.3); color:var(--neon-cyan); cursor:pointer;" onclick="selectSuggestedUsername('${sug}')">
-          <i class="fa-solid fa-circle-plus"></i> ${sug}
-        </button>
-      `).join('');
-    }
-
-    function selectSuggestedUsername(sug) {
-      const input = document.getElementById("onboardingUsernameInput");
-      if (input) {
-        input.value = sug;
-        handleUsernameValidation(sug);
-      }
-    }
-
-    function handleUsernameValidation(val) {
-      const feedback = document.getElementById("onboardingUsernameFeedback");
-      const nextBtn = document.getElementById("btnOnboardingStep1Next");
-      const container = document.getElementById("usernameSuggestionsContainer");
-      const clean = (val || "").trim();
-
-      isUsernameAvailable = false;
-      if (nextBtn) nextBtn.disabled = true;
-
-      if (clean.length < 3 || clean.length > 20) {
-        feedback.innerHTML = `<span style="color:var(--text-muted);"><i class="fa-solid fa-circle-info"></i> Username must be 3-20 characters.</span>`;
-        if (container) container.style.display = "none";
-        return;
-      }
-
-      if (!/^[a-zA-Z0-9_]{3,20}$/.test(clean)) {
-        feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> Only letters, numbers and underscores allowed.</span>`;
-        if (container) container.style.display = "none";
-        return;
-      }
-
-      feedback.innerHTML = `<span style="color:var(--neon-cyan);"><i class="fa-solid fa-spinner fa-spin"></i> Checking availability...</span>`;
-
-      const requestId = ++currentUsernameRequestId;
-      clearTimeout(usernameCheckTimeout);
-
-      usernameCheckTimeout = setTimeout(() => {
-        if (requestId !== currentUsernameRequestId) return;
-        const lower = clean.toLowerCase();
-        const currentUid = pendingOnboardingUid || (currentUser ? currentUser.uid : null);
-
-        if (database && firebaseInitialized) {
-          let timeoutTriggered = false;
-          const timer = setTimeout(() => {
-            if (requestId !== currentUsernameRequestId) return;
-            timeoutTriggered = true;
-            feedback.innerHTML = `<span style="color:var(--neon-orange);"><i class="fa-solid fa-triangle-exclamation"></i> Unable to check availability right now. Please try again or pick a suggestion.</span>`;
-            isUsernameAvailable = false;
-            if (nextBtn) nextBtn.disabled = true;
-            renderUsernameSuggestions(clean);
-          }, 6000);
-
-          database.ref('usernames/' + lower).once('value', (snap) => {
-            if (requestId !== currentUsernameRequestId || timeoutTriggered) return;
-            clearTimeout(timer);
-
-            try {
-              const valData = snap.val();
-              let ownerUid = null;
-              if (valData) {
-                ownerUid = typeof valData === 'object' ? valData.uid : valData;
-              }
-
-              if (snap.exists() && ownerUid && ownerUid !== currentUid) {
-                feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> "${clean}" is already taken by another player.</span>`;
-                isUsernameAvailable = false;
-                if (nextBtn) nextBtn.disabled = true;
-                renderUsernameSuggestions(clean);
-              } else {
-                feedback.innerHTML = `<span style="color:var(--neon-green);"><i class="fa-solid fa-circle-check"></i> "${clean}" is available!</span>`;
-                isUsernameAvailable = true;
-                if (nextBtn) nextBtn.disabled = false;
-                if (container) container.style.display = "none";
-              }
-            } catch (parseErr) {
-              if (requestId !== currentUsernameRequestId) return;
-              console.error("Username check parse error:", parseErr);
-              feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> Couldn't check username. Try again.</span>`;
-              isUsernameAvailable = false;
-              if (nextBtn) nextBtn.disabled = true;
-              renderUsernameSuggestions(clean);
-            }
-          }).catch((err) => {
-            if (requestId !== currentUsernameRequestId || timeoutTriggered) return;
-            clearTimeout(timer);
-            console.error("Username check read error:", err);
-            feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> Couldn't check username. Try again.</span>`;
-            isUsernameAvailable = false;
-            if (nextBtn) nextBtn.disabled = true;
-            renderUsernameSuggestions(clean);
-          });
-        } else {
-          const taken = ["admin", "root", "moderator", "arbiter", "shadowhunter"].includes(lower);
-          if (taken) {
-            feedback.innerHTML = `<span style="color:var(--neon-red);"><i class="fa-solid fa-circle-xmark"></i> "${clean}" is reserved.</span>`;
-            isUsernameAvailable = false;
-            if (nextBtn) nextBtn.disabled = true;
-            renderUsernameSuggestions(clean);
-          } else {
-            feedback.innerHTML = `<span style="color:var(--neon-green);"><i class="fa-solid fa-circle-check"></i> "${clean}" is available!</span>`;
-            isUsernameAvailable = true;
-            if (nextBtn) nextBtn.disabled = false;
-            if (container) container.style.display = "none";
-          }
-        }
-      }, 400);
-    }
-
-    function goToOnboardingStep2() {
-      const username = document.getElementById("onboardingUsernameInput").value.trim();
-      if (!username || !isUsernameAvailable) {
-        showToast("Please enter a valid, available username first.", "error");
-        return;
-      }
-      document.getElementById("onboardingStep1").style.display = "none";
-      document.getElementById("onboardingStep2").style.display = "block";
-    }
-
-    function backToOnboardingStep1() {
-      document.getElementById("onboardingStep2").style.display = "none";
-      document.getElementById("onboardingStep1").style.display = "block";
-    }
-
-    function finishFirstTimeOnboarding() {
-      const username = document.getElementById("onboardingUsernameInput").value.trim();
-      const playerId = document.getElementById("onboardingPlayerIdInput").value.trim();
-
-      if (!username || !isUsernameAvailable) {
-        showToast("Please enter a valid, available username first.", "error");
-        return;
-      }
-
-      if (!playerId || playerId.length < 8 || !/^[0-9]+$/.test(playerId)) {
-        showToast("Please enter a valid numeric Free Fire UID (8-12 digits).", "error");
-        return;
-      }
-
-      const uid = pendingOnboardingUid || (currentUser ? currentUser.uid : "user-" + Math.floor(1000 + Math.random() * 9000));
-      const email = pendingOnboardingEmail || (currentUser ? currentUser.email : "player@freefirearena.com");
-      const authProvider = pendingOnboardingProvider || "password";
-      const normalizedUsername = username.toLowerCase();
-
-      currentUser = {
-        uid: uid,
-        username: username,
-        usernameLowercase: normalizedUsername,
-        displayName: username,
-        playerId: playerId,
-        ffUID: playerId,
-        email: email,
-        authProvider: authProvider,
-        onboardingCompleted: true,
-        coins: 250,
-        skillLevel: "Rising",
-        matches: 0,
-        wins: 0,
-        kills: 0,
-        role: "player",
-        isAdmin: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-
-      if (database && firebaseInitialized) {
-        database.ref('usernames/' + normalizedUsername).transaction((currentVal) => {
-          if (currentVal === null || (typeof currentVal === 'object' && currentVal.uid === uid) || currentVal === uid) {
-            return { uid: uid };
-          }
-          return;
-        }, (error, committed) => {
-          if (error) {
-            console.warn("Username transaction warning:", error);
-          }
-          database.ref('users/' + uid).set(currentUser);
-          database.ref('wallets/' + uid + '/coins').set(250);
-        });
-      }
-
-      const overlay = document.getElementById("authScreenOverlay");
-      if (overlay) overlay.style.display = "none";
-
-      hapticFeedback();
-      showToast(`Welcome to RS TOURNAMENT, ${username}! 250 Coins credited.`, "success");
-      renderProfileData();
-      renderWalletScreen();
-      renderHomePersonalizedSections();
     }
 
     function handleLogout() {
@@ -9123,7 +8895,7 @@
       if (auth && firebaseInitialized) {
         auth.getRedirectResult().then((result) => {
           if (result && result.user) {
-            handleSuccessfulGoogleUser(result.user);
+            handleUserSession(result.user);
             return;
           }
         }).catch((err) => {
@@ -9131,29 +8903,7 @@
         });
 
         auth.onAuthStateChanged((user) => {
-          if (user) {
-            database.ref('users/' + user.uid).once('value', (snap) => {
-              const profile = snap.val();
-              if (profile && profile.onboardingCompleted) {
-                currentUser = profile;
-                currentUser.uid = user.uid;
-                localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-                overlay.style.display = 'none';
-                renderProfileData();
-                renderWalletScreen();
-                renderHomePersonalizedSections();
-              } else {
-                pendingOnboardingUid = user.uid;
-                pendingOnboardingEmail = user.email || "";
-                pendingOnboardingProvider = user.providerData && user.providerData[0] ? user.providerData[0].providerId : "google.com";
-                showOnboardingView();
-              }
-            });
-          } else {
-            currentUser = null;
-            localStorage.removeItem('ffa_user');
-            showAuthMainView();
-          }
+          handleUserSession(user);
         });
       } else {
         currentUser = null;
