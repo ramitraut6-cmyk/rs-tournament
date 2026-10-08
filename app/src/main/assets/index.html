@@ -5718,259 +5718,36 @@
     let pendingOnboardingProvider = "password";
     let isUsernameAvailable = false;
     let usernameCheckTimeout = null;
-    let userFavorites = JSON.parse(localStorage.getItem('ffa_favorites')) || ['ff-tourney-1', 'ff-tourney-3'];
-    let userRegistrations = JSON.parse(localStorage.getItem('ffa_registrations')) || [
-      {
-        regId: 'REG-FFA-8910',
-        tournamentId: 'ff-tourney-2',
-        tourneyTitle: 'Midnight Havoc Duo Showdown',
-        mode: 'Duo',
-        ign: 'ShadowHunter',
-        playerUID: '6829401827',
-        status: 'Confirmed',
-        registeredAt: new Date(Date.now() - 3600000).toISOString(),
-        roomId: '891024',
-        roomPass: 'FFA77'
-      }
-    ];
+    let userFavorites = JSON.parse(localStorage.getItem('ffa_favorites')) || [];
+    let userRegistrations = JSON.parse(localStorage.getItem('ffa_registrations')) || [];
 
     // Part 2: Transactions Ledger Repository
-    let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [
-      {
-        transactionId: "TX-FFA-1001",
-        userId: currentUser.uid,
-        type: "BONUS",
-        amount: 250,
-        coinAmount: 250,
-        status: "Completed",
-        referenceId: "SIGNUP-WELCOME",
-        description: "Arena Welcome Bonus Coins",
-        createdAt: new Date(Date.now() - 86400000).toISOString()
-      },
-      {
-        transactionId: "TX-FFA-1002",
-        userId: currentUser.uid,
-        type: "TOURNAMENT_WIN",
-        amount: 500,
-        coinAmount: 500,
-        status: "Completed",
-        referenceId: "MATCH-FFA-8910",
-        description: "1st Place Prize - Bermuda Clash Squad",
-        createdAt: new Date(Date.now() - 43200000).toISOString()
-      },
-      {
-        transactionId: "TX-FFA-1003",
-        userId: currentUser.uid,
-        type: "KILL_REWARD",
-        amount: 200,
-        coinAmount: 200,
-        status: "Completed",
-        referenceId: "MATCH-FFA-8910",
-        description: "8 Kills Bounty Reward",
-        createdAt: new Date(Date.now() - 43100000).toISOString()
-      }
-    ];
+    let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
 
     // Part 2: Payment Requests Repository
-    let userPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [
-      {
-        paymentId: "PAY-FFA-7001",
-        userId: currentUser.uid,
-        amount: 100,
-        coinAmount: 100,
-        paymentMethod: "eSewa",
-        transactionReference: "ESEWA9820194",
-        note: "Topup 100 Coins for Bermuda match",
-        status: "APPROVED",
-        createdAt: new Date(Date.now() - 172800000).toISOString(),
-        updatedAt: new Date(Date.now() - 170000000).toISOString()
-      }
-    ];
+    let userPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [];
 
     // Part 2: Redeem Requests Repository
     let userRedeems = JSON.parse(localStorage.getItem('ffa_redeems')) || [];
 
     // Part 2: Match Results Repository
-    let tournamentResults = JSON.parse(localStorage.getItem('ffa_tournament_results')) || [
-      {
-        matchId: "MATCH-FFA-8910",
-        tournamentId: "ff-tourney-1",
-        tournamentTitle: "Bermuda Clash Squad Grand Cup",
-        mode: "Squad",
-        placement: 1,
-        kills: 8,
-        killPoints: 200,
-        placementPoints: 12,
-        bonusPoints: 0,
-        score: 212,
-        prizeCoins: 700,
-        status: "VERIFIED",
-        verified: true,
-        payoutStatus: "Credited",
-        date: "Yesterday, 09:00 PM",
-        rulesUsed: "Official Arena Squad Battle Royale Rules v4.2"
-      },
-      {
-        matchId: "MATCH-FFA-7741",
-        tournamentId: "ff-tourney-2",
-        tournamentTitle: "Midnight Havoc Duo Showdown",
-        mode: "Duo",
-        placement: 4,
-        kills: 3,
-        killPoints: 30,
-        placementPoints: 7,
-        bonusPoints: 0,
-        score: 37,
-        prizeCoins: 30,
-        status: "VERIFIED",
-        verified: true,
-        payoutStatus: "Credited",
-        date: "2 days ago",
-        rulesUsed: "Standard Duo Competitive Rules"
-      },
-      {
-        matchId: "MATCH-FFA-6512",
-        tournamentId: "ff-tourney-3",
-        tournamentTitle: "Alpine Solo Survival Challenge",
-        mode: "Solo",
-        placement: 12,
-        kills: 1,
-        killPoints: 15,
-        placementPoints: 0,
-        bonusPoints: 0,
-        score: 15,
-        prizeCoins: 0,
-        status: "VERIFIED",
-        verified: true,
-        payoutStatus: "Completed",
-        date: "3 days ago",
-        rulesUsed: "Solo Battle Royale Protocol"
-      }
-    ];
+    let tournamentResults = JSON.parse(localStorage.getItem('ffa_tournament_results')) || [];
 
     // Part 2: Result Disputes Repository
     let userDisputes = JSON.parse(localStorage.getItem('ffa_disputes')) || [];
 
     // Part 2: Notifications Repository
-    let userNotifications = JSON.parse(localStorage.getItem('ffa_notifications')) || [
-      {
-        id: "notif-1",
-        title: "Welcome to Free Fire Arena!",
-        message: "You received 250 Arena Coins welcome bonus. Enter tournaments or test your skills.",
-        type: "COINS_CREDITED",
-        read: false,
-        time: "1 hour ago",
-        timestamp: Date.now() - 3600000
-      },
-      {
-        id: "notif-2",
-        title: "Championship Registration Open",
-        message: "Bermuda Clash Squad Cup is now accepting team registrations.",
-        type: "TOURNAMENT",
-        read: false,
-        time: "3 hours ago",
-        timestamp: Date.now() - 10800000
-      }
-    ];
+    let userNotifications = JSON.parse(localStorage.getItem('ffa_notifications')) || [];
 
-    const sampleTournaments = [
-      {
-        id: "ff-tourney-1",
-        title: "Bermuda Clash Squad Grand Cup",
-        mode: "Squad",
-        map: "Bermuda",
-        type: "Competitive",
-        isPaid: true,
-        entryFee: 50,
-        prizePool: 5000,
-        prizeFirst: 2500,
-        prizeSecond: 1500,
-        prizeThird: 1000,
-        perKill: 25,
-        totalSlots: 48,
-        filledSlots: 42,
-        date: "Tonight",
-        time: "09:00 PM IST",
-        status: "Registration Open",
-        banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
-        organizer: "Arena Official Esports",
-        rules: "No emulators, no PC players. Room credentials distributed 15 minutes before start. Screenshots required for result claims.",
-        requirements: "Free Fire Account Level 25+. Anti-cheat verified.",
-        lastUpdated: "10 mins ago"
-      },
-      {
-        id: "ff-tourney-2",
-        title: "Midnight Havoc Duo Showdown",
-        mode: "Duo",
-        map: "Purgatory",
-        type: "Free",
-        isPaid: false,
-        entryFee: 0,
-        prizePool: 1200,
-        prizeFirst: 700,
-        prizeSecond: 300,
-        prizeThird: 200,
-        perKill: 10,
-        totalSlots: 24,
-        filledSlots: 21,
-        date: "Tonight",
-        time: "10:30 PM IST",
-        status: "Registration Open",
-        banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
-        organizer: "Phoenix Gaming Guild",
-        rules: "Standard duo tournament. Fair play guidelines apply. Team captains must join Discord room.",
-        requirements: "Level 20+ FF ID.",
-        lastUpdated: "25 mins ago"
-      },
-      {
-        id: "ff-tourney-3",
-        title: "Alpine Solo Survival Challenge",
-        mode: "Solo",
-        map: "Alpine",
-        type: "Beginner",
-        isPaid: true,
-        entryFee: 20,
-        prizePool: 1800,
-        prizeFirst: 1000,
-        prizeSecond: 500,
-        prizeThird: 300,
-        perKill: 15,
-        totalSlots: 48,
-        filledSlots: 48,
-        date: "Live Now",
-        time: "Ongoing",
-        status: "Live",
-        banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80",
-        organizer: "Arena Official Esports",
-        rules: "Solo battle royale. Campers and teamers will be disqualified instantly.",
-        requirements: "Level 15+ FF ID.",
-        lastUpdated: "Just now"
-      },
-      {
-        id: "ff-tourney-4",
-        title: "Kalahari Deathmatch Practice",
-        mode: "Solo",
-        map: "Kalahari",
-        type: "Practice",
-        isPaid: false,
-        entryFee: 0,
-        prizePool: 500,
-        prizeFirst: 300,
-        prizeSecond: 150,
-        prizeThird: 50,
-        perKill: 5,
-        totalSlots: 48,
-        filledSlots: 18,
-        date: "Tomorrow",
-        time: "06:00 PM IST",
-        status: "Upcoming",
-        banner: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?auto=format&fit=crop&w=800&q=80",
-        organizer: "Community Scrims Hub",
-        rules: "Practice tournament for rising and beginner rank players.",
-        requirements: "All players welcome.",
-        lastUpdated: "1 hour ago"
-      }
-    ];
+    let sampleTournaments = [];
+    if (typeof database !== 'undefined' && database) {
+      database.ref('tournaments').on('value', (snap) => {
+        const data = snap.val();
+        sampleTournaments = data ? Object.values(data) : [];
+        if (typeof renderTournamentsList === 'function') renderTournamentsList();
+        if (typeof renderHomePersonalizedSections === 'function') renderHomePersonalizedSections();
+      });
+    }
 
     // ==========================================
     // 3. REUSABLE COPY UTILITY
@@ -8592,7 +8369,7 @@
             email: email,
             authProvider: authProvider,
             onboardingCompleted: true,
-            coins: 250,
+            coins: 0,
             skillLevel: "Rising",
             matches: 0,
             wins: 0,
@@ -8604,17 +8381,36 @@
           };
 
           await database.ref('usernames/' + normalizedUsername).set({ uid: uid });
+          
+          // Check if wallet coins already exist in Firebase
+          const walletSnap = await database.ref('wallets/' + uid + '/coins').once('value');
+          let currentCoins = walletSnap.val();
+          if (currentCoins === null || currentCoins === undefined) {
+            currentCoins = 0;
+            await database.ref('wallets/' + uid + '/coins').set(0);
+          }
+          newProfile.coins = currentCoins;
+
           await database.ref('users/' + uid).set(newProfile);
-          await database.ref('wallets/' + uid + '/coins').set(250);
 
           currentUser = newProfile;
           localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+
+          // Set up real-time listener for coins balance
+          database.ref('wallets/' + uid + '/coins').on('value', (snap) => {
+            const val = snap.val();
+            const coinVal = (val !== null && val !== undefined) ? val : 0;
+            if (currentUser) currentUser.coins = coinVal;
+            document.querySelectorAll("#headerCoinBalance, #walletTotalCoins, #redeemAvailableCoins, #redeemAvailableRupees").forEach(el => {
+              if (el) el.innerText = coinVal;
+            });
+          });
 
           const overlay = document.getElementById("authScreenOverlay");
           if (overlay) overlay.style.display = "none";
 
           hapticFeedback();
-          showToast(`Welcome to RS TOURNAMENT, ${finalUsername}! 250 Coins credited.`, "success");
+          showToast(`Welcome to RS TOURNAMENT, ${finalUsername}!`, "success");
           renderProfileData();
           renderWalletScreen();
           renderHomePersonalizedSections();
@@ -8632,7 +8428,7 @@
             email: email,
             authProvider: authProvider,
             onboardingCompleted: true,
-            coins: 250,
+            coins: 0,
             skillLevel: "Rising",
             matches: 0,
             wins: 0,
@@ -8641,6 +8437,16 @@
             isAdmin: false
           };
           localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          
+          database.ref('wallets/' + uid + '/coins').on('value', (snap) => {
+            const val = snap.val();
+            const coinVal = (val !== null && val !== undefined) ? val : 0;
+            if (currentUser) currentUser.coins = coinVal;
+            document.querySelectorAll("#headerCoinBalance, #walletTotalCoins, #redeemAvailableCoins, #redeemAvailableRupees").forEach(el => {
+              if (el) el.innerText = coinVal;
+            });
+          });
+
           const overlay = document.getElementById("authScreenOverlay");
           if (overlay) overlay.style.display = "none";
           showToast(`Welcome to RS TOURNAMENT, ${fallbackUsername}!`, "success");
@@ -8659,7 +8465,7 @@
           email: email,
           authProvider: authProvider,
           onboardingCompleted: true,
-          coins: 250,
+          coins: 0,
           skillLevel: "Rising",
           matches: 0,
           wins: 0,

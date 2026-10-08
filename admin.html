@@ -3308,65 +3308,7 @@
     // TOURNAMENT MANAGEMENT
     // ==========================================
     function getAdminTournaments() {
-      return JSON.parse(localStorage.getItem('ffa_tournaments')) || [
-        {
-          id: "T-101",
-          title: "Bermuda Clash Squad Masters",
-          mode: "Squad",
-          map: "Bermuda",
-          date: "Tonight",
-          time: "7:00 PM",
-          entryFee: 50,
-          totalSlots: 48,
-          filledSlots: 42,
-          prizePool: 2000,
-          prizeFirst: 1000,
-          prizeSecond: 500,
-          perKill: 25,
-          status: "REGISTRATION_OPEN",
-          banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80",
-          roomId: "",
-          roomPassword: ""
-        },
-        {
-          id: "T-102",
-          title: "Purgatory Duo Headshot Cup",
-          mode: "Duo",
-          map: "Purgatory",
-          date: "Tomorrow",
-          time: "5:00 PM",
-          entryFee: 30,
-          totalSlots: 50,
-          filledSlots: 50,
-          prizePool: 1200,
-          prizeFirst: 600,
-          prizeSecond: 300,
-          perKill: 15,
-          status: "CHECKIN_OPEN",
-          banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
-          roomId: "8912401",
-          roomPassword: "8899"
-        },
-        {
-          id: "T-103",
-          title: "Kalahari Solo Survival Cup",
-          mode: "Solo",
-          map: "Kalahari",
-          date: "Saturday",
-          time: "8:30 PM",
-          entryFee: 0,
-          totalSlots: 48,
-          filledSlots: 26,
-          prizePool: 500,
-          prizeFirst: 250,
-          prizeSecond: 150,
-          perKill: 5,
-          status: "REGISTRATION_OPEN",
-          banner: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80",
-          roomId: "",
-          roomPassword: ""
-        }
-      ];
+      return JSON.parse(localStorage.getItem('ffa_tournaments')) || [];
     }
 
     function renderAdminTournaments() {
@@ -3501,6 +3443,9 @@
       }
 
       localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      if (typeof database !== 'undefined' && database) {
+        database.ref('tournaments/' + id).set(tourneyObj).catch(err => console.warn("Firebase tournament sync error:", err));
+      }
       recordAudit("TOURNAMENT_SAVED", `Saved tournament ${id}: ${title} (${mode}, ${map})`);
       closeAdminModal("modalAdminTournament");
       renderAdminTournaments();
