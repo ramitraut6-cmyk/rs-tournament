@@ -4445,10 +4445,10 @@
       <div class="wallet-hero" style="border-color:rgba(0,230,118,0.3); margin-bottom:16px;">
         <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Referral Rewards Program</div>
         <div style="font-size:22px; font-weight:800; color:#fff; font-family:var(--font-heading); margin:4px 0;">
-          Get 50 Coins Per Friend
+          Get 10 Coins Per Friend
         </div>
         <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
-          Invite teammates with your unique referral code. When they register and join their first tournament, both of you receive 50 Arena Coins.
+          Invite teammates with your unique referral code. When they register and join their first tournament, both of you receive 10 Arena Coins.
         </p>
       </div>
 
@@ -9632,7 +9632,7 @@
       { id: "ach-5", title: "Squad Recruiter", desc: "Post or apply to a team recruitment request.", reward: 20, current: 1, max: 1, icon: "fa-users", category: "Community" },
       { id: "ach-6", title: "Fair Play Guardian", desc: "Submit a verified report against a cheater or rulebreaker.", reward: 30, current: 1, max: 1, icon: "fa-shield-halved", category: "Community" },
       { id: "ach-7", title: "High Roller", desc: "Deposit coins using Khalti or eSewa.", reward: 40, current: 1, max: 1, icon: "fa-coins", category: "Financial" },
-      { id: "ach-8", title: "Arena Ambassador", desc: "Refer a fellow player using your unique referral code.", reward: 50, current: 2, max: 2, icon: "fa-gift", category: "Community" }
+      { id: "ach-8", title: "Arena Ambassador", desc: "Refer a fellow player using your unique referral code.", reward: 10, current: 2, max: 2, icon: "fa-gift", category: "Community" }
     ];
 
     function openAchievementsModal() {
@@ -9983,7 +9983,13 @@
     // PART 3: REFERRAL & SHARE PROGRAM
     // ==========================================
     function openReferralModal() {
-      const code = (currentUser && currentUser.referralCode) || "FFA-SHADOW77";
+      const code = (currentUser && currentUser.referralCode) || (currentUser && currentUser.username ? `FFA-${currentUser.username.toUpperCase()}` : "FFA-SHADOW77");
+      if (currentUser && !currentUser.referralCode) {
+        currentUser.referralCode = code;
+        if (database && firebaseInitialized) {
+          database.ref(`users/${currentUser.uid}`).update({ referralCode: code });
+        }
+      }
       document.getElementById("myReferralCode").innerText = code;
       document.getElementById("myReferralLink").innerText = `https://freefirearena.com?ref=${code}`;
       openModal("modalReferral");
@@ -9991,7 +9997,7 @@
 
     function shareReferralLink() {
       const code = document.getElementById("myReferralCode").innerText;
-      const shareText = `🔥 Join me on Free Fire Arena! Play competitive Solo, Duo & Squad tournaments, earn real cash & coins. Use my referral code: ${code} to get 50 bonus coins instantly!\nhttps://freefirearena.com?ref=${code}`;
+      const shareText = `🔥 Join me on Free Fire Arena! Play competitive Solo, Duo & Squad tournaments, earn real cash & coins. Use my referral code: ${code} to get 10 bonus coins instantly!\nhttps://freefirearena.com?ref=${code}`;
 
       if (navigator.share) {
         navigator.share({

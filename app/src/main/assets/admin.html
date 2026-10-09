@@ -1160,7 +1160,7 @@
               </div>
               <div>
                 <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:4px;">Referral Bonus Coins</label>
-                <input type="number" id="settingRefBonus" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="50">
+                <input type="number" id="settingRefBonus" class="btn-secondary" style="width:100%; padding:8px 10px; border-radius:6px;" value="10">
               </div>
             </div>
           </div>
@@ -1745,9 +1745,7 @@
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Authenticating Arbiter Credentials...`;
 
-      // Authorized email patterns or Firebase
-      const isEmailAuthorized = email.includes("admin") || email.includes("arbiter") || email === "ramitraut6@gmail.com";
-
+      // Strict Firebase Auth & RTDB isAdmin verification (No email substring bypass)
       if (firebaseInitialized && firebase.auth) {
         firebase.auth().signInWithEmailAndPassword(email, pass)
           .then((userCred) => {
@@ -1755,7 +1753,7 @@
             database.ref('users/' + user.uid + '/isAdmin').once('value', (snap) => {
               btn.disabled = false;
               btn.innerHTML = `<i class="fa-solid fa-lock"></i> Authorize & Enter Console`;
-              if (snap.val() === true || isEmailAuthorized) {
+              if (snap.val() === true) {
                 // If authenticated and verified or matching authorized email pattern
                 currentAdminUser = {
                   uid: user.uid,
@@ -2654,7 +2652,7 @@
       const khaltiId = document.getElementById("settingKhaltiId").value.trim();
       const esewaId = document.getElementById("settingEsewaId").value.trim();
       const minRedeem = parseInt(document.getElementById("settingMinRedeem").value) || 100;
-      const refBonus = parseInt(document.getElementById("settingRefBonus").value) || 50;
+      const refBonus = parseInt(document.getElementById("settingRefBonus").value) || 10;
 
       const settings = {
         khalti: { id: khaltiId },
