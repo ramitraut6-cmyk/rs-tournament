@@ -7663,9 +7663,13 @@
     }
 
     function updateAddCoinsSummary() {
-      const customVal = parseInt(document.getElementById("addCoinsCustomInput").value) || selectedAddCoinsAmount;
-      document.getElementById("summaryPayAmount").innerText = `₹${customVal}`;
-      document.getElementById("summaryReceiveCoins").innerText = `${customVal} Coins`;
+      const customInput = document.getElementById("addCoinsCustomInput");
+      const val = parseInt(customInput ? customInput.value : 0) || selectedAddCoinsAmount || 100;
+      selectedAddCoinsAmount = val;
+      const payElem = document.getElementById("summaryPayAmount");
+      const recElem = document.getElementById("summaryReceiveCoins");
+      if (payElem) payElem.innerText = `₹${val}`;
+      if (recElem) recElem.innerText = `${val} Coins`;
     }
 
     function proceedToPaymentInstructions() {
@@ -11006,12 +11010,14 @@
 
       // Add coins amount pills
       document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
+        pill.addEventListener('click', (e) => {
+          e.preventDefault();
           document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
           pill.classList.add('selected');
           const amt = parseInt(pill.dataset.amount);
           selectedAddCoinsAmount = amt;
-          document.getElementById("addCoinsCustomInput").value = amt;
+          const customInput = document.getElementById("addCoinsCustomInput");
+          if (customInput) customInput.value = amt;
           updateAddCoinsSummary();
         });
       });
@@ -11026,12 +11032,14 @@
 
       // Redeem amount pills
       document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
+        pill.addEventListener('click', (e) => {
+          e.preventDefault();
           document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
           pill.classList.add('selected');
           const amt = parseInt(pill.dataset.redeem);
           selectedRedeemAmount = amt;
-          document.getElementById("redeemCustomInput").value = amt;
+          const redeemCustom = document.getElementById("redeemCustomInput");
+          if (redeemCustom) redeemCustom.value = amt;
         });
       });
 
@@ -11039,6 +11047,7 @@
       if (redeemCustom) {
         redeemCustom.addEventListener('input', () => {
           document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
+          selectedRedeemAmount = parseInt(redeemCustom.value) || 0;
         });
       }
 
