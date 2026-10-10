@@ -7648,6 +7648,14 @@
         openModal("modalAuth");
         return;
       }
+      selectedAddCoinsAmount = 100;
+      const customInput = document.getElementById("addCoinsCustomInput");
+      if (customInput) customInput.value = 100;
+      document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(p => {
+        if (p.dataset.amount === "100") p.classList.add('selected');
+        else p.classList.remove('selected');
+      });
+      updateAddCoinsSummary();
       backToAddCoinsStep1();
       openModal("modalAddCoins");
     }
@@ -7799,8 +7807,18 @@
         openModal("modalAuth");
         return;
       }
-      document.getElementById("redeemAvailableCoins").innerText = currentUser.coins || 0;
-      document.getElementById("redeemAvailableRupees").innerText = currentUser.coins || 0;
+      const balance = currentUser.coins || 0;
+      document.getElementById("redeemAvailableCoins").innerText = balance;
+      document.getElementById("redeemAvailableRupees").innerText = balance;
+      
+      selectedRedeemAmount = 30;
+      const redeemCustom = document.getElementById("redeemCustomInput");
+      if (redeemCustom) redeemCustom.value = 30;
+      document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(p => {
+        if (p.dataset.redeem === "30") p.classList.add('selected');
+        else p.classList.remove('selected');
+      });
+
       backToRedeemStep1();
       openModal("modalRedeem");
     }
@@ -11008,11 +11026,14 @@
         });
       }
 
-      // Add coins amount pills
-      document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(pill => {
-        pill.addEventListener('click', (e) => {
+      // Add coins amount pills (Event Delegation)
+      const addCoinsPillsContainer = document.getElementById("addCoinsAmountPills");
+      if (addCoinsPillsContainer) {
+        addCoinsPillsContainer.addEventListener('click', (e) => {
+          const pill = e.target.closest('.amount-pill');
+          if (!pill) return;
           e.preventDefault();
-          document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
+          addCoinsPillsContainer.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('selected'));
           pill.classList.add('selected');
           const amt = parseInt(pill.dataset.amount);
           selectedAddCoinsAmount = amt;
@@ -11020,34 +11041,52 @@
           if (customInput) customInput.value = amt;
           updateAddCoinsSummary();
         });
-      });
+      }
 
       const customInput = document.getElementById("addCoinsCustomInput");
       if (customInput) {
         customInput.addEventListener('input', () => {
-          document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
+          const val = parseInt(customInput.value) || 0;
+          selectedAddCoinsAmount = val;
+          document.querySelectorAll('#addCoinsAmountPills .amount-pill').forEach(p => {
+            if (parseInt(p.dataset.amount) === val) {
+              p.classList.add('selected');
+            } else {
+              p.classList.remove('selected');
+            }
+          });
           updateAddCoinsSummary();
         });
       }
 
-      // Redeem amount pills
-      document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(pill => {
-        pill.addEventListener('click', (e) => {
+      // Redeem amount pills (Event Delegation)
+      const redeemPillsContainer = document.getElementById("redeemAmountPills");
+      if (redeemPillsContainer) {
+        redeemPillsContainer.addEventListener('click', (e) => {
+          const pill = e.target.closest('.amount-pill');
+          if (!pill) return;
           e.preventDefault();
-          document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
+          redeemPillsContainer.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('selected'));
           pill.classList.add('selected');
           const amt = parseInt(pill.dataset.redeem);
           selectedRedeemAmount = amt;
           const redeemCustom = document.getElementById("redeemCustomInput");
           if (redeemCustom) redeemCustom.value = amt;
         });
-      });
+      }
 
       const redeemCustom = document.getElementById("redeemCustomInput");
       if (redeemCustom) {
         redeemCustom.addEventListener('input', () => {
-          document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(p => p.classList.remove('selected'));
-          selectedRedeemAmount = parseInt(redeemCustom.value) || 0;
+          const val = parseInt(redeemCustom.value) || 0;
+          selectedRedeemAmount = val;
+          document.querySelectorAll('#redeemAmountPills .amount-pill').forEach(p => {
+            if (parseInt(p.dataset.redeem) === val) {
+              p.classList.add('selected');
+            } else {
+              p.classList.remove('selected');
+            }
+          });
         });
       }
 
