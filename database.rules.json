@@ -113,6 +113,22 @@
         ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
       }
     },
+    "topupProducts": {
+      ".read": "auth != null",
+      "$productId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    "topupOrders": {
+      ".read": "auth != null",
+      "$orderId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('isAdmin').val() === true || (!data.exists() && newData.child('uid').val() === auth.uid) || (data.exists() && data.child('uid').val() === auth.uid))"
+      }
+    },
+    "settings": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+    },
     "auditLogs": {
       ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true",
       "$logId": {

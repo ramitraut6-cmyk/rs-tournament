@@ -5867,30 +5867,97 @@
     }
 
     // ==========================================
-    // TOPUP CENTER & DIAMOND ORDERS
+    // TOPUP CENTER & COIN ECONOMY WORKFLOW
     // ==========================================
-    const DEFAULT_TOPUP_PACKAGES = [
-      { id: "pkg_100", name: "100 Diamonds", diamonds: 100, price: 80, badge: "Popular" },
-      { id: "pkg_310", name: "310 Diamonds", diamonds: 310, price: 240, badge: "Best Value" },
-      { id: "pkg_520", name: "520 Diamonds", diamonds: 520, price: 400, badge: "Bonus +20%" },
-      { id: "pkg_1060", name: "1060 Diamonds", diamonds: 1060, price: 800, badge: "Super Value" },
-      { id: "pkg_2180", name: "2180 Diamonds", diamonds: 2180, price: 1600, badge: "Pro Pack" },
-      { id: "pkg_5600", name: "5600 Diamonds", diamonds: 5600, price: 4000, badge: "Mega VIP" }
-    ];
-
+    let topupProductsCache = [];
+    let topupCategoryFilter = 'diamond';
+    let topupCoinDeductionEnabled = true;
     let selectedTopupPkg = null;
+
+    async function loadTopupData() {
+      if (database && firebaseInitialized) {
+        database.ref('settings/topupCoinDeductionEnabled').on('value', (snap) => {
+          topupCoinDeductionEnabled = snap.val() !== false;
+          const statusEl = document.getElementById("topupCoinDeductionNotice");
+          if (statusEl) {
+            statusEl.style.display = topupCoinDeductionEnabled ? "block" : "none";
+          }
+        });
+
+        database.ref('topupProducts').on('value', (snap) => {
+          const val = snap.val();
+          if (val) {
+            topupProductsCache = Object.values(val).filter(p => p.active !== false).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+          } else {
+            topupProductsCache = getDefaultTopupProducts();
+            initDefaultTopupProducts();
+          }
+          renderTopupScreen();
+        });
+      } else {
+        topupProductsCache = JSON.parse(localStorage.getItem('ffa_topup_products')) || getDefaultTopupProducts();
+        renderTopupScreen();
+      }
+    }
+
+    function getDefaultTopupProducts() {
+      return [
+        { id: "pkg_100", name: "100 Diamonds", type: "diamond", diamonds: 100, price: 80, coinCost: 80, badge: "Popular", active: true, sortOrder: 1 },
+        { id: "pkg_310", name: "310 Diamonds", type: "diamond", diamonds: 310, price: 240, coinCost: 240, badge: "Best Value", active: true, sortOrder: 2 },
+        { id: "pkg_520", name: "520 Diamonds", type: "diamond", diamonds: 520, price: 400, coinCost: 400, badge: "Bonus +20%", active: true, sortOrder: 3 },
+        { id: "pkg_1060", name: "1060 Diamonds", type: "diamond", diamonds: 1060, price: 800, coinCost: 800, badge: "Super Value", active: true, sortOrder: 4 },
+        { id: "pkg_2180", name: "2180 Diamonds", type: "diamond", diamonds: 2180, price: 1600, coinCost: 1600, badge: "Pro Pack", active: true, sortOrder: 5 },
+        { id: "pkg_5600", name: "5600 Diamonds", type: "diamond", diamonds: 5600, price: 4000, coinCost: 4000, badge: "Mega VIP", active: true, sortOrder: 6 },
+        { id: "pkg_weekly", name: "Weekly Membership", type: "weekly", diamonds: "7 Days", price: 200, coinCost: 200, badge: "Membership", active: true, sortOrder: 7 },
+        { id: "pkg_monthly", name: "Monthly Membership", type: "monthly", diamonds: "30 Days", price: 500, coinCost: 500, badge: "VIP Elite", active: true, sortOrder: 8 }
+      ];
+    }
+
+    async function initDefaultTopupProducts() {
+      if (database && firebaseInitialized) {
+        const defaults = getDefaultTopupProducts();
+        for (const p of defaults) {
+          await database.ref('topupProducts/' + p.id).set(p);
+        }
+      } else {
+        localStorage.setItem('ffa_topup_products', JSON.stringify(getDefaultTopupProducts()));
+      }
+    }
+
+    function setTopupCategory(cat) {
+      topupCategoryFilter = cat;
+      ['diamond', 'weekly', 'monthly'].forEach(c => {
+        const btn = document.getElementById(`topupCat_${c}`);
+        if (btn) {
+          btn.classList.toggle('active', c === cat);
+          btn.style.background = c === cat ? 'var(--neon-cyan)' : 'var(--bg-card)';
+          btn.style.color = c === cat ? '#000' : 'var(--text-secondary)';
+        }
+      });
+      selectedTopupPkg = null;
+      const checkoutCard = document.getElementById("topupCheckoutCard");
+      if (checkoutCard) checkoutCard.style.display = "none";
+      renderTopupScreen();
+    }
 
     function renderTopupScreen() {
       const grid = document.getElementById("topupPackagesGrid");
       if (!grid) return;
-      grid.innerHTML = DEFAULT_TOPUP_PACKAGES.map(p => `
+
+      const filteredProducts = (topupProductsCache.length ? topupProductsCache : getDefaultTopupProducts())
+        .filter(p => p.active !== false && p.type === topupCategoryFilter);
+
+      grid.innerHTML = filteredProducts.map(p => `
         <div class="package-card ${selectedTopupPkg && selectedTopupPkg.id === p.id ? 'selected' : ''}" onclick="selectTopupPackage('${p.id}')" style="background:var(--bg-card); border:1px solid ${selectedTopupPkg && selectedTopupPkg.id === p.id ? 'var(--neon-cyan)' : 'var(--surface-border)'}; border-radius:14px; padding:14px; cursor:pointer; position:relative; transition:all 0.2s;">
-          ${p.badge ? `<span style="position:absolute; top:8px; right:8px; font-size:9px; font-weight:700; background:rgba(0,229,255,0.2); color:var(--neon-cyan); padding:2px 6px; border-radius:6px;">${p.badge}</span>` : ''}
+          ${p.badge ? `<span style="position:absolute; top:8px; right:8px; font-size:9px; font-weight:700; background:rgba(0,229,255,0.2); color:var(--neon-cyan); padding:2px 6px; border-radius:6px;">${escapeHTML(p.badge)}</span>` : ''}
           <div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
-            <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${p.diamonds}
+            <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(String(p.name || p.diamonds))}
           </div>
-          <div style="font-size:11px; color:var(--text-secondary); margin-bottom:10px;">Free Fire Diamonds</div>
-          <div style="font-size:14px; font-weight:800; color:var(--neon-amber);">₹${p.price}</div>
+          <div style="font-size:11px; color:var(--text-secondary); margin-bottom:8px;">Free Fire Official</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:14px; font-weight:800; color:var(--neon-amber);">₹${p.price}</span>
+            ${topupCoinDeductionEnabled ? `<span style="font-size:11px; font-weight:700; color:var(--neon-green);"><i class="fa-solid fa-coins"></i> ${p.coinCost || p.price} Coins</span>` : ''}
+          </div>
         </div>
       `).join('');
 
@@ -5901,14 +5968,38 @@
     }
 
     function selectTopupPackage(pkgId) {
-      selectedTopupPkg = DEFAULT_TOPUP_PACKAGES.find(p => p.id === pkgId);
+      const allProds = topupProductsCache.length ? topupProductsCache : getDefaultTopupProducts();
+      selectedTopupPkg = allProds.find(p => p.id === pkgId);
       const checkoutCard = document.getElementById("topupCheckoutCard");
-      if (selectedTopupPkg) {
+      if (selectedTopupPkg && checkoutCard) {
         checkoutCard.style.display = "block";
         document.getElementById("topupSelectedPkgName").innerText = selectedTopupPkg.name;
-        document.getElementById("topupSummaryDiamonds").innerText = selectedTopupPkg.diamonds + " Diamonds";
+        document.getElementById("topupSummaryDiamonds").innerText = String(selectedTopupPkg.diamonds) + (typeof selectedTopupPkg.diamonds === 'number' ? " Diamonds" : "");
         document.getElementById("topupSummaryPrice").innerText = "₹" + selectedTopupPkg.price;
-      } else {
+
+        const coinCostEl = document.getElementById("topupSummaryCoins");
+        const coinBalanceEl = document.getElementById("topupUserCoinBalance");
+        const coinWarningEl = document.getElementById("topupCoinInsufficientWarning");
+        const btnPlace = document.getElementById("btnPlaceTopupOrder");
+
+        if (topupCoinDeductionEnabled) {
+          if (coinCostEl) coinCostEl.innerText = (selectedTopupPkg.coinCost || selectedTopupPkg.price) + " Coins";
+          const userCoins = currentUser ? (currentUser.coins || 0) : 0;
+          if (coinBalanceEl) coinBalanceEl.innerText = userCoins + " Coins";
+          
+          const requiredCoins = selectedTopupPkg.coinCost || selectedTopupPkg.price;
+          if (userCoins < requiredCoins) {
+            if (coinWarningEl) {
+              coinWarningEl.style.display = "block";
+              coinWarningEl.innerText = `Insufficient coins! You need ${requiredCoins} coins, but you only have ${userCoins} coins.`;
+            }
+            if (btnPlace) { btnPlace.disabled = true; btnPlace.style.opacity = "0.5"; }
+          } else {
+            if (coinWarningEl) coinWarningEl.style.display = "none";
+            if (btnPlace) { btnPlace.disabled = false; btnPlace.style.opacity = "1"; }
+          }
+        }
+      } else if (checkoutCard) {
         checkoutCard.style.display = "none";
       }
       renderTopupScreen();
@@ -5916,18 +6007,20 @@
 
     function saveTopupUIDDefault() {
       const uidVal = document.getElementById("topupPlayerUID").value.trim();
+      const ignVal = document.getElementById("topupIGN") ? document.getElementById("topupIGN").value.trim() : "";
       if (!uidVal || uidVal.length < 6) {
         showToast("Enter a valid Free Fire UID (6-14 digits)", "error");
         return;
       }
       if (currentUser) {
         currentUser.ffUID = uidVal;
+        if (ignVal) currentUser.ign = ignVal;
         localStorage.setItem('ffa_user', JSON.stringify(currentUser));
         if (database && firebaseInitialized) {
-          database.ref('users/' + currentUser.uid).update({ ffUID: uidVal, updatedAt: new Date().toISOString() });
+          database.ref('users/' + currentUser.uid).update({ ffUID: uidVal, ign: ignVal, updatedAt: new Date().toISOString() });
         }
       }
-      showToast("Player UID saved successfully!", "success");
+      showToast("Player details saved successfully!", "success");
     }
 
     async function placeTopupOrder() {
@@ -5936,33 +6029,78 @@
         return;
       }
       if (!selectedTopupPkg) {
-        showToast("Please select a diamond package first.", "error");
+        showToast("Please select a top-up package first.", "error");
         return;
       }
       const playerUID = document.getElementById("topupPlayerUID").value.trim();
+      const inGameName = document.getElementById("topupIGN") ? document.getElementById("topupIGN").value.trim() : (currentUser.ign || currentUser.displayName || "Player");
+      
       if (!playerUID || playerUID.length < 6) {
         showToast("Please enter a valid Free Fire Player UID.", "error");
         return;
       }
+      if (!inGameName) {
+        showToast("Please enter your In-Game Name (IGN).", "error");
+        return;
+      }
+
+      const requiredCoins = selectedTopupPkg.coinCost || selectedTopupPkg.price;
+      if (topupCoinDeductionEnabled) {
+        const currentCoins = currentUser.coins || 0;
+        if (currentCoins < requiredCoins) {
+          showToast(`Insufficient coins! Required: ${requiredCoins}, Available: ${currentCoins}`, "error");
+          return;
+        }
+      }
 
       const btn = document.getElementById("btnPlaceTopupOrder");
-      if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Submitting Order...`; }
+      if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Order...`; }
 
       const orderId = "TOPUP-" + Math.floor(100000 + Math.random() * 900000);
+      const now = new Date().toISOString();
       const orderData = {
         orderId: orderId,
         uid: currentUser.uid,
-        username: currentUser.displayName || currentUser.username || "Player",
+        username: inGameName,
         playerUID: playerUID,
         packageId: selectedTopupPkg.id,
         packageName: selectedTopupPkg.name,
+        productType: selectedTopupPkg.type || 'diamond',
         diamonds: selectedTopupPkg.diamonds,
         price: selectedTopupPkg.price,
+        coinCostPaid: topupCoinDeductionEnabled ? requiredCoins : 0,
+        coinsDeducted: topupCoinDeductionEnabled,
         status: "PENDING",
-        createdAt: new Date().toISOString()
+        createdAt: now
       };
 
       try {
+        // Safe coin deduction if enabled
+        if (topupCoinDeductionEnabled && requiredCoins > 0) {
+          currentUser.coins = (currentUser.coins || 0) - requiredCoins;
+          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          
+          const txId = "TX-TOPUP-" + Math.floor(100000 + Math.random() * 900000);
+          const txData = {
+            txId: txId,
+            userId: currentUser.uid,
+            type: "TOPUP_DEDUCTION",
+            amount: -requiredCoins,
+            reason: `Top-up order deduction for ${selectedTopupPkg.name} (Order: ${orderId})`,
+            timestamp: now
+          };
+
+          if (database && firebaseInitialized) {
+            await database.ref('users/' + currentUser.uid).update({ coins: currentUser.coins, updatedAt: now });
+            await database.ref('transactions/' + currentUser.uid + '/' + txId).set(txData);
+            await database.ref('coinTransactions/' + txId).set(txData);
+          } else {
+            let txs = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+            txs.unshift(txData);
+            localStorage.setItem('ffa_transactions', JSON.stringify(txs));
+          }
+        }
+
         if (database && firebaseInitialized) {
           await database.ref('topupOrders/' + orderId).set(orderData);
         } else {
@@ -5971,15 +6109,16 @@
           localStorage.setItem('ffa_topup_orders', JSON.stringify(orders));
         }
 
-        showToast("Top-up order submitted successfully!", "success");
+        showToast("Top-up request submitted successfully!", "success");
         selectedTopupPkg = null;
         document.getElementById("topupCheckoutCard").style.display = "none";
+        renderWalletScreen();
         renderTopupScreen();
       } catch (err) {
         console.error("Topup order error:", err);
         showToast("Failed to submit order: " + err.message, "error");
       } finally {
-        if (btn) { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Place Top-Up Request`; }
+        if (btn) { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Confirm & Place Order`; }
       }
     }
 
@@ -5990,10 +6129,7 @@
       if (database && firebaseInitialized) {
         database.ref('topupOrders').orderByChild('uid').equalTo(currentUser ? currentUser.uid : '').once('value', (snap) => {
           const val = snap.val();
-          let orders = [];
-          if (val) {
-            orders = Object.values(val).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          }
+          let orders = val ? Object.values(val).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
           displayTopupOrdersList(orders);
         });
       } else {
@@ -6018,6 +6154,36 @@
         `;
         return;
       }
+
+      container.innerHTML = orders.map(o => {
+        let badgeColor = "var(--neon-amber)";
+        let badgeBg = "rgba(255,152,0,0.15)";
+        if (o.status === "APPROVED" || o.status === "COMPLETED") { badgeColor = "var(--neon-green)"; badgeBg = "rgba(0,230,118,0.15)"; }
+        if (o.status === "REJECTED") { badgeColor = "var(--neon-red)"; badgeBg = "rgba(255,23,68,0.15)"; }
+
+        return `
+          <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:16px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <div>
+                <div style="font-size:15px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)}
+                </div>
+                <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
+                  Order ID: <strong style="color:#fff;">${escapeHTML(o.orderId)}</strong> | UID: <strong style="color:var(--neon-cyan);">${escapeHTML(o.playerUID)}</strong>
+                </div>
+              </div>
+              <span style="font-size:11px; font-weight:700; background:${badgeBg}; color:${badgeColor}; padding:4px 10px; border-radius:8px; text-transform:uppercase;">
+                ${escapeHTML(o.status)}
+              </span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); border-top:1px solid var(--surface-border); padding-top:8px; margin-top:8px;">
+              <span>NPR: <strong style="color:var(--neon-amber);">₹${o.price}</strong> ${o.coinCostPaid ? `| Coins Paid: <strong style="color:var(--neon-green);">${o.coinCostPaid}</strong>` : ''}</span>
+              <span>${new Date(o.createdAt).toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
       container.innerHTML = orders.map(o => {
         let badgeColor = "var(--neon-amber)";
@@ -11315,6 +11481,7 @@
       renderProfileData();
       renderWalletScreen();
       renderHomePersonalizedSections();
+      loadTopupData();
 
       // Mode filter clicks
       document.querySelectorAll('#modeFilterRow .filter-chip').forEach(chip => {
