@@ -477,6 +477,10 @@
         <i class="fa-solid fa-arrow-up-from-bracket"></i> Redeems
         <span id="badgePendingRedeems" style="background:var(--neon-cyan); color:#000; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
       </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('topup-orders')">
+        <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> Topup Orders
+        <span id="badgePendingTopupOrders" style="background:var(--neon-cyan); color:#000; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
+      </button>
       <button class="admin-tab-btn" onclick="switchAdminTab('reports')">
         <i class="fa-solid fa-shield-halved"></i> Fair Play
         <span id="badgePendingReports" style="background:var(--neon-red); color:#fff; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
@@ -721,6 +725,30 @@
           Send the real payment via Khalti or eSewa manually to the player's account, then mark as Paid. If rejected, coins are safely refunded once.
         </p>
         <div id="adminRedeemsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: TOPUP ORDERS -->
+    <div id="tab-topup-orders" class="tab-section">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h3 class="card-title" style="margin-bottom:0;">
+            <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i>
+            Free Fire Diamond Top-Up Orders Queue
+          </h3>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary active" id="topupFilterAll" onclick="setAdminTopupFilter('all')">All</button>
+            <button class="btn btn-secondary" id="topupFilterPending" onclick="setAdminTopupFilter('PENDING')">Pending</button>
+            <button class="btn btn-secondary" id="topupFilterApproved" onclick="setAdminTopupFilter('APPROVED')">Approved</button>
+            <button class="btn btn-secondary" id="topupFilterRejected" onclick="setAdminTopupFilter('REJECTED')">Rejected</button>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          Review player diamond orders. Once completed in Free Fire in-game or partner panel, click Approve to notify player.
+        </p>
+        <div id="adminTopupOrdersContainer">
           <!-- Rendered dynamically -->
         </div>
       </div>
@@ -1901,6 +1929,7 @@
 
       renderPaymentsTab();
       renderRedeemsTab();
+      renderAdminTopupOrders();
       renderAdminTournaments();
       renderAdminUsers();
       renderPaymentConfigAdmin();
@@ -2049,6 +2078,111 @@
       recordAudit("PAYMENT_REJECTED", `Rejected ${payment.paymentMethod} payment ${paymentId} (Ref: ${payment.transactionReference}, Reason: ${payment.rejectReason})`);
       renderAdminData();
       alert(`Payment ${paymentId} rejected.`);
+    }
+
+    let allTopupOrders = [];
+    let currentAdminTopupFilter = 'all';
+
+    function setAdminTopupFilter(filter) {
+      currentAdminTopupFilter = filter;
+      ['all', 'PENDING', 'APPROVED', 'REJECTED'].forEach(f => {
+        const btn = document.getElementById(`topupFilter${f === 'all' ? 'All' : f.charAt(0) + f.slice(1).toLowerCase()}`);
+        if (btn) btn.classList.toggle('active', f.toUpperCase() === filter.toUpperCase());
+      });
+      renderAdminTopupOrders();
+    }
+
+    function renderAdminTopupOrders() {
+      const container = document.getElementById("adminTopupOrdersContainer");
+      if (!container) return;
+
+      if (database && firebaseInitialized) {
+        database.ref('topupOrders').once('value', (snap) => {
+          const val = snap.val();
+          allTopupOrders = val ? Object.values(val).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
+          displayAdminTopupOrdersList(allTopupOrders);
+        });
+      } else {
+        allTopupOrders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+        displayAdminTopupOrdersList(allTopupOrders);
+      }
+    }
+
+    function displayAdminTopupOrdersList(orders) {
+      const container = document.getElementById("adminTopupOrdersContainer");
+      if (!container) return;
+
+      let filtered = orders;
+      if (currentAdminTopupFilter !== 'all') {
+        filtered = orders.filter(o => o.status === currentAdminTopupFilter);
+      }
+
+      const pendingCount = orders.filter(o => o.status === 'PENDING').length;
+      const badge = document.getElementById("badgePendingTopupOrders");
+      if (badge) badge.innerText = pendingCount;
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:24px; text-align:center; color:var(--text-secondary);">
+            <i class="fa-solid fa-gem" style="font-size:32px; color:var(--text-muted); margin-bottom:8px;"></i>
+            <div>No Top-Up Orders Found</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(o => {
+        let badgeColor = "var(--neon-amber)";
+        let badgeBg = "rgba(255,152,0,0.15)";
+        if (o.status === "APPROVED") { badgeColor = "var(--neon-green)"; badgeBg = "rgba(0,230,118,0.15)"; }
+        if (o.status === "REJECTED") { badgeColor = "var(--neon-red)"; badgeBg = "rgba(255,23,68,0.15)"; }
+
+        return `
+          <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:16px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+              <div>
+                <div style="font-size:16px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)} (${o.diamonds} Diamonds)
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                  Order ID: <strong style="color:#fff;">${escapeHTML(o.orderId)}</strong> | Player: <strong style="color:var(--neon-orange);">${escapeHTML(o.username)}</strong> (UID: <strong style="color:var(--neon-cyan);">${escapeHTML(o.playerUID)}</strong>)
+                </div>
+              </div>
+              <span style="font-size:11px; font-weight:700; background:${badgeBg}; color:${badgeColor}; padding:4px 10px; border-radius:8px; text-transform:uppercase;">
+                ${escapeHTML(o.status)}
+              </span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); border-top:1px solid var(--surface-border); padding-top:10px; margin-top:10px;">
+              <span>Price: <strong style="color:var(--neon-amber);">₹${o.price}</strong> | Date: ${new Date(o.createdAt).toLocaleString()}</span>
+              <div style="display:flex; gap:6px;">
+                ${o.status === 'PENDING' ? `
+                  <button class="btn btn-primary" onclick="updateTopupOrderStatus('${o.orderId}', 'APPROVED')" style="padding:6px 12px; font-size:11px; background:var(--neon-green); color:#000;">Approve</button>
+                  <button class="btn btn-secondary" onclick="updateTopupOrderStatus('${o.orderId}', 'REJECTED')" style="padding:6px 12px; font-size:11px; background:var(--neon-red); color:#fff;">Reject</button>
+                ` : `
+                  <span style="font-size:11px; color:var(--text-muted);">Processed</span>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateTopupOrderStatus(orderId, newStatus) {
+      try {
+        if (database && firebaseInitialized) {
+          await database.ref('topupOrders/' + orderId).update({ status: newStatus, updatedAt: new Date().toISOString() });
+        } else {
+          let orders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+          orders = orders.map(o => o.orderId === orderId ? { ...o, status: newStatus, updatedAt: new Date().toISOString() } : o);
+          localStorage.setItem('ffa_topup_orders', JSON.stringify(orders));
+        }
+        showToast(`Top-up order ${orderId} marked as ${newStatus}`, "success");
+        renderAdminTopupOrders();
+      } catch (err) {
+        console.error("Error updating topup order:", err);
+        showToast("Failed to update status: " + err.message, "error");
+      }
     }
 
     function renderRedeemsTab() {

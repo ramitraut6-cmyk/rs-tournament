@@ -2801,9 +2801,9 @@
         <div class="action-icon fire"><i class="fa-solid fa-trophy"></i></div>
         <span class="action-label">Tournaments</span>
       </button>
-      <button class="action-btn" onclick="switchTab('my-games')">
-        <div class="action-icon results"><i class="fa-solid fa-gamepad"></i></div>
-        <span class="action-label">My Games</span>
+      <button class="action-btn" onclick="switchTab('topup')">
+        <div class="action-icon results"><i class="fa-solid fa-gem"></i></div>
+        <span class="action-label">Topup Center</span>
       </button>
       <button class="action-btn" onclick="openTeamFinderModal()">
         <div class="action-icon team"><i class="fa-solid fa-users"></i></div>
@@ -2975,18 +2975,65 @@
     </div>
   </section>
 
-  <!-- SCREEN 3: MY GAMES / REGISTRATIONS -->
-  <section id="screen-my-games" class="screen">
-    <div class="section-title">
-      <span><i class="fa-solid fa-gamepad" style="color:var(--neon-green); margin-right:6px;"></i>My Registered Matches</span>
-    </div>
-    
-    <div class="filter-scroll" id="myGamesFilterRow">
-      <button class="filter-chip active" data-mg="active">Active & Upcoming</button>
-      <button class="filter-chip" data-mg="completed">Completed History</button>
+  <!-- SCREEN 3: TOPUP CENTER -->
+  <section id="screen-topup" class="screen">
+    <div class="wallet-hero" style="background: linear-gradient(135deg, rgba(0,229,255,0.15) 0%, rgba(14,17,26,0.95) 100%); border-color: rgba(0,229,255,0.3);">
+      <div style="font-size: 11px; text-transform: uppercase; color: var(--neon-cyan); font-weight: 700; margin-bottom: 4px;">
+        <i class="fa-solid fa-gem"></i> Free Fire Official Partner
+      </div>
+      <div style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: #fff; margin-bottom: 4px;">
+        Diamond Top-Up Center
+      </div>
+      <div style="font-size: 12px; color: var(--text-secondary);">
+        Instant ID top-up. Secured by RS TOURNAMENT Arbiter system.
+      </div>
     </div>
 
-    <div id="myGamesContainer">
+    <!-- Player UID Input Box -->
+    <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:14px;">
+      <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">
+        Free Fire Player UID *
+      </label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="topupPlayerUID" class="form-input" placeholder="e.g. 6829401827" pattern="[0-9]{6,14}" style="flex:1;">
+        <button class="btn btn-secondary" onclick="saveTopupUIDDefault()" style="padding: 10px 14px; font-size:12px;">Save UID</button>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span><i class="fa-solid fa-boxes-stacked" style="color:var(--neon-amber); margin-right:6px;"></i>Select Diamond Package</span>
+    </div>
+
+    <!-- Diamond Packages Grid -->
+    <div id="topupPackagesGrid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:16px;">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- Order Summary & Place Order -->
+    <div id="topupCheckoutCard" style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:16px; margin-bottom:20px; display:none;">
+      <div style="font-size:14px; font-weight:800; color:#fff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+        <span>Order Summary</span>
+        <span id="topupSelectedPkgName" style="color:var(--neon-cyan);">--</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+        <span>Diamonds</span>
+        <strong id="topupSummaryDiamonds" style="color:#fff;">0</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+        <span>Price (NPR / INR)</span>
+        <strong id="topupSummaryPrice" style="color:var(--neon-amber);">₹0</strong>
+      </div>
+
+      <button class="btn btn-primary" id="btnPlaceTopupOrder" onclick="placeTopupOrder()" style="width:100%; justify-content:center;">
+        <i class="fa-solid fa-paper-plane"></i> Place Top-Up Request
+      </button>
+    </div>
+
+    <div class="section-title">
+      <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--neon-cyan); margin-right:6px;"></i>My Top-Up Orders</span>
+    </div>
+
+    <div id="myTopupOrdersList">
       <!-- Populated dynamically -->
     </div>
   </section>
@@ -3471,9 +3518,9 @@
       <i class="fa-solid fa-trophy"></i>
       <span>Tourneys</span>
     </button>
-    <button class="nav-item" onclick="switchTab('my-games')" id="nav-my-games">
-      <i class="fa-solid fa-gamepad"></i>
-      <span>My Games</span>
+    <button class="nav-item" onclick="switchTab('topup')" id="nav-topup">
+      <i class="fa-solid fa-gem"></i>
+      <span>Topup</span>
     </button>
     <button class="nav-item" onclick="switchTab('wallet')" id="nav-wallet">
       <i class="fa-solid fa-wallet"></i>
@@ -5810,13 +5857,196 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      if (tabId === 'my-games') renderMyGames();
+      if (tabId === 'topup') renderTopupScreen();
       if (tabId === 'profile') renderProfileData();
       if (tabId === 'community') {
         initCommunityChat();
       } else {
         detachCommunityChatListener();
       }
+    }
+
+    // ==========================================
+    // TOPUP CENTER & DIAMOND ORDERS
+    // ==========================================
+    const DEFAULT_TOPUP_PACKAGES = [
+      { id: "pkg_100", name: "100 Diamonds", diamonds: 100, price: 80, badge: "Popular" },
+      { id: "pkg_310", name: "310 Diamonds", diamonds: 310, price: 240, badge: "Best Value" },
+      { id: "pkg_520", name: "520 Diamonds", diamonds: 520, price: 400, badge: "Bonus +20%" },
+      { id: "pkg_1060", name: "1060 Diamonds", diamonds: 1060, price: 800, badge: "Super Value" },
+      { id: "pkg_2180", name: "2180 Diamonds", diamonds: 2180, price: 1600, badge: "Pro Pack" },
+      { id: "pkg_5600", name: "5600 Diamonds", diamonds: 5600, price: 4000, badge: "Mega VIP" }
+    ];
+
+    let selectedTopupPkg = null;
+
+    function renderTopupScreen() {
+      const grid = document.getElementById("topupPackagesGrid");
+      if (!grid) return;
+      grid.innerHTML = DEFAULT_TOPUP_PACKAGES.map(p => `
+        <div class="package-card ${selectedTopupPkg && selectedTopupPkg.id === p.id ? 'selected' : ''}" onclick="selectTopupPackage('${p.id}')" style="background:var(--bg-card); border:1px solid ${selectedTopupPkg && selectedTopupPkg.id === p.id ? 'var(--neon-cyan)' : 'var(--surface-border)'}; border-radius:14px; padding:14px; cursor:pointer; position:relative; transition:all 0.2s;">
+          ${p.badge ? `<span style="position:absolute; top:8px; right:8px; font-size:9px; font-weight:700; background:rgba(0,229,255,0.2); color:var(--neon-cyan); padding:2px 6px; border-radius:6px;">${p.badge}</span>` : ''}
+          <div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${p.diamonds}
+          </div>
+          <div style="font-size:11px; color:var(--text-secondary); margin-bottom:10px;">Free Fire Diamonds</div>
+          <div style="font-size:14px; font-weight:800; color:var(--neon-amber);">₹${p.price}</div>
+        </div>
+      `).join('');
+
+      if (currentUser && currentUser.ffUID && !document.getElementById("topupPlayerUID").value) {
+        document.getElementById("topupPlayerUID").value = currentUser.ffUID;
+      }
+      renderMyTopupOrders();
+    }
+
+    function selectTopupPackage(pkgId) {
+      selectedTopupPkg = DEFAULT_TOPUP_PACKAGES.find(p => p.id === pkgId);
+      const checkoutCard = document.getElementById("topupCheckoutCard");
+      if (selectedTopupPkg) {
+        checkoutCard.style.display = "block";
+        document.getElementById("topupSelectedPkgName").innerText = selectedTopupPkg.name;
+        document.getElementById("topupSummaryDiamonds").innerText = selectedTopupPkg.diamonds + " Diamonds";
+        document.getElementById("topupSummaryPrice").innerText = "₹" + selectedTopupPkg.price;
+      } else {
+        checkoutCard.style.display = "none";
+      }
+      renderTopupScreen();
+    }
+
+    function saveTopupUIDDefault() {
+      const uidVal = document.getElementById("topupPlayerUID").value.trim();
+      if (!uidVal || uidVal.length < 6) {
+        showToast("Enter a valid Free Fire UID (6-14 digits)", "error");
+        return;
+      }
+      if (currentUser) {
+        currentUser.ffUID = uidVal;
+        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        if (database && firebaseInitialized) {
+          database.ref('users/' + currentUser.uid).update({ ffUID: uidVal, updatedAt: new Date().toISOString() });
+        }
+      }
+      showToast("Player UID saved successfully!", "success");
+    }
+
+    async function placeTopupOrder() {
+      if (!currentUser) {
+        openModal("modalAuth");
+        return;
+      }
+      if (!selectedTopupPkg) {
+        showToast("Please select a diamond package first.", "error");
+        return;
+      }
+      const playerUID = document.getElementById("topupPlayerUID").value.trim();
+      if (!playerUID || playerUID.length < 6) {
+        showToast("Please enter a valid Free Fire Player UID.", "error");
+        return;
+      }
+
+      const btn = document.getElementById("btnPlaceTopupOrder");
+      if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Submitting Order...`; }
+
+      const orderId = "TOPUP-" + Math.floor(100000 + Math.random() * 900000);
+      const orderData = {
+        orderId: orderId,
+        uid: currentUser.uid,
+        username: currentUser.displayName || currentUser.username || "Player",
+        playerUID: playerUID,
+        packageId: selectedTopupPkg.id,
+        packageName: selectedTopupPkg.name,
+        diamonds: selectedTopupPkg.diamonds,
+        price: selectedTopupPkg.price,
+        status: "PENDING",
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        if (database && firebaseInitialized) {
+          await database.ref('topupOrders/' + orderId).set(orderData);
+        } else {
+          let orders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+          orders.unshift(orderData);
+          localStorage.setItem('ffa_topup_orders', JSON.stringify(orders));
+        }
+
+        showToast("Top-up order submitted successfully!", "success");
+        selectedTopupPkg = null;
+        document.getElementById("topupCheckoutCard").style.display = "none";
+        renderTopupScreen();
+      } catch (err) {
+        console.error("Topup order error:", err);
+        showToast("Failed to submit order: " + err.message, "error");
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Place Top-Up Request`; }
+      }
+    }
+
+    function renderMyTopupOrders() {
+      const container = document.getElementById("myTopupOrdersList");
+      if (!container) return;
+
+      if (database && firebaseInitialized) {
+        database.ref('topupOrders').orderByChild('uid').equalTo(currentUser ? currentUser.uid : '').once('value', (snap) => {
+          const val = snap.val();
+          let orders = [];
+          if (val) {
+            orders = Object.values(val).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          }
+          displayTopupOrdersList(orders);
+        });
+      } else {
+        let orders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+        if (currentUser) {
+          orders = orders.filter(o => o.uid === currentUser.uid);
+        }
+        displayTopupOrdersList(orders);
+      }
+    }
+
+    function displayTopupOrdersList(orders) {
+      const container = document.getElementById("myTopupOrdersList");
+      if (!container) return;
+      if (!orders.length) {
+        container.innerHTML = `
+          <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:24px; text-align:center; color:var(--text-secondary);">
+            <i class="fa-solid fa-gem" style="font-size:32px; color:var(--text-muted); margin-bottom:8px;"></i>
+            <div style="font-size:14px; font-weight:700; color:#fff;">No Top-Up Orders Yet</div>
+            <div style="font-size:12px; margin-top:4px;">Select a package above to request Free Fire diamonds.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        let badgeColor = "var(--neon-amber)";
+        let badgeBg = "rgba(255,152,0,0.15)";
+        if (o.status === "APPROVED") { badgeColor = "var(--neon-green)"; badgeBg = "rgba(0,230,118,0.15)"; }
+        if (o.status === "REJECTED") { badgeColor = "var(--neon-red)"; badgeBg = "rgba(255,23,68,0.15)"; }
+
+        return `
+          <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <div>
+                <div style="font-size:14px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)}
+                </div>
+                <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
+                  Order ID: <strong style="color:var(--text-primary);">${escapeHTML(o.orderId)}</strong> | UID: <strong style="color:var(--neon-orange);">${escapeHTML(o.playerUID)}</strong>
+                </div>
+              </div>
+              <span style="font-size:11px; font-weight:700; background:${badgeBg}; color:${badgeColor}; padding:4px 8px; border-radius:8px; text-transform:uppercase;">
+                ${escapeHTML(o.status)}
+              </span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); border-top:1px solid var(--surface-border); padding-top:8px; margin-top:8px;">
+              <span>Price: <strong style="color:var(--neon-amber);">₹${o.price}</strong></span>
+              <span>${new Date(o.createdAt).toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // ==========================================
