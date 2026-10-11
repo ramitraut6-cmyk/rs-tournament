@@ -484,6 +484,9 @@
       <button class="admin-tab-btn" onclick="switchAdminTab('topup-manager')">
         <i class="fa-solid fa-sliders" style="color:var(--neon-cyan);"></i> Topup Manager
       </button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('branding')">
+        <i class="fa-solid fa-palette" style="color:var(--neon-orange);"></i> App Branding
+      </button>
       <button class="admin-tab-btn" onclick="switchAdminTab('reports')">
         <i class="fa-solid fa-shield-halved"></i> Fair Play
         <span id="badgePendingReports" style="background:var(--neon-red); color:#fff; font-size:10px; border-radius:10px; padding:1px 6px; margin-left:4px;">0</span>
@@ -730,6 +733,67 @@
         <div id="adminRedeemsList">
           <!-- Rendered dynamically -->
         </div>
+      </div>
+    </div>
+
+    <!-- TAB: APP BRANDING & LOGO -->
+    <div id="tab-branding" class="tab-section">
+      <div class="card" style="margin-bottom:16px;">
+        <h3 class="card-title">
+          <i class="fa-solid fa-palette" style="color:var(--neon-orange);"></i> Admin App Branding & Logo Control
+        </h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+          Customize the app name, login screen tagline, and logos across the User Panel and login screen in real time.
+        </p>
+
+        <form onsubmit="saveAppBranding(event)">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">App Name</label>
+            <input type="text" id="adminAppName" class="form-input" placeholder="e.g. RS TOURNAMENT" required style="width:100%; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:10px; padding:10px 14px; color:#fff;">
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">Login Screen Logo URL (External image link)</label>
+            <input type="url" id="adminLoginLogoUrl" class="form-input" placeholder="https://example.com/logo-login.png" style="width:100%; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:10px; padding:10px 14px; color:#fff;" oninput="populateBrandingForm({appName: adminAppName.value, loginLogoUrl: this.value, headerLogoUrl: adminHeaderLogoUrl.value, tagline: adminTagline.value})">
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">Header Logo URL (External image link)</label>
+            <input type="url" id="adminHeaderLogoUrl" class="form-input" placeholder="https://example.com/logo-header.png" style="width:100%; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:10px; padding:10px 14px; color:#fff;" oninput="populateBrandingForm({appName: adminAppName.value, loginLogoUrl: adminLoginLogoUrl.value, headerLogoUrl: this.value, tagline: adminTagline.value})">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">Login Screen Tagline / Subtitle</label>
+            <input type="text" id="adminTagline" class="form-input" placeholder="South Asia's Premier Esports Battleground" required style="width:100%; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:10px; padding:10px 14px; color:#fff;">
+          </div>
+
+          <div style="background:var(--bg-card-hover); border:1px solid var(--surface-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#fff; margin-bottom:10px;">Branding Previews</div>
+            <div style="display:flex; gap:16px; align-items:center;">
+              <div style="text-align:center;">
+                <div style="font-size:10px; color:var(--text-secondary); margin-bottom:4px;">Login Logo</div>
+                <div id="previewLoginLogo" style="width:50px; height:50px; background:linear-gradient(135deg,var(--neon-orange),#d50000); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; box-shadow:0 0 10px rgba(255,87,34,0.4);">
+                  <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:10px; color:var(--text-secondary); margin-bottom:4px;">Header Logo</div>
+                <div id="previewHeaderLogo" style="width:36px; height:36px; background:linear-gradient(135deg,var(--neon-orange),#d50000); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; box-shadow:0 0 10px rgba(255,87,34,0.4);">
+                  <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn btn-primary" style="flex:1; justify-content:center;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish Changes
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="resetAppBranding()" style="border-color:var(--neon-red); color:var(--neon-red);">
+              <i class="fa-solid fa-rotate-left"></i> Reset Default
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -1979,6 +2043,7 @@
       renderReportsTab();
       renderChatModTab();
       renderResultsCenter();
+      loadAdminBrandingSettings();
       renderAuditTab();
     }
 
@@ -4286,6 +4351,90 @@
         if (document.getElementById('adminKhaltiQrPreview') && k.qrImageUrl) document.getElementById('adminKhaltiQrPreview').src = k.qrImageUrl;
         if (document.getElementById('adminKhaltiMeta')) document.getElementById('adminKhaltiMeta').innerText = `Last updated: ${k.updatedAt ? new Date(k.updatedAt).toLocaleString() : 'Never'} • By: ${k.updatedBy || 'Admin'}`;
       }
+    }
+
+    let currentAdminBranding = {
+      appName: "RS TOURNAMENT",
+      loginLogoUrl: "",
+      headerLogoUrl: "",
+      tagline: "South Asia's Premier Esports Battleground"
+    };
+
+    function loadAdminBrandingSettings() {
+      if (database && firebaseInitialized) {
+        database.ref('appSettings/branding').once('value', (snap) => {
+          const val = snap.val();
+          if (val) {
+            currentAdminBranding = val;
+          }
+          populateBrandingForm(currentAdminBranding);
+        });
+      } else {
+        const saved = JSON.parse(localStorage.getItem('ffa_branding'));
+        if (saved) currentAdminBranding = saved;
+        populateBrandingForm(currentAdminBranding);
+      }
+    }
+
+    function populateBrandingForm(b) {
+      if (document.getElementById("adminAppName")) document.getElementById("adminAppName").value = b.appName || "RS TOURNAMENT";
+      if (document.getElementById("adminLoginLogoUrl")) document.getElementById("adminLoginLogoUrl").value = b.loginLogoUrl || "";
+      if (document.getElementById("adminHeaderLogoUrl")) document.getElementById("adminHeaderLogoUrl").value = b.headerLogoUrl || "";
+      if (document.getElementById("adminTagline")) document.getElementById("adminTagline").value = b.tagline || "South Asia's Premier Esports Battleground";
+      
+      const prevLogin = document.getElementById("previewLoginLogo");
+      if (prevLogin) {
+        prevLogin.innerHTML = b.loginLogoUrl ? `<img src="${escapeHTML(b.loginLogoUrl)}" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\\\'fa-solid fa-fire-flame-curved\\\'></i>';">` : `<i class="fa-solid fa-fire-flame-curved"></i>`;
+      }
+      const prevHeader = document.getElementById("previewHeaderLogo");
+      if (prevHeader) {
+        prevHeader.innerHTML = b.headerLogoUrl ? `<img src="${escapeHTML(b.headerLogoUrl)}" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\\\'fa-solid fa-fire-flame-curved\\\'></i>';">` : `<i class="fa-solid fa-fire-flame-curved"></i>`;
+      }
+    }
+
+    async function saveAppBranding(event) {
+      if (event) event.preventDefault();
+      const appName = document.getElementById("adminAppName").value.trim() || "RS TOURNAMENT";
+      const loginLogoUrl = document.getElementById("adminLoginLogoUrl").value.trim();
+      const headerLogoUrl = document.getElementById("adminHeaderLogoUrl").value.trim();
+      const tagline = document.getElementById("adminTagline").value.trim() || "South Asia's Premier Esports Battleground";
+
+      const updated = {
+        appName: appName,
+        loginLogoUrl: loginLogoUrl,
+        headerLogoUrl: headerLogoUrl,
+        tagline: tagline,
+        updatedAt: new Date().toISOString()
+      };
+
+      currentAdminBranding = updated;
+      localStorage.setItem('ffa_branding', JSON.stringify(updated));
+
+      if (database && firebaseInitialized) {
+        await database.ref('appSettings/branding').set(updated);
+      }
+
+      recordAudit("BRANDING_UPDATED", `Updated app branding: ${appName}`);
+      showToast("App branding saved and published globally!", "success");
+      populateBrandingForm(updated);
+      alert("App branding updated successfully! Changes are now live across the app.");
+    }
+
+    function resetAppBranding() {
+      if (!confirm("Reset all branding settings to default?")) return;
+      const defaultB = {
+        appName: "RS TOURNAMENT",
+        loginLogoUrl: "",
+        headerLogoUrl: "",
+        tagline: "South Asia's Premier Esports Battleground"
+      };
+      currentAdminBranding = defaultB;
+      localStorage.setItem('ffa_branding', JSON.stringify(defaultB));
+      if (database && firebaseInitialized) {
+        database.ref('appSettings/branding').set(defaultB);
+      }
+      populateBrandingForm(defaultB);
+      showToast("Branding reset to default.", "success");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
