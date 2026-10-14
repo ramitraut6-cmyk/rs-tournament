@@ -2690,13 +2690,6 @@
           <button type="submit" class="btn btn-primary" id="btnSubmitLogin" style="min-height:48px;">
             <i class="fa-solid fa-right-to-bracket"></i> Sign In to Arena
           </button>
-
-          <!-- Quick Test Demo helper -->
-          <div style="margin-top:14px; text-align:center;">
-            <button type="button" class="btn btn-secondary" style="font-size:11px; padding:6px 12px; width:auto;" onclick="quickDemoLogin()">
-              <i class="fa-solid fa-bolt" style="color:var(--neon-amber);"></i> Quick Demo Play (Guest)
-            </button>
-          </div>
         </form>
 
         <!-- Form 2: Create Account -->
@@ -6249,35 +6242,7 @@
       }).join('');
     }
 
-      container.innerHTML = orders.map(o => {
-        let badgeColor = "var(--neon-amber)";
-        let badgeBg = "rgba(255,152,0,0.15)";
-        if (o.status === "APPROVED") { badgeColor = "var(--neon-green)"; badgeBg = "rgba(0,230,118,0.15)"; }
-        if (o.status === "REJECTED") { badgeColor = "var(--neon-red)"; badgeBg = "rgba(255,23,68,0.15)"; }
 
-        return `
-          <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-              <div>
-                <div style="font-size:14px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)}
-                </div>
-                <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
-                  Order ID: <strong style="color:var(--text-primary);">${escapeHTML(o.orderId)}</strong> | UID: <strong style="color:var(--neon-orange);">${escapeHTML(o.playerUID)}</strong>
-                </div>
-              </div>
-              <span style="font-size:11px; font-weight:700; background:${badgeBg}; color:${badgeColor}; padding:4px 8px; border-radius:8px; text-transform:uppercase;">
-                ${escapeHTML(o.status)}
-              </span>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); border-top:1px solid var(--surface-border); padding-top:8px; margin-top:8px;">
-              <span>Price: <strong style="color:var(--neon-amber);">₹${o.price}</strong></span>
-              <span>${new Date(o.createdAt).toLocaleString()}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
 
     // ==========================================
     // 6. TOURNAMENT RENDERING & FILTERS
@@ -9166,17 +9131,10 @@
             errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
           });
       } else {
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Sign In to Arena`;
-          const dummyUser = {
-            uid: "user-" + Math.floor(1000 + Math.random() * 9000),
-            email: email,
-            displayName: email.split('@')[0],
-            providerData: [{ providerId: "password" }]
-          };
-          handleUserSession(dummyUser);
-        }, 500);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Sign In to Arena`;
+        errBox.style.display = "flex";
+        errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Firebase Auth is not initialized. Cannot sign in without backend.`;
       }
     }
 
@@ -9221,30 +9179,14 @@
             errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
           });
       } else {
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create Account`;
-          const dummyUser = {
-            uid: "user-" + Math.floor(1000 + Math.random() * 9000),
-            email: email,
-            displayName: email.split('@')[0],
-            providerData: [{ providerId: "password" }]
-          };
-          handleUserSession(dummyUser);
-        }, 500);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create Account`;
+        errBox.style.display = "flex";
+        errBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Firebase Auth is not initialized. Cannot create account without backend.`;
       }
     }
 
-    function quickDemoLogin() {
-      const dummyUser = {
-        uid: "user-demo-101",
-        email: "player@freefirearena.com",
-        displayName: "ShadowHunter",
-        providerData: [{ providerId: "password" }]
-      };
-      handleUserSession(dummyUser);
-      showToast("Signed in as Demo Guest Player (ShadowHunter)", "success");
-    }
+
 
     function handleLogout() {
       if (auth && firebaseInitialized) {

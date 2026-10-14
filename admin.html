@@ -423,14 +423,7 @@
         </button>
       </form>
 
-      <div style="margin-top:16px; border-top:1px solid var(--surface-border); padding-top:14px;">
-        <button type="button" class="btn btn-secondary" style="font-size:11px; width:100%; justify-content:center;" onclick="quickDemoAdminLogin()">
-          <i class="fa-solid fa-user-shield" style="color:var(--neon-green);"></i> Quick Sandbox Arbiter Demo
-        </button>
-        <div style="font-size:10px; color:var(--text-muted); margin-top:8px;">
-          Unauthorized attempts are logged with IP & timestamp to /auditLogs.
-        </div>
-      </div>
+
     </div>
   </div>
 
@@ -1793,8 +1786,8 @@
     let currentAdminRedeemFilter = 'ALL';
     let currentAdminTourneyFilter = 'ALL';
 
-    // Admin Auth State
-    let currentAdminUser = JSON.parse(localStorage.getItem('ffa_admin_auth')) || null;
+    // Admin Auth State (Require verified Firebase Auth and database check; localStorage alone cannot authorize admin)
+    let currentAdminUser = null;
 
     function checkAdminAuth() {
       const overlay = document.getElementById("adminAuthOverlay");
@@ -1935,19 +1928,7 @@
       }
     }
 
-    function quickDemoAdminLogin() {
-      currentAdminUser = {
-        uid: "adm-arbiter-01",
-        email: "arbiter@freefirearena.com",
-        role: "HEAD_ARBITER",
-        isAuthorized: true,
-        loginAt: new Date().toISOString()
-      };
-      localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
-      recordAudit("DEMO_ADMIN_LOGIN", `Authorized Sandbox Arbiter session started.`);
-      checkAdminAuth();
-      renderAdminData();
-    }
+
 
     function adminLogout() {
       if (confirm("Sign out of the Admin Control Center?")) {
