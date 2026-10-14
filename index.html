@@ -2942,6 +2942,9 @@
       <button class="btn btn-secondary" style="width:auto; padding:0 14px;" onclick="openTournamentCompareModal()" title="Compare Tournaments">
         <i class="fa-solid fa-code-compare"></i>
       </button>
+      <button class="btn btn-primary" style="width:auto; padding:0 14px; font-size:12px; font-weight:700; background:linear-gradient(135deg, var(--neon-cyan), #00b0ff); color:#000;" onclick="openModal('modalCreateMatch')" title="Add Tournament Matches">
+        <i class="fa-solid fa-plus"></i> Add Match
+      </button>
     </div>
 
     <!-- Mode Filters -->
@@ -3539,6 +3542,87 @@
       <div id="detailContent">
         <!-- Filled dynamically -->
       </div>
+    </div>
+  </div>
+
+  <!-- CREATE CUSTOM MATCH BOTTOM SHEET -->
+  <div class="modal-backdrop" id="modalCreateMatch">
+    <div class="bottom-sheet" style="max-height:90vh; overflow-y:auto;">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title"><i class="fa-solid fa-plus-circle" style="color:var(--neon-cyan);"></i> Create Custom Match (+70% Prize)</div>
+        <button class="btn-close-sheet" onclick="closeModal('modalCreateMatch')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="createMatchForm" onsubmit="submitCreateCustomMatch(event)">
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Match Title</label>
+          <input type="text" id="cmTitle" class="input-field" placeholder="e.g. Bermuda Custom War #1" required style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div>
+            <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Game Mode</label>
+            <select id="cmMode" class="input-field" style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+              <option value="Battle Royale">Battle Royale</option>
+              <option value="Clash Squad">Clash Squad</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Format</label>
+            <select id="cmFormat" class="input-field" style="width:100% ; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+              <option value="Solo">Solo</option>
+              <option value="Duo">Duo</option>
+              <option value="Squad">Squad</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div>
+            <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Map</label>
+            <select id="cmMap" class="input-field" style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+              <option value="Bermuda">Bermuda</option>
+              <option value="Purgatory">Purgatory</option>
+              <option value="Kalahari">Kalahari</option>
+              <option value="Nexterra">Nexterra</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Date & Time</label>
+            <input type="datetime-local" id="cmDateTime" class="input-field" required style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div>
+            <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Entry Fee (Coins)</label>
+            <input type="number" id="cmEntryFee" class="input-field" min="0" max="500" value="10" oninput="updateEstimatedPrize()" required style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Winner Prize (+70%)</label>
+            <input type="text" id="cmEstimatedPrizeDisplay" class="input-field" readonly style="width:100%; padding:10px; background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.3); border-radius:8px; color:var(--neon-cyan); font-weight:700;" value="17 Coins">
+            <input type="hidden" id="cmPrizePool" value="17">
+          </div>
+        </div>
+
+        <div style="font-size:11px; color:var(--neon-amber); margin-bottom:14px; background:rgba(255,152,0,0.1); padding:8px 10px; border-radius:6px; border:1px solid rgba(255,152,0,0.2);" id="cmPrizeBreakdown">
+          Formula: Entry Fee (10) + 70% Bonus (7) = 17 Coins Winner Prize
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Max Slots / Capacity</label>
+          <input type="number" id="cmCapacity" class="input-field" value="48" min="12" max="100" required style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff;">
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px;">Rules & Notes</label>
+          <textarea id="cmRules" class="input-field" rows="2" placeholder="Fair play required. Room ID & password shared 10 mins prior." style="width:100%; padding:10px; background:var(--bg-card); border:1px solid var(--surface-border); border-radius:8px; color:#fff; resize:none;">Fair play required. Room ID & password shared 10 mins prior to match start.</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
+          <i class="fa-solid fa-rocket"></i> Publish Custom Match
+        </button>
+      </form>
     </div>
   </div>
 
@@ -9035,6 +9119,104 @@
         renderProfileData();
         renderWalletScreen();
         renderHomePersonalizedSections();
+      }
+    }
+
+    function updateEstimatedPrize() {
+      const feeInput = document.getElementById("cmEntryFee");
+      const prizeDisplay = document.getElementById("cmEstimatedPrizeDisplay");
+      const prizePoolHidden = document.getElementById("cmPrizePool");
+      const breakdown = document.getElementById("cmPrizeBreakdown");
+
+      let fee = parseInt(feeInput.value);
+      if (isNaN(fee) || fee < 0) fee = 0;
+      if (fee > 500) {
+        showToast("Maximum entry fee is 500 Coins.", "error");
+        fee = 500;
+        feeInput.value = 500;
+      }
+
+      // Automatic 70% Coin Winning Prize formula: Winner Prize = Entry Fee + (Entry Fee * 70 / 100)
+      const bonus = Math.round(fee * 70 / 100);
+      const totalPrize = fee + bonus;
+
+      prizeDisplay.value = `${totalPrize} Coins`;
+      if (prizePoolHidden) prizePoolHidden.value = totalPrize;
+      if (breakdown) {
+        breakdown.innerHTML = `<i class="fa-solid fa-calculator"></i> Formula: Entry Fee (${fee}) + 70% Bonus (${bonus}) = ${totalPrize} Coins Winner Prize`;
+      }
+    }
+
+    function submitCreateCustomMatch(event) {
+      if (event) event.preventDefault();
+      if (!currentUser) {
+        showToast("Please sign in to create a custom match.", "error");
+        openModal("modalAuth");
+        return;
+      }
+
+      const title = document.getElementById("cmTitle").value.trim();
+      const mode = document.getElementById("cmMode").value;
+      const format = document.getElementById("cmFormat").value;
+      const map = document.getElementById("cmMap").value;
+      const dateTime = document.getElementById("cmDateTime").value;
+      const entryFee = parseInt(document.getElementById("cmEntryFee").value) || 0;
+      const prizePool = parseInt(document.getElementById("cmPrizePool").value) || Math.round(entryFee * 1.7);
+      const capacity = parseInt(document.getElementById("cmCapacity").value) || 48;
+      const rules = document.getElementById("cmRules").value.trim();
+
+      if (!title) {
+        showToast("Please enter a match title.", "error");
+        return;
+      }
+
+      const matchId = "MATCH-CUSTOM-" + Math.floor(100000 + Math.random() * 900000);
+      const newCustomMatch = {
+        id: matchId,
+        title: title,
+        mode: mode,
+        format: format,
+        map: map,
+        dateTime: dateTime || new Date(Date.now() + 3600000).toISOString(),
+        entryFee: entryFee,
+        isPaid: entryFee > 0,
+        prizePool: prizePool,
+        capacity: capacity,
+        slotsFilled: 0,
+        status: "open",
+        creatorId: currentUser.uid,
+        organizer: currentUser.displayName || currentUser.username || "Custom Organizer",
+        rules: rules,
+        createdAt: new Date().toISOString()
+      };
+
+      if (database && firebaseInitialized) {
+        database.ref('customMatches/' + matchId).set(newCustomMatch)
+          .then(() => {
+            showToast("Custom match published successfully!", "success");
+            closeModal("modalCreateMatch");
+            document.getElementById("createMatchForm").reset();
+            updateEstimatedPrize();
+            renderTournaments();
+          })
+          .catch((err) => {
+            console.error("Failed to publish custom match to DB:", err);
+            allTournaments.unshift(newCustomMatch);
+            localStorage.setItem('ffa_tournaments', JSON.stringify(allTournaments));
+            showToast("Custom match created successfully!", "success");
+            closeModal("modalCreateMatch");
+            document.getElementById("createMatchForm").reset();
+            updateEstimatedPrize();
+            renderTournaments();
+          });
+      } else {
+        allTournaments.unshift(newCustomMatch);
+        localStorage.setItem('ffa_tournaments', JSON.stringify(allTournaments));
+        showToast("Custom match created successfully!", "success");
+        closeModal("modalCreateMatch");
+        document.getElementById("createMatchForm").reset();
+        updateEstimatedPrize();
+        renderTournaments();
       }
     }
 
