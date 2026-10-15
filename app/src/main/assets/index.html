@@ -2741,15 +2741,14 @@
       </div>
       <div>
         <div style="display:flex; align-items:center; gap:6px;">
-          <span class="brand-text">FREE FIRE</span>
-          <span class="brand-tag">ARENA</span>
+          <span class="brand-text">RS</span>
+          <span class="brand-tag">TOURNAMENT</span>
         </div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="conn-status-pill" id="connStatusPill" onclick="checkConnectionStatus()" title="Connection Status">
-        <span class="conn-dot"></span>
-        <span id="connStatusLabel">Online</span>
+      <div class="conn-status-pill" id="connStatusPill" onclick="checkConnectionStatus()" title="Online" style="padding:4px 8px; min-width:auto;">
+        <span class="conn-dot" style="width:8px; height:8px; background:var(--neon-green); border-radius:50%; box-shadow:0 0 6px var(--neon-green); display:inline-block;"></span>
       </div>
       <button class="btn-header-icon" id="btnGlobalSearch" onclick="openGlobalSearchModal()" aria-label="Global Search" title="Smart Search">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -2972,16 +2971,13 @@
   </section>
 
   <!-- SCREEN 3: TOPUP CENTER -->
-  <section id="screen-topup" class="screen">
-    <div class="wallet-hero" style="background: linear-gradient(135deg, rgba(0,229,255,0.15) 0%, rgba(14,17,26,0.95) 100%); border-color: rgba(0,229,255,0.3);">
-      <div style="font-size: 11px; text-transform: uppercase; color: var(--neon-cyan); font-weight: 700; margin-bottom: 4px;">
-        <i class="fa-solid fa-gem"></i> Free Fire Official Partner
-      </div>
-      <div style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: #fff; margin-bottom: 4px;">
+  <section id="screen-topup" class="screen" style="padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 40px);">
+    <div class="wallet-hero" style="background: linear-gradient(135deg, rgba(0,229,255,0.15) 0%, rgba(14,17,26,0.95) 100%); border-color: rgba(0,229,255,0.3); margin-bottom: 14px;">
+      <div style="font-size: 20px; font-weight: 800; font-family: var(--font-heading); color: #fff; margin-bottom: 4px;">
         Diamond Top-Up Center
       </div>
-      <div style="font-size: 12px; color: var(--text-secondary);">
-        Instant ID top-up. Secured by RS TOURNAMENT Arbiter system.
+      <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+        Order with your coins. Delivered to your UID after admin approval, usually within 30 minutes.
       </div>
     </div>
 
@@ -2990,9 +2986,16 @@
       <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">
         Free Fire Player UID *
       </label>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="topupPlayerUID" class="form-input" placeholder="e.g. 6829401827" pattern="[0-9]{6,14}" style="flex:1;">
-        <button class="btn btn-secondary" onclick="saveTopupUIDDefault()" style="padding: 10px 14px; font-size:12px;">Save UID</button>
+      <div id="topupUidInputContainer" style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="topupPlayerUID" class="form-input" inputmode="numeric" pattern="[0-9]{8,12}" maxlength="12" placeholder="Enter your Free Fire UID (8-12 digits)" style="flex:1; min-width:0; padding:10px 12px; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:8px; color:#fff; font-size:14px;">
+          <button class="btn btn-secondary" onclick="saveTopupUIDDefault()" style="padding: 10px 14px; font-size:12px; white-space:nowrap;">Save UID</button>
+        </div>
+        <div id="topupUidError" style="font-size:11px; color:var(--neon-red); display:none;"></div>
+      </div>
+      <div id="topupSavedUidDisplay" style="display:none; align-items:center; justify-content:space-between; font-size:13px; color:#fff;">
+        <span>Saved UID: <strong id="topupSavedUidText" style="color:var(--neon-cyan);">--</strong></span>
+        <a href="javascript:void(0)" onclick="editTopupUID()" style="font-size:12px; color:var(--neon-orange); text-decoration:underline;">Edit</a>
       </div>
     </div>
 
@@ -3001,7 +3004,7 @@
     </div>
 
     <!-- Diamond Packages Grid -->
-    <div id="topupPackagesGrid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:16px;">
+    <div id="topupPackagesGrid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; margin-bottom:16px;">
       <!-- Populated dynamically -->
     </div>
 
@@ -3016,12 +3019,16 @@
         <strong id="topupSummaryDiamonds" style="color:#fff;">0</strong>
       </div>
       <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
-        <span>Price (NPR / INR)</span>
-        <strong id="topupSummaryPrice" style="color:var(--neon-amber);">₹0</strong>
+        <span>Total Cost</span>
+        <strong id="topupSummaryCoins" style="color:var(--neon-green);">0 Coins</strong>
       </div>
 
-      <button class="btn btn-primary" id="btnPlaceTopupOrder" onclick="placeTopupOrder()" style="width:100%; justify-content:center;">
-        <i class="fa-solid fa-paper-plane"></i> Place Top-Up Request
+      <div id="topupCoinInsufficientWarning" style="display:none; background:rgba(255,23,68,0.12); border:1px solid rgba(255,23,68,0.3); border-radius:8px; padding:10px; margin-bottom:12px; font-size:12px; color:var(--neon-red); text-align:center;">
+        Not enough coins! <button class="btn btn-secondary" onclick="switchTab('wallet')" style="margin-top:6px; padding:4px 10px; font-size:11px;">Add Coins</button>
+      </div>
+
+      <button class="btn btn-primary" id="btnPlaceTopupOrder" onclick="placeTopupOrder()" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
+        <i class="fa-solid fa-paper-plane"></i> Confirm & Place Order
       </button>
     </div>
 
@@ -3031,6 +3038,11 @@
 
     <div id="myTopupOrdersList">
       <!-- Populated dynamically -->
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:24px; padding:0 12px; line-height:1.4;">
+      RS TOURNAMENT is not affiliated with or endorsed by Garena. Free Fire is a trademark of Garena.
     </div>
   </section>
 
@@ -6088,23 +6100,41 @@
       const filteredProducts = (topupProductsCache.length ? topupProductsCache : getDefaultTopupProducts())
         .filter(p => p.active !== false && p.type === topupCategoryFilter);
 
-      grid.innerHTML = filteredProducts.map(p => `
-        <div class="package-card ${selectedTopupPkg && selectedTopupPkg.id === p.id ? 'selected' : ''}" onclick="selectTopupPackage('${p.id}')" style="background:var(--bg-card); border:1px solid ${selectedTopupPkg && selectedTopupPkg.id === p.id ? 'var(--neon-cyan)' : 'var(--surface-border)'}; border-radius:14px; padding:14px; cursor:pointer; position:relative; transition:all 0.2s;">
-          ${p.badge ? `<span style="position:absolute; top:8px; right:8px; font-size:9px; font-weight:700; background:rgba(0,229,255,0.2); color:var(--neon-cyan); padding:2px 6px; border-radius:6px;">${escapeHTML(p.badge)}</span>` : ''}
-          <div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
-            <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(String(p.name || p.diamonds))}
+      grid.innerHTML = filteredProducts.map(p => {
+        const isSelected = selectedTopupPkg && selectedTopupPkg.id === p.id;
+        const coinCost = p.coinCost || p.price;
+        return `
+          <div class="package-card ${isSelected ? 'selected' : ''}" onclick="selectTopupPackage('${p.id}')" style="background:var(--bg-card); border:${isSelected ? '2px solid var(--neon-orange)' : '1px solid var(--surface-border)'}; border-radius:14px; padding:18px 14px 14px 14px; cursor:pointer; position:relative; transition:all 0.2s; box-shadow:${isSelected ? '0 0 14px rgba(255,87,34,0.3)' : 'none'};">
+            ${p.badge ? `<span style="position:absolute; top:-10px; right:12px; z-index:2; background:rgba(0,229,255,0.25); color:var(--neon-cyan); font-size:9px; font-weight:800; padding:3px 8px; border-radius:6px; border:1px solid rgba(0,229,255,0.4); text-transform:uppercase;">${escapeHTML(p.badge)}</span>` : ''}
+            <div style="font-size:15px; font-weight:800; color:#fff; margin-bottom:8px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              <i class="fa-solid fa-gem" style="color:var(--neon-cyan); font-size:14px;"></i> ${escapeHTML(String(p.name || p.diamonds))}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:13px; font-weight:800; color:var(--neon-green);"><i class="fa-solid fa-coins"></i> ${coinCost} Coins</span>
+              ${isSelected ? `<i class="fa-solid fa-circle-check" style="color:var(--neon-orange); font-size:16px;"></i>` : ''}
+            </div>
           </div>
-          <div style="font-size:11px; color:var(--text-secondary); margin-bottom:8px;">Free Fire Official</div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:14px; font-weight:800; color:var(--neon-amber);">₹${p.price}</span>
-            ${topupCoinDeductionEnabled ? `<span style="font-size:11px; font-weight:700; color:var(--neon-green);"><i class="fa-solid fa-coins"></i> ${p.coinCost || p.price} Coins</span>` : ''}
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
-      if (currentUser && currentUser.ffUID && !document.getElementById("topupPlayerUID").value) {
-        document.getElementById("topupPlayerUID").value = currentUser.ffUID;
+      const inputContainer = document.getElementById("topupUidInputContainer");
+      const savedDisplay = document.getElementById("topupSavedUidDisplay");
+      const uidInput = document.getElementById("topupPlayerUID");
+
+      if (currentUser && currentUser.ffUID && currentUser.ffUID.trim().length >= 8) {
+        if (inputContainer) inputContainer.style.display = "none";
+        if (savedDisplay) {
+          savedDisplay.style.display = "flex";
+          document.getElementById("topupSavedUidText").innerText = currentUser.ffUID;
+        }
+      } else {
+        if (inputContainer) inputContainer.style.display = "flex";
+        if (savedDisplay) savedDisplay.style.display = "none";
+        if (uidInput && currentUser && currentUser.ffUID && !uidInput.value) {
+          uidInput.value = currentUser.ffUID;
+        }
       }
+
       renderMyTopupOrders();
     }
 
@@ -6116,29 +6146,21 @@
         checkoutCard.style.display = "block";
         document.getElementById("topupSelectedPkgName").innerText = selectedTopupPkg.name;
         document.getElementById("topupSummaryDiamonds").innerText = String(selectedTopupPkg.diamonds) + (typeof selectedTopupPkg.diamonds === 'number' ? " Diamonds" : "");
-        document.getElementById("topupSummaryPrice").innerText = "₹" + selectedTopupPkg.price;
 
         const coinCostEl = document.getElementById("topupSummaryCoins");
-        const coinBalanceEl = document.getElementById("topupUserCoinBalance");
         const coinWarningEl = document.getElementById("topupCoinInsufficientWarning");
         const btnPlace = document.getElementById("btnPlaceTopupOrder");
 
-        if (topupCoinDeductionEnabled) {
-          if (coinCostEl) coinCostEl.innerText = (selectedTopupPkg.coinCost || selectedTopupPkg.price) + " Coins";
-          const userCoins = currentUser ? (currentUser.coins || 0) : 0;
-          if (coinBalanceEl) coinBalanceEl.innerText = userCoins + " Coins";
-          
-          const requiredCoins = selectedTopupPkg.coinCost || selectedTopupPkg.price;
-          if (userCoins < requiredCoins) {
-            if (coinWarningEl) {
-              coinWarningEl.style.display = "block";
-              coinWarningEl.innerText = `Insufficient coins! You need ${requiredCoins} coins, but you only have ${userCoins} coins.`;
-            }
-            if (btnPlace) { btnPlace.disabled = true; btnPlace.style.opacity = "0.5"; }
-          } else {
-            if (coinWarningEl) coinWarningEl.style.display = "none";
-            if (btnPlace) { btnPlace.disabled = false; btnPlace.style.opacity = "1"; }
-          }
+        const requiredCoins = selectedTopupPkg.coinCost || selectedTopupPkg.price;
+        if (coinCostEl) coinCostEl.innerText = requiredCoins + " Coins";
+        const userCoins = currentUser ? (currentUser.coins || 0) : 0;
+
+        if (userCoins < requiredCoins) {
+          if (coinWarningEl) coinWarningEl.style.display = "block";
+          if (btnPlace) { btnPlace.disabled = true; btnPlace.style.opacity = "0.5"; }
+        } else {
+          if (coinWarningEl) coinWarningEl.style.display = "none";
+          if (btnPlace) { btnPlace.disabled = false; btnPlace.style.opacity = "1"; }
         }
       } else if (checkoutCard) {
         checkoutCard.style.display = "none";
@@ -6148,20 +6170,37 @@
 
     function saveTopupUIDDefault() {
       const uidVal = document.getElementById("topupPlayerUID").value.trim();
-      const ignVal = document.getElementById("topupIGN") ? document.getElementById("topupIGN").value.trim() : "";
-      if (!uidVal || uidVal.length < 6) {
-        showToast("Enter a valid Free Fire UID (6-14 digits)", "error");
+      const errEl = document.getElementById("topupUidError");
+      if (!/^\d{8,12}$/.test(uidVal)) {
+        if (errEl) {
+          errEl.style.display = "block";
+          errEl.innerText = "Free Fire UID must be numeric and between 8 to 12 digits.";
+        }
+        showToast("Invalid Free Fire UID format (8-12 digits required).", "error");
         return;
       }
+      if (errEl) errEl.style.display = "none";
+
       if (currentUser) {
         currentUser.ffUID = uidVal;
-        if (ignVal) currentUser.ign = ignVal;
         localStorage.setItem('ffa_user', JSON.stringify(currentUser));
         if (database && firebaseInitialized) {
-          database.ref('users/' + currentUser.uid).update({ ffUID: uidVal, ign: ignVal, updatedAt: new Date().toISOString() });
+          database.ref('users/' + currentUser.uid).update({ ffUID: uidVal, updatedAt: new Date().toISOString() });
         }
       }
-      showToast("Player details saved successfully!", "success");
+      showToast("Player UID saved successfully!", "success");
+      renderTopupScreen();
+    }
+
+    function editTopupUID() {
+      const inputContainer = document.getElementById("topupUidInputContainer");
+      const savedDisplay = document.getElementById("topupSavedUidDisplay");
+      if (inputContainer) inputContainer.style.display = "flex";
+      if (savedDisplay) savedDisplay.style.display = "none";
+      const uidInput = document.getElementById("topupPlayerUID");
+      if (uidInput && currentUser && currentUser.ffUID) {
+        uidInput.value = currentUser.ffUID;
+      }
     }
 
     async function placeTopupOrder() {
