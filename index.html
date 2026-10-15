@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>RS TOURNAMENT</title>
   <!-- Google Fonts: Inter & Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2765,7 +2765,7 @@
         <i class="fa-solid fa-bell"></i>
         <span class="notif-badge"></span>
       </button>
-      <a href="admin.html" class="admin-pill-link" title="Open Admin Panel">
+      <a href="admin.html" class="admin-pill-link" id="adminPillLink" style="display:none;" title="Open Admin Panel">
         <i class="fa-solid fa-shield-halved"></i> Admin
       </a>
     </div>
@@ -8876,6 +8876,10 @@
 
       document.getElementById("headerCoinBalance").innerText = currentUser.coins || 0;
       document.getElementById("walletTotalCoins").innerText = currentUser.coins || 0;
+      const adminPill = document.getElementById("adminPillLink");
+      if (adminPill) {
+        adminPill.style.display = (currentUser && currentUser.isAdmin) ? "inline-flex" : "none";
+      }
       updatePlayerPerformanceProfile();
     }
 
