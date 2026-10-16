@@ -2675,7 +2675,7 @@
 
           <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" id="authLoginEmail" class="form-input" placeholder="player@freefirearena.com" required autocomplete="email">
+            <input type="email" id="authLoginEmail" class="form-input" placeholder="you@example.com" required autocomplete="email">
           </div>
 
           <div class="form-group">
@@ -2701,7 +2701,7 @@
 
           <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" id="authSignupEmail" class="form-input" placeholder="player@freefirearena.com" required autocomplete="email">
+            <input type="email" id="authSignupEmail" class="form-input" placeholder="you@example.com" required autocomplete="email">
           </div>
 
           <div class="form-group">
@@ -3719,7 +3719,7 @@
       <form id="loginForm" onsubmit="handleAuthLogin(event)">
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" id="loginEmail" class="form-input" placeholder="player@freefirearena.com" required>
+          <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" required>
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
@@ -3745,7 +3745,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" id="signupEmail" class="form-input" placeholder="player@freefirearena.com" required>
+          <input type="email" id="signupEmail" class="form-input" placeholder="you@example.com" required>
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
@@ -4181,7 +4181,7 @@
         <input type="hidden" id="disputeMatchId">
         <div style="background:rgba(0,0,0,0.3); border:1px solid var(--surface-border); border-radius:12px; padding:12px; margin-bottom:12px;">
           <div style="font-size:12px; color:var(--text-muted);">Disputing Match:</div>
-          <strong id="disputeMatchTitle" style="font-size:14px; color:#fff;">Match #FFA-8910</strong>
+          <strong id="disputeMatchTitle" style="font-size:14px; color:#fff;">Match #RST-8910</strong>
         </div>
 
         <div class="form-group">
@@ -4280,7 +4280,7 @@
       <form onsubmit="submitPlayerReport(event)">
         <div class="form-group">
           <label class="form-label">Tournament / Match Reference *</label>
-          <input type="text" id="reportMatchRef" class="form-input" placeholder="e.g. Bermuda Clash Squad / MATCH-FFA-8910" required>
+          <input type="text" id="reportMatchRef" class="form-input" placeholder="e.g. Bermuda Clash Squad / MATCH-RST-8910" required>
         </div>
 
         <div class="form-group">
@@ -4587,7 +4587,7 @@
       <div class="card" style="padding:14px; margin-bottom:14px;">
         <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Your Referral Code</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-          <strong id="myReferralCode" style="font-size:18px; font-family:var(--font-heading); color:var(--neon-green); letter-spacing:1px;">FFA-SHADOW77</strong>
+          <strong id="myReferralCode" style="font-size:18px; font-family:var(--font-heading); color:var(--neon-green); letter-spacing:1px;">RST-SHADOW77</strong>
           <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:11px; min-height:34px;" onclick="copyToClipboard(document.getElementById('myReferralCode').innerText, 'Referral Code')">
             <i class="fa-regular fa-copy"></i> Copy Code
           </button>
@@ -4597,7 +4597,7 @@
       <div class="card" style="padding:14px; margin-bottom:16px;">
         <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Direct Referral Link</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-          <span id="myReferralLink" style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;">https://freefirearena.com?ref=FFA-SHADOW77</span>
+          <span id="myReferralLink" style="font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;">window.location.origin + window.location.pathname?ref=RST-SHADOW77</span>
           <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:11px; min-height:34px;" onclick="copyToClipboard(document.getElementById('myReferralLink').innerText, 'Referral Link')">
             <i class="fa-regular fa-copy"></i> Copy Link
           </button>
@@ -4674,7 +4674,7 @@
 
           <div class="form-group">
             <label class="form-label">Related ID (Payment / Match / Redeem ID)</label>
-            <input type="text" id="ticketRelatedId" class="form-input" placeholder="e.g. PAY-FFA-7001 or MATCH-FFA-8910">
+            <input type="text" id="ticketRelatedId" class="form-input" placeholder="e.g. PAY-RST-7001 or MATCH-RST-8910">
           </div>
 
           <div class="form-group">
@@ -4991,7 +4991,7 @@
           </div>
           <div>
             <div style="color:var(--text-muted); font-size:10px;">PASS / REG ID</div>
-            <strong id="passRegID" style="color:var(--neon-green);">REG-FFA-891024</strong>
+            <strong id="passRegID" style="color:var(--neon-green);">REG-RST-891024</strong>
           </div>
           <div>
             <div style="color:var(--text-muted); font-size:10px;">MODE & FEE</div>
@@ -5046,11 +5046,11 @@
 
         <div class="receipt-row">
           <span>Receipt ID</span>
-          <strong id="receiptID" style="color:var(--neon-cyan);">REC-FFA-91823</strong>
+          <strong id="receiptID" style="color:var(--neon-cyan);">REC-RST-91823</strong>
         </div>
         <div class="receipt-row">
           <span>Registration Ref</span>
-          <strong id="receiptRegRef">REG-FFA-891024</strong>
+          <strong id="receiptRegRef">REG-RST-891024</strong>
         </div>
         <div class="receipt-row">
           <span>Coins Deducted</span>
@@ -5100,7 +5100,7 @@
       <div class="form-group">
         <label class="form-label">Or Enter Pass / Room Code Manually</label>
         <div style="display:flex; gap:8px;">
-          <input type="text" id="manualScanInput" class="form-input" placeholder="e.g. REG-FFA-891024 or TF-101">
+          <input type="text" id="manualScanInput" class="form-input" placeholder="e.g. REG-RST-891024 or TF-101">
           <button class="btn btn-primary" style="width:auto; padding:0 16px;" onclick="processManualScanCode()">
             <i class="fa-solid fa-arrow-right"></i>
           </button>
@@ -5395,7 +5395,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
           <div>
             <strong>Current Device (Android WebApp)</strong>
-            <div style="color:var(--text-muted);" id="activeSessionMeta">Last active: Just now • Session ID: #FFA-881</div>
+            <div style="color:var(--text-muted);" id="activeSessionMeta">Last active: Just now • Session ID: #RST-881</div>
           </div>
           <span class="status-chip status-open" style="font-size:9px;">Active</span>
         </div>
@@ -5438,8 +5438,8 @@
           <span class="tf-slots-badge">4/4 Full</span>
         </div>
         <div style="display:flex; gap:8px;">
-          <button class="btn btn-secondary" style="flex:1; padding:6px; font-size:11px;" onclick="copyToClipboard('FFA-SQD-9912', 'Squad Invite Code')">
-            <i class="fa-regular fa-copy"></i> Code: FFA-SQD-9912
+          <button class="btn btn-secondary" style="flex:1; padding:6px; font-size:11px;" onclick="copyToClipboard('RST-SQD-9912', 'Squad Invite Code')">
+            <i class="fa-regular fa-copy"></i> Code: RST-SQD-9912
           </button>
           <button class="btn btn-primary" style="flex:1; padding:6px; font-size:11px;" onclick="toggleSquadReady()">
             <i class="fa-solid fa-check-double"></i> <span id="squadReadyText">Mark Ready</span>
@@ -5719,7 +5719,7 @@
       console.error("Firebase initialization failed:", e);
     }
 
-    let livePaymentConfig = JSON.parse(localStorage.getItem('ffa_payment_config')) || {
+    let livePaymentConfig = JSON.parse(localStorage.getItem('rst_payment_config')) || {
       esewa: {
         enabled: true,
         qrImageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=eSewa%20Payment%209812345678%20RS%20TOURNAMENT&color=41a317",
@@ -5742,7 +5742,7 @@
         if (val) {
           if (val.esewa) livePaymentConfig.esewa = val.esewa;
           if (val.khalti) livePaymentConfig.khalti = val.khalti;
-          localStorage.setItem('ffa_payment_config', JSON.stringify(livePaymentConfig));
+          localStorage.setItem('rst_payment_config', JSON.stringify(livePaymentConfig));
           updatePaymentInstructionUI();
         }
       });
@@ -5779,7 +5779,7 @@
       onboardingCompleted: true
     };
 
-    let currentUser = JSON.parse(localStorage.getItem('ffa_user')) || null;
+    let currentUser = JSON.parse(localStorage.getItem('rst_user')) || null;
     let uploadedRedeemQR = null;
 
     // ==========================================
@@ -5854,26 +5854,26 @@
     let pendingOnboardingProvider = "password";
     let isUsernameAvailable = false;
     let usernameCheckTimeout = null;
-    let userFavorites = JSON.parse(localStorage.getItem('ffa_favorites')) || [];
-    let userRegistrations = JSON.parse(localStorage.getItem('ffa_registrations')) || [];
+    let userFavorites = JSON.parse(localStorage.getItem('rst_favorites')) || [];
+    let userRegistrations = JSON.parse(localStorage.getItem('rst_registrations')) || [];
 
     // Part 2: Transactions Ledger Repository
-    let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+    let userTransactions = JSON.parse(localStorage.getItem('rst_transactions')) || [];
 
     // Part 2: Payment Requests Repository
-    let userPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [];
+    let userPayments = JSON.parse(localStorage.getItem('rst_payments')) || [];
 
     // Part 2: Redeem Requests Repository
-    let userRedeems = JSON.parse(localStorage.getItem('ffa_redeems')) || [];
+    let userRedeems = JSON.parse(localStorage.getItem('rst_redeems')) || [];
 
     // Part 2: Match Results Repository
-    let tournamentResults = JSON.parse(localStorage.getItem('ffa_tournament_results')) || [];
+    let tournamentResults = JSON.parse(localStorage.getItem('rst_tournament_results')) || [];
 
     // Part 2: Result Disputes Repository
-    let userDisputes = JSON.parse(localStorage.getItem('ffa_disputes')) || [];
+    let userDisputes = JSON.parse(localStorage.getItem('rst_disputes')) || [];
 
     // Part 2: Notifications Repository
-    let userNotifications = JSON.parse(localStorage.getItem('ffa_notifications')) || [];
+    let userNotifications = JSON.parse(localStorage.getItem('rst_notifications')) || [];
 
     let sampleTournaments = [];
     if (typeof database !== 'undefined' && database) {
@@ -5987,7 +5987,7 @@
           applyBrandingToUI(val);
         });
       } else {
-        const saved = JSON.parse(localStorage.getItem('ffa_branding')) || DEFAULT_BRANDING;
+        const saved = JSON.parse(localStorage.getItem('rst_branding')) || DEFAULT_BRANDING;
         applyBrandingToUI(saved);
       }
     }
@@ -6059,7 +6059,7 @@
           renderTopupScreen();
         });
       } else {
-        topupProductsCache = JSON.parse(localStorage.getItem('ffa_topup_products')) || getDefaultTopupProducts();
+        topupProductsCache = JSON.parse(localStorage.getItem('rst_topup_products')) || getDefaultTopupProducts();
         renderTopupScreen();
       }
     }
@@ -6084,7 +6084,7 @@
           await database.ref('topupProducts/' + p.id).set(p);
         }
       } else {
-        localStorage.setItem('ffa_topup_products', JSON.stringify(getDefaultTopupProducts()));
+        localStorage.setItem('rst_topup_products', JSON.stringify(getDefaultTopupProducts()));
       }
     }
 
@@ -6194,7 +6194,7 @@
 
       if (currentUser) {
         currentUser.ffUID = uidVal;
-        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        localStorage.setItem('rst_user', JSON.stringify(currentUser));
         if (database && firebaseInitialized) {
           database.ref('users/' + currentUser.uid).update({ ffUID: uidVal, updatedAt: new Date().toISOString() });
         }
@@ -6269,7 +6269,7 @@
         // Safe coin deduction if enabled
         if (topupCoinDeductionEnabled && requiredCoins > 0) {
           currentUser.coins = (currentUser.coins || 0) - requiredCoins;
-          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          localStorage.setItem('rst_user', JSON.stringify(currentUser));
           
           const txId = "TX-TOPUP-" + Math.floor(100000 + Math.random() * 900000);
           const txData = {
@@ -6286,18 +6286,18 @@
             await database.ref('transactions/' + currentUser.uid + '/' + txId).set(txData);
             await database.ref('coinTransactions/' + txId).set(txData);
           } else {
-            let txs = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+            let txs = JSON.parse(localStorage.getItem('rst_transactions')) || [];
             txs.unshift(txData);
-            localStorage.setItem('ffa_transactions', JSON.stringify(txs));
+            localStorage.setItem('rst_transactions', JSON.stringify(txs));
           }
         }
 
         if (database && firebaseInitialized) {
           await database.ref('topupOrders/' + orderId).set(orderData);
         } else {
-          let orders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+          let orders = JSON.parse(localStorage.getItem('rst_topup_orders')) || [];
           orders.unshift(orderData);
-          localStorage.setItem('ffa_topup_orders', JSON.stringify(orders));
+          localStorage.setItem('rst_topup_orders', JSON.stringify(orders));
         }
 
         showToast("Top-up request submitted successfully!", "success");
@@ -6324,7 +6324,7 @@
           displayTopupOrdersList(orders);
         });
       } else {
-        let orders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+        let orders = JSON.parse(localStorage.getItem('rst_topup_orders')) || [];
         if (currentUser) {
           orders = orders.filter(o => o.uid === currentUser.uid);
         }
@@ -6537,9 +6537,9 @@
     let tournamentChatListener = null;
     let tournamentAnnouncementListener = null;
     let lastChatSendTime = 0;
-    let blockedUsers = JSON.parse(localStorage.getItem('ffa_blocked_users')) || [];
-    let mutedTournaments = JSON.parse(localStorage.getItem('ffa_muted_tourneys')) || [];
-    let reportedChatMessages = JSON.parse(localStorage.getItem('ffa_chat_reports')) || [];
+    let blockedUsers = JSON.parse(localStorage.getItem('rst_blocked_users')) || [];
+    let mutedTournaments = JSON.parse(localStorage.getItem('rst_muted_tourneys')) || [];
+    let reportedChatMessages = JSON.parse(localStorage.getItem('rst_chat_reports')) || [];
 
     function escapeHTML(str) {
       if (!str) return "";
@@ -6571,7 +6571,7 @@
     function getUserRoleInTourney(user, tourneyId) {
       if (!user) return "Player";
       if (user.isAdmin) return "Admin";
-      if (user.role === "Arbiter" || user.email === "arbiter@freefirearena.com") return "Arbiter";
+      if (user.role === "Arbiter" || user.email === "") return "Arbiter";
       const reg = userRegistrations.find(r => r.tournamentId === tourneyId);
       if (reg && (reg.mode === "Squad" || reg.mode === "Duo")) return "Squad Leader";
       return "Player";
@@ -6883,7 +6883,7 @@
     // TOURNAMENT LIVE CHAT & ANNOUNCEMENTS LOGIC
     // ==========================================
     function getTournamentAnnouncements(tourneyId) {
-      let anns = JSON.parse(localStorage.getItem(`ffa_tourney_announcements_${tourneyId}`));
+      let anns = JSON.parse(localStorage.getItem(`rst_tourney_announcements_${tourneyId}`));
       if (!anns) {
         anns = [
           {
@@ -6896,13 +6896,13 @@
             createdAt: new Date(Date.now() - 3600000).toISOString()
           }
         ];
-        localStorage.setItem(`ffa_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
+        localStorage.setItem(`rst_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
       }
       return anns;
     }
 
     function getTournamentMessages(tourneyId) {
-      let msgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tourneyId}`));
+      let msgs = JSON.parse(localStorage.getItem(`rst_tourney_messages_${tourneyId}`));
       if (!msgs) {
         msgs = [
           {
@@ -6929,7 +6929,7 @@
             deleted: false
           }
         ];
-        localStorage.setItem(`ffa_tourney_messages_${tourneyId}`, JSON.stringify(msgs));
+        localStorage.setItem(`rst_tourney_messages_${tourneyId}`, JSON.stringify(msgs));
       }
       return msgs;
     }
@@ -6982,7 +6982,7 @@
             const val = snap.val();
             if (val) {
               const msgs = Object.values(val).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-              localStorage.setItem(`ffa_tourney_messages_${tourneyId}`, JSON.stringify(msgs));
+              localStorage.setItem(`rst_tourney_messages_${tourneyId}`, JSON.stringify(msgs));
               renderTournamentChatMessages(tourneyId);
             }
           });
@@ -6992,7 +6992,7 @@
             const val = snap.val();
             if (val) {
               const anns = Object.values(val).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-              localStorage.setItem(`ffa_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
+              localStorage.setItem(`rst_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
               renderPinnedAnnouncement(tourneyId);
             }
           });
@@ -7129,7 +7129,7 @@
         return;
       }
 
-      if (localStorage.getItem('ffa_chat_muted_' + (currentUser ? currentUser.uid : '')) === 'true') {
+      if (localStorage.getItem('rst_chat_muted_' + (currentUser ? currentUser.uid : '')) === 'true') {
         showToast("Your chat access is temporarily restricted by arbiters.", "error");
         return;
       }
@@ -7179,7 +7179,7 @@
 
       const msgs = getTournamentMessages(activeTournamentChatId);
       msgs.push(newMsg);
-      localStorage.setItem(`ffa_tourney_messages_${activeTournamentChatId}`, JSON.stringify(msgs));
+      localStorage.setItem(`rst_tourney_messages_${activeTournamentChatId}`, JSON.stringify(msgs));
 
       if (database && firebaseInitialized) {
         try {
@@ -7269,10 +7269,10 @@
     ];
 
     function getCommunityChats() {
-      let chats = JSON.parse(localStorage.getItem('ffa_community_chats'));
+      let chats = JSON.parse(localStorage.getItem('rst_community_chats'));
       if (!chats || chats.length === 0) {
         chats = defaultCommunityChats;
-        localStorage.setItem('ffa_community_chats', JSON.stringify(chats));
+        localStorage.setItem('rst_community_chats', JSON.stringify(chats));
       }
       return chats;
     }
@@ -7291,7 +7291,7 @@
             const val = snapshot.val();
             if (val) {
               const msgs = Object.values(val).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-              localStorage.setItem('ffa_community_chats', JSON.stringify(msgs));
+              localStorage.setItem('rst_community_chats', JSON.stringify(msgs));
               renderCommunityChatMessages();
             }
           });
@@ -7403,7 +7403,7 @@
         return;
       }
 
-      if (localStorage.getItem('ffa_chat_muted_' + currentUser.uid) === 'true') {
+      if (localStorage.getItem('rst_chat_muted_' + currentUser.uid) === 'true') {
         showToast("Your chat access is temporarily restricted by arbiters.", "error");
         return;
       }
@@ -7453,7 +7453,7 @@
 
       const allMsgs = getCommunityChats();
       allMsgs.push(newMsg);
-      localStorage.setItem('ffa_community_chats', JSON.stringify(allMsgs));
+      localStorage.setItem('rst_community_chats', JSON.stringify(allMsgs));
 
       if (database && firebaseInitialized) {
         try {
@@ -7573,7 +7573,7 @@
         blockedUsers.push(uid);
         showToast(`Blocked ${name}. Their messages are now hidden.`, "info");
       }
-      localStorage.setItem('ffa_blocked_users', JSON.stringify(blockedUsers));
+      localStorage.setItem('rst_blocked_users', JSON.stringify(blockedUsers));
 
       if (currentUser && database && firebaseInitialized) {
         try {
@@ -7594,7 +7594,7 @@
         mutedTournaments.push(tourneyId);
         showToast("Tournament chat & notifications muted.", "info");
       }
-      localStorage.setItem('ffa_muted_tourneys', JSON.stringify(mutedTournaments));
+      localStorage.setItem('rst_muted_tourneys', JSON.stringify(mutedTournaments));
 
       if (currentUser && database && firebaseInitialized) {
         try {
@@ -7647,7 +7647,7 @@
       };
 
       reportedChatMessages.unshift(newReport);
-      localStorage.setItem('ffa_chat_reports', JSON.stringify(reportedChatMessages));
+      localStorage.setItem('rst_chat_reports', JSON.stringify(reportedChatMessages));
 
       if (database && firebaseInitialized) {
         try {
@@ -7693,7 +7693,7 @@
 
       const anns = getTournamentAnnouncements(tourneyId);
       anns.unshift(newAnn);
-      localStorage.setItem(`ffa_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
+      localStorage.setItem(`rst_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
 
       if (database && firebaseInitialized) {
         try {
@@ -7823,7 +7823,7 @@
         currentUser.coins -= tourney.entryFee;
 
         // Create transaction in ledger
-        const txId = "TX-FFA-" + Math.floor(100000 + Math.random() * 900000);
+        const txId = "TX-RST-" + Math.floor(100000 + Math.random() * 900000);
         const entryTx = {
           transactionId: txId,
           userId: currentUser.uid,
@@ -7836,14 +7836,14 @@
           createdAt: new Date().toISOString()
         };
         userTransactions.unshift(entryTx);
-        localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+        localStorage.setItem('rst_transactions', JSON.stringify(userTransactions));
 
         // Create notification
         addNotification(`Joined ${tourney.title}`, `Entry fee of ${tourney.entryFee} Coins was deducted.`, "TOURNAMENT_ENTRY");
       }
 
       // Create Registration
-      const regId = "REG-FFA-" + Math.floor(100000 + Math.random() * 900000);
+      const regId = "REG-RST-" + Math.floor(100000 + Math.random() * 900000);
       const newReg = {
         regId: regId,
         tournamentId: tourney.id,
@@ -7861,8 +7861,8 @@
       tourney.filledSlots++;
 
       // Update state and persistence
-      localStorage.setItem('ffa_user', JSON.stringify(currentUser));
-      localStorage.setItem('ffa_registrations', JSON.stringify(userRegistrations));
+      localStorage.setItem('rst_user', JSON.stringify(currentUser));
+      localStorage.setItem('rst_registrations', JSON.stringify(userRegistrations));
 
       if (database && currentUser) {
         database.ref(`wallets/${currentUser.uid}/coins`).set(currentUser.coins);
@@ -7894,7 +7894,7 @@
         showToast("Added to favorites", "success");
       }
 
-      localStorage.setItem('ffa_favorites', JSON.stringify(userFavorites));
+      localStorage.setItem('rst_favorites', JSON.stringify(userFavorites));
       if (database && currentUser) {
         database.ref(`favorites/${currentUser.uid}`).set(userFavorites);
       }
@@ -8303,7 +8303,7 @@
         return;
       }
 
-      const paymentId = "PAY-FFA-" + Math.floor(100000 + Math.random() * 900000);
+      const paymentId = "PAY-RST-" + Math.floor(100000 + Math.random() * 900000);
       const newPayment = {
         paymentId: paymentId,
         userId: currentUser.uid,
@@ -8321,7 +8321,7 @@
       };
 
       userPayments.unshift(newPayment);
-      localStorage.setItem('ffa_payments', JSON.stringify(userPayments));
+      localStorage.setItem('rst_payments', JSON.stringify(userPayments));
 
       if (database && currentUser) {
         database.ref(`payments/${currentUser.uid}/${paymentId}`).set(newPayment);
@@ -8588,7 +8588,7 @@
       // Safely reserve/deduct coins
       currentUser.coins -= selectedRedeemAmount;
 
-      const redeemId = "RED-FFA-" + Math.floor(100000 + Math.random() * 900000);
+      const redeemId = "RED-RST-" + Math.floor(100000 + Math.random() * 900000);
       const newRedeem = {
         redeemId: redeemId,
         userId: currentUser.uid,
@@ -8605,10 +8605,10 @@
       };
 
       userRedeems.unshift(newRedeem);
-      localStorage.setItem('ffa_redeems', JSON.stringify(userRedeems));
+      localStorage.setItem('rst_redeems', JSON.stringify(userRedeems));
 
       // Record REDEEM in transactions ledger
-      const txId = "TX-FFA-" + Math.floor(100000 + Math.random() * 900000);
+      const txId = "TX-RST-" + Math.floor(100000 + Math.random() * 900000);
       const redeemTx = {
         transactionId: txId,
         userId: currentUser.uid,
@@ -8621,8 +8621,8 @@
         createdAt: new Date().toISOString()
       };
       userTransactions.unshift(redeemTx);
-      localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
-      localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+      localStorage.setItem('rst_transactions', JSON.stringify(userTransactions));
+      localStorage.setItem('rst_user', JSON.stringify(currentUser));
 
       if (database && currentUser) {
         database.ref(`wallets/${currentUser.uid}/coins`).set(currentUser.coins);
@@ -8832,7 +8832,7 @@
       };
 
       userDisputes.unshift(ticket);
-      localStorage.setItem('ffa_disputes', JSON.stringify(userDisputes));
+      localStorage.setItem('rst_disputes', JSON.stringify(userDisputes));
 
       if (database && currentUser) {
         database.ref(`disputes/${currentUser.uid}/${disputeId}`).set(ticket);
@@ -8858,7 +8858,7 @@
         timestamp: Date.now()
       };
       userNotifications.unshift(notif);
-      localStorage.setItem('ffa_notifications', JSON.stringify(userNotifications));
+      localStorage.setItem('rst_notifications', JSON.stringify(userNotifications));
       renderNotificationsModal();
     }
 
@@ -8974,7 +8974,7 @@
     async function handleUserSession(user) {
       if (!user) {
         currentUser = null;
-        localStorage.removeItem('ffa_user');
+        localStorage.removeItem('rst_user');
         showAuthMainView();
         return;
       }
@@ -9006,7 +9006,7 @@
           if (profile && profile.onboardingCompleted && profile.username) {
             currentUser = profile;
             currentUser.uid = uid;
-            localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+            localStorage.setItem('rst_user', JSON.stringify(currentUser));
             
             // Real-time listener for coins balance
             database.ref('wallets/' + uid + '/coins').on('value', (cSnap) => {
@@ -9087,7 +9087,7 @@
           await database.ref('users/' + uid).set(newProfile);
 
           currentUser = newProfile;
-          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          localStorage.setItem('rst_user', JSON.stringify(currentUser));
 
           // Set up real-time listener for coins balance
           database.ref('wallets/' + uid + '/coins').on('value', (snap) => {
@@ -9129,7 +9129,7 @@
             role: "player",
             isAdmin: false
           };
-          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          localStorage.setItem('rst_user', JSON.stringify(currentUser));
           
           database.ref('wallets/' + uid + '/coins').on('value', (snap) => {
             const val = snap.val();
@@ -9166,7 +9166,7 @@
           role: "player",
           isAdmin: true
         };
-        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        localStorage.setItem('rst_user', JSON.stringify(currentUser));
         const overlay = document.getElementById("authScreenOverlay");
         if (overlay) overlay.style.display = "none";
         showToast(`Welcome to RS TOURNAMENT, ${baseUsername}!`, "success");
@@ -9310,7 +9310,7 @@
           capacity: document.getElementById("cmCapacity")?.value || 48,
           rules: document.getElementById("cmRules")?.value || ""
         };
-        localStorage.setItem("ffa_match_draft", JSON.stringify(draft));
+        localStorage.setItem("rst_match_draft", JSON.stringify(draft));
       } catch (e) {
         console.error("Draft save error:", e);
       }
@@ -9318,7 +9318,7 @@
 
     function restoreMatchDraft() {
       try {
-        const raw = localStorage.getItem("ffa_match_draft");
+        const raw = localStorage.getItem("rst_match_draft");
         if (!raw) return;
         const draft = JSON.parse(raw);
         if (draft.title) document.getElementById("cmTitle").value = draft.title;
@@ -9431,7 +9431,7 @@
               showToast("Custom match published & entry fee held in escrow!", "success");
               closeModal("modalCreateMatch");
               document.getElementById("createMatchForm").reset();
-              localStorage.removeItem("ffa_match_draft");
+              localStorage.removeItem("rst_match_draft");
               allTournaments.unshift(newCustomMatch);
               renderTournaments();
               renderWalletScreen();
@@ -9440,21 +9440,21 @@
             .catch((err) => {
               console.error("Failed to publish to DB:", err);
               allTournaments.unshift(newCustomMatch);
-              localStorage.setItem('ffa_tournaments', JSON.stringify(allTournaments));
+              localStorage.setItem('rst_tournaments', JSON.stringify(allTournaments));
               showToast("Custom match created successfully!", "success");
               closeModal("modalCreateMatch");
               document.getElementById("createMatchForm").reset();
-              localStorage.removeItem("ffa_match_draft");
+              localStorage.removeItem("rst_match_draft");
               renderTournaments();
               renderWalletScreen();
             });
         } else {
           allTournaments.unshift(newCustomMatch);
-          localStorage.setItem('ffa_tournaments', JSON.stringify(allTournaments));
+          localStorage.setItem('rst_tournaments', JSON.stringify(allTournaments));
           showToast("Custom match created successfully!", "success");
           closeModal("modalCreateMatch");
           document.getElementById("createMatchForm").reset();
-          localStorage.removeItem("ffa_match_draft");
+          localStorage.removeItem("rst_match_draft");
           renderTournaments();
           renderWalletScreen();
         }
@@ -9654,7 +9654,7 @@
         auth.signOut().catch(() => {});
       }
       currentUser = null;
-      localStorage.removeItem('ffa_user');
+      localStorage.removeItem('rst_user');
       showToast("Logged out of RS TOURNAMENT", "info");
       showAuthMainView();
     }
@@ -9692,7 +9692,7 @@
         });
       } else {
         currentUser = null;
-        localStorage.removeItem('ffa_user');
+        localStorage.removeItem('rst_user');
         showAuthMainView();
       }
     }
@@ -9718,7 +9718,7 @@
     let currentLbTime = "alltime";
     let currentLbTier = "all";
     let currentLbSearch = "";
-    let userFavoritePlayers = JSON.parse(localStorage.getItem('ffa_fav_players')) || ['7812904812', '789102451'];
+    let userFavoritePlayers = JSON.parse(localStorage.getItem('rst_fav_players')) || ['7812904812', '789102451'];
 
     let activeTourneyLeaderboardListener = null;
     let activeTourneyLeaderboardId = null;
@@ -9749,7 +9749,7 @@
         userFavoritePlayers.push(targetUid);
         showToast("Player added to favorites!", "success");
       }
-      localStorage.setItem('ffa_fav_players', JSON.stringify(userFavoritePlayers));
+      localStorage.setItem('rst_fav_players', JSON.stringify(userFavoritePlayers));
       if (database && currentUser && currentUser.uid) {
         database.ref(`favoritePlayers/${currentUser.uid}`).set(userFavoritePlayers);
       }
@@ -10021,10 +10021,10 @@
     }
 
     function loadLocalTournamentLeaderboard(tourneyId) {
-      let localStandings = JSON.parse(localStorage.getItem(`ffa_tourney_leaderboard_${tourneyId}`));
+      let localStandings = JSON.parse(localStorage.getItem(`rst_tourney_leaderboard_${tourneyId}`));
       if (!localStandings || localStandings.length === 0) {
         localStandings = generateDefaultTourneyStandings(tourneyId);
-        localStorage.setItem(`ffa_tourney_leaderboard_${tourneyId}`, JSON.stringify(localStandings));
+        localStorage.setItem(`rst_tourney_leaderboard_${tourneyId}`, JSON.stringify(localStandings));
       }
       renderTournamentLeaderboard(tourneyId, localStandings);
     }
@@ -10460,7 +10460,7 @@
     // PART 3: TEAM FINDER & SQUAD RECRUITMENT
     // ==========================================
     let currentTfFilter = "all";
-    let teamRequests = JSON.parse(localStorage.getItem('ffa_team_requests')) || [
+    let teamRequests = JSON.parse(localStorage.getItem('rst_team_requests')) || [
       {
         id: "TF-101",
         leaderIGN: "ApexPredator",
@@ -10579,7 +10579,7 @@
       };
 
       teamRequests.unshift(newReq);
-      localStorage.setItem('ffa_team_requests', JSON.stringify(teamRequests));
+      localStorage.setItem('rst_team_requests', JSON.stringify(teamRequests));
 
       if (database && currentUser) {
         database.ref(`teamRequests/${newReq.id}`).set(newReq);
@@ -10601,7 +10601,7 @@
     // ==========================================
     // PART 3: ACHIEVEMENTS & CLAIMABLE COINS
     // ==========================================
-    let userClaimedAchievements = JSON.parse(localStorage.getItem('ffa_claimed_achievements')) || [];
+    let userClaimedAchievements = JSON.parse(localStorage.getItem('rst_claimed_achievements')) || [];
 
     const appAchievements = [
       { id: "ach-1", title: "First Blood", desc: "Get your first elimination in an official tournament match.", reward: 15, current: 1, max: 1, icon: "fa-skull", category: "Combat" },
@@ -10676,15 +10676,15 @@
       if (userClaimedAchievements.includes(achId)) return;
 
       userClaimedAchievements.push(achId);
-      localStorage.setItem('ffa_claimed_achievements', JSON.stringify(userClaimedAchievements));
+      localStorage.setItem('rst_claimed_achievements', JSON.stringify(userClaimedAchievements));
 
       // Credit Coins
       currentUser.coins = (currentUser.coins || 0) + coinAmount;
-      localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+      localStorage.setItem('rst_user', JSON.stringify(currentUser));
 
       // Record transaction
       const tx = {
-        transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
+        transactionId: "TX-RST-" + Math.floor(100000 + Math.random() * 900000),
         userId: currentUser.uid,
         type: "ACHIEVEMENT_REWARD",
         amount: coinAmount,
@@ -10695,7 +10695,7 @@
         createdAt: new Date().toISOString()
       };
       userTransactions.unshift(tx);
-      localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+      localStorage.setItem('rst_transactions', JSON.stringify(userTransactions));
 
       if (database && currentUser) {
         database.ref(`wallets/${currentUser.uid}/coins`).set(currentUser.coins);
@@ -10713,11 +10713,11 @@
     // ==========================================
     // PART 3: REPORTS, EVIDENCE & FAIR PLAY
     // ==========================================
-    let userReports = JSON.parse(localStorage.getItem('ffa_reports')) || [
+    let userReports = JSON.parse(localStorage.getItem('rst_reports')) || [
       {
-        id: "REP-FFA-8901",
+        id: "REP-RST-8901",
         reportedPlayer: "SuspiciousAim99",
-        matchRef: "Bermuda Clash Squad (MATCH-FFA-8910)",
+        matchRef: "Bermuda Clash Squad (MATCH-RST-8910)",
         reason: "Hacker / suspicious gameplay",
         description: "Instant 180 snap through smoke grenade wall on factory roof.",
         status: "ACTION_TAKEN",
@@ -10796,7 +10796,7 @@
       const reason = document.getElementById("reportReason").value;
       const desc = document.getElementById("reportDescription").value.trim();
 
-      const repId = "REP-FFA-" + Math.floor(1000 + Math.random() * 9000);
+      const repId = "REP-RST-" + Math.floor(1000 + Math.random() * 9000);
       const newRep = {
         id: repId,
         reportedPlayer: target,
@@ -10811,7 +10811,7 @@
       };
 
       userReports.unshift(newRep);
-      localStorage.setItem('ffa_reports', JSON.stringify(userReports));
+      localStorage.setItem('rst_reports', JSON.stringify(userReports));
 
       if (database && currentUser) {
         database.ref(`reports/${repId}`).set(newRep);
@@ -10898,7 +10898,7 @@
       currentUser.device = device;
       currentUser.bio = bio;
 
-      localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+      localStorage.setItem('rst_user', JSON.stringify(currentUser));
       if (database && currentUser) {
         database.ref(`users/${currentUser.uid}`).update({
           username: ign,
@@ -10962,7 +10962,7 @@
     // PART 3: REFERRAL & SHARE PROGRAM
     // ==========================================
     function openReferralModal() {
-      const code = (currentUser && currentUser.referralCode) || (currentUser && currentUser.username ? `FFA-${currentUser.username.toUpperCase()}` : "FFA-SHADOW77");
+      const code = (currentUser && currentUser.referralCode) || (currentUser && currentUser.username ? `RST-${currentUser.username.toUpperCase()}` : "RST-SHADOW77");
       if (currentUser && !currentUser.referralCode) {
         currentUser.referralCode = code;
         if (database && firebaseInitialized) {
@@ -10970,19 +10970,19 @@
         }
       }
       document.getElementById("myReferralCode").innerText = code;
-      document.getElementById("myReferralLink").innerText = `https://freefirearena.com?ref=${code}`;
+      document.getElementById("myReferralLink").innerText = `window.location.origin + window.location.pathname?ref=${code}`;
       openModal("modalReferral");
     }
 
     function shareReferralLink() {
       const code = document.getElementById("myReferralCode").innerText;
-      const shareText = `🔥 Join me on RS TOURNAMENT! Play competitive Solo, Duo & Squad tournaments, earn real cash & coins. Use my referral code: ${code} to get 10 bonus coins instantly!\nhttps://freefirearena.com?ref=${code}`;
+      const shareText = `🔥 Join me on RS TOURNAMENT! Play competitive Solo, Duo & Squad tournaments, earn real cash & coins. Use my referral code: ${code} to get 10 bonus coins instantly!\nwindow.location.origin + window.location.pathname?ref=${code}`;
 
       if (navigator.share) {
         navigator.share({
           title: "Join RS TOURNAMENT",
           text: shareText,
-          url: `https://freefirearena.com?ref=${code}`
+          url: `window.location.origin + window.location.pathname?ref=${code}`
         }).catch(() => {});
       } else {
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
@@ -11040,7 +11040,7 @@
       const ref = document.getElementById("ticketRelatedId").value.trim();
       const desc = document.getElementById("ticketDescription").value.trim();
 
-      const ticketId = "TKT-FFA-" + Math.floor(1000 + Math.random() * 9000);
+      const ticketId = "TKT-RST-" + Math.floor(1000 + Math.random() * 9000);
       hapticFeedback();
       addNotification("Support Ticket Created", `Your ticket #${ticketId} (${cat}: ${subject}) has been assigned to support.`, "SUPPORT");
       showToast(`Support Ticket ${ticketId} created! Support agent will respond in 2 hours.`, "success");
@@ -11056,8 +11056,8 @@
     // ==========================================
     // PART 4: COMPREHENSIVE FEATURES & CONVENIENCE
     // ==========================================
-    let recentSearches = JSON.parse(localStorage.getItem('ffa_recent_searches')) || ["Bermuda", "Squad", "Free", "ViperKing"];
-    let recentlyViewedTourneys = JSON.parse(localStorage.getItem('ffa_recently_viewed')) || ["ff-tourney-1", "ff-tourney-2"];
+    let recentSearches = JSON.parse(localStorage.getItem('rst_recent_searches')) || ["Bermuda", "Squad", "Free", "ViperKing"];
+    let recentlyViewedTourneys = JSON.parse(localStorage.getItem('rst_recently_viewed')) || ["ff-tourney-1", "ff-tourney-2"];
     let currentAdvFilters = {
       fee: "all",
       mode: "all",
@@ -11066,7 +11066,7 @@
       highPrize: false,
       availableSlots: true
     };
-    let currentAppLanguage = localStorage.getItem('ffa_lang') || 'en';
+    let currentAppLanguage = localStorage.getItem('rst_lang') || 'en';
     let currentRatingStars = 5;
     let onboardingCurrentStep = 0;
     let squadReadyState = false;
@@ -11162,7 +11162,7 @@
 
     function clearRecentSearches() {
       recentSearches = [];
-      localStorage.setItem('ffa_recent_searches', JSON.stringify(recentSearches));
+      localStorage.setItem('rst_recent_searches', JSON.stringify(recentSearches));
       renderRecentSearches();
       showToast("Recent search history cleared", "info");
     }
@@ -11181,7 +11181,7 @@
       if (q.length > 2 && !recentSearches.includes(q)) {
         recentSearches.unshift(q);
         if (recentSearches.length > 6) recentSearches.pop();
-        localStorage.setItem('ffa_recent_searches', JSON.stringify(recentSearches));
+        localStorage.setItem('rst_recent_searches', JSON.stringify(recentSearches));
         renderRecentSearches();
       }
 
@@ -11360,7 +11360,7 @@
     // ------------------------------------------
     function openTournamentPassModal(regId) {
       const reg = userRegistrations.find(r => r.regId === regId) || userRegistrations[0] || {
-        regId: "REG-FFA-891024",
+        regId: "REG-RST-891024",
         tourneyTitle: "Bermuda Clash Squad Grand Cup",
         mode: "Squad",
         ign: currentUser ? currentUser.displayName : "ShadowHunter",
@@ -11396,13 +11396,13 @@
 
     function openTournamentReceiptModal(regId) {
       const reg = userRegistrations.find(r => r.regId === regId) || userRegistrations[0] || {
-        regId: "REG-FFA-891024",
+        regId: "REG-RST-891024",
         tourneyTitle: "Bermuda Clash Squad Grand Cup",
         entryFee: 50
       };
 
       document.getElementById("receiptTourneyTitle").innerText = reg.tourneyTitle;
-      document.getElementById("receiptID").innerText = "REC-FFA-" + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById("receiptID").innerText = "REC-RST-" + Math.floor(10000 + Math.random() * 90000);
       document.getElementById("receiptRegRef").innerText = reg.regId;
       document.getElementById("receiptCoins").innerText = `-${reg.entryFee || 50} Coins`;
       document.getElementById("receiptDate").innerText = new Date().toLocaleString();
@@ -11458,7 +11458,7 @@
     // NOTIFICATION PREFERENCES
     // ------------------------------------------
     function openNotificationPrefsModal() {
-      const saved = JSON.parse(localStorage.getItem('ffa_notif_prefs'));
+      const saved = JSON.parse(localStorage.getItem('rst_notif_prefs'));
       if (saved) {
         if (document.getElementById("notifPrefTourney")) document.getElementById("notifPrefTourney").checked = saved.tourney !== false;
         if (document.getElementById("notifPrefRoom")) document.getElementById("notifPrefRoom").checked = saved.room !== false;
@@ -11486,7 +11486,7 @@
         communityChat: document.getElementById("notifPrefCommunityChat") ? document.getElementById("notifPrefCommunityChat").checked : true,
         savedAt: new Date().toISOString()
       };
-      localStorage.setItem('ffa_notif_prefs', JSON.stringify(prefs));
+      localStorage.setItem('rst_notif_prefs', JSON.stringify(prefs));
       hapticFeedback();
       closeModal("modalNotificationPrefs");
       showToast("Notification preferences updated!", "success");
@@ -11501,7 +11501,7 @@
 
     function changeLanguage(lang) {
       currentAppLanguage = lang;
-      localStorage.setItem('ffa_lang', lang);
+      localStorage.setItem('rst_lang', lang);
 
       document.getElementById("langCheckEn").style.display = lang === 'en' ? 'inline-block' : 'none';
       document.getElementById("langCheckHi").style.display = lang === 'hi' ? 'inline-block' : 'none';
@@ -11652,7 +11652,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBlob, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `ffa_player_data_${currentUser ? currentUser.displayName : 'shadow'}.json`);
+      downloadAnchor.setAttribute("download", `rst_player_data_${currentUser ? currentUser.displayName : 'shadow'}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -11740,7 +11740,7 @@
       const cat = document.getElementById("feedbackCategory").value;
       const comment = document.getElementById("feedbackComment").value.trim();
 
-      const feedList = JSON.parse(localStorage.getItem('ffa_feedback')) || [];
+      const feedList = JSON.parse(localStorage.getItem('rst_feedback')) || [];
       feedList.unshift({
         id: "FEED-" + Date.now(),
         stars: currentRatingStars,
@@ -11749,7 +11749,7 @@
         user: currentUser ? currentUser.displayName : "Player",
         createdAt: new Date().toISOString()
       });
-      localStorage.setItem('ffa_feedback', JSON.stringify(feedList));
+      localStorage.setItem('rst_feedback', JSON.stringify(feedList));
 
       hapticFeedback();
       closeModal("modalFeedback");
@@ -11766,7 +11766,7 @@
       const screen = document.getElementById("bugScreen").value.trim();
       const desc = document.getElementById("bugDescription").value.trim();
 
-      const bugs = JSON.parse(localStorage.getItem('ffa_bug_tickets')) || [];
+      const bugs = JSON.parse(localStorage.getItem('rst_bug_tickets')) || [];
       bugs.unshift({
         id: "BUG-" + Date.now(),
         category: cat,
@@ -11775,7 +11775,7 @@
         user: currentUser ? currentUser.uid : "user-101",
         createdAt: new Date().toISOString()
       });
-      localStorage.setItem('ffa_bug_tickets', JSON.stringify(bugs));
+      localStorage.setItem('rst_bug_tickets', JSON.stringify(bugs));
 
       hapticFeedback();
       closeModal("modalBugReport");
@@ -11791,7 +11791,7 @@
       const title = document.getElementById("featTitle").value.trim();
       const desc = document.getElementById("featDescription").value.trim();
 
-      const feats = JSON.parse(localStorage.getItem('ffa_feature_requests')) || [];
+      const feats = JSON.parse(localStorage.getItem('rst_feature_requests')) || [];
       feats.unshift({
         id: "FEAT-" + Date.now(),
         title: title,
@@ -11799,7 +11799,7 @@
         user: currentUser ? currentUser.uid : "user-101",
         createdAt: new Date().toISOString()
       });
-      localStorage.setItem('ffa_feature_requests', JSON.stringify(feats));
+      localStorage.setItem('rst_feature_requests', JSON.stringify(feats));
 
       hapticFeedback();
       closeModal("modalFeatureRequest");

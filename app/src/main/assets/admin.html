@@ -403,7 +403,7 @@
       <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
         <div class="admin-input-group">
           <label class="admin-input-label">Admin Email</label>
-          <input type="email" id="adminEmailInput" class="admin-input" placeholder="admin@freefirearena.com" required autocomplete="email">
+          <input type="email" id="adminEmailInput" class="admin-input" placeholder="admin@rstournament.com" required autocomplete="email">
         </div>
 
         <div class="admin-input-group">
@@ -1779,11 +1779,11 @@
     }
 
     // Shared State Repositories
-    let allPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [];
-    let allRedeems = JSON.parse(localStorage.getItem('ffa_redeems')) || [];
-    let allReports = JSON.parse(localStorage.getItem('ffa_reports')) || [];
-    let allDisputes = JSON.parse(localStorage.getItem('ffa_disputes')) || [];
-    let auditLogs = JSON.parse(localStorage.getItem('ffa_audit_logs')) || [
+    let allPayments = JSON.parse(localStorage.getItem('rst_payments')) || [];
+    let allRedeems = JSON.parse(localStorage.getItem('rst_redeems')) || [];
+    let allReports = JSON.parse(localStorage.getItem('rst_reports')) || [];
+    let allDisputes = JSON.parse(localStorage.getItem('rst_disputes')) || [];
+    let auditLogs = JSON.parse(localStorage.getItem('rst_audit_logs')) || [
       {
         action: "SYSTEM_INITIALIZED",
         details: "RS TOURNAMENT Part 3 Engine activated with Khalti, Reports & Gateways.",
@@ -1797,7 +1797,7 @@
     let currentAdminTourneyFilter = 'ALL';
 
     // Admin Auth State
-    let currentAdminUser = JSON.parse(localStorage.getItem('ffa_admin_auth')) || null;
+    let currentAdminUser = JSON.parse(localStorage.getItem('rst_admin_auth')) || null;
 
     function checkAdminAuth() {
       const overlay = document.getElementById("adminAuthOverlay");
@@ -1826,13 +1826,13 @@
                 isAuthorized: true,
                 loginAt: new Date().toISOString()
               };
-              localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+              localStorage.setItem('rst_admin_auth', JSON.stringify(currentAdminUser));
               checkAdminAuth();
               renderAdminData();
             } else {
               firebase.auth().signOut();
               currentAdminUser = null;
-              localStorage.removeItem('ffa_admin_auth');
+              localStorage.removeItem('rst_admin_auth');
               if (errBox) {
                 errBox.style.display = "block";
                 errBox.innerHTML = `<i class="fa-solid fa-ban"></i> Access Denied: You do not have administrator permissions.`;
@@ -1842,7 +1842,7 @@
           });
         } else {
           currentAdminUser = null;
-          localStorage.removeItem('ffa_admin_auth');
+          localStorage.removeItem('rst_admin_auth');
           checkAdminAuth();
         }
       });
@@ -1897,7 +1897,7 @@
                   isAuthorized: true,
                   loginAt: new Date().toISOString()
                 };
-                localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+                localStorage.setItem('rst_admin_auth', JSON.stringify(currentAdminUser));
                 recordAudit("ADMIN_LOGIN", `Admin ${email} signed in via Firebase Auth.`);
                 checkAdminAuth();
                 renderAdminData();
@@ -1926,7 +1926,7 @@
               isAuthorized: true,
               loginAt: new Date().toISOString()
             };
-            localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+            localStorage.setItem('rst_admin_auth', JSON.stringify(currentAdminUser));
             recordAudit("ADMIN_LOGIN", `Admin ${email} signed into Admin Console.`);
             checkAdminAuth();
             renderAdminData();
@@ -1941,12 +1941,12 @@
     function quickDemoAdminLogin() {
       currentAdminUser = {
         uid: "adm-arbiter-01",
-        email: "arbiter@freefirearena.com",
+        email: "",
         role: "HEAD_ARBITER",
         isAuthorized: true,
         loginAt: new Date().toISOString()
       };
-      localStorage.setItem('ffa_admin_auth', JSON.stringify(currentAdminUser));
+      localStorage.setItem('rst_admin_auth', JSON.stringify(currentAdminUser));
       recordAudit("DEMO_ADMIN_LOGIN", `Authorized Sandbox Arbiter session started.`);
       checkAdminAuth();
       renderAdminData();
@@ -1955,7 +1955,7 @@
     function adminLogout() {
       if (confirm("Sign out of the Admin Control Center?")) {
         currentAdminUser = null;
-        localStorage.removeItem('ffa_admin_auth');
+        localStorage.removeItem('rst_admin_auth');
         checkAdminAuth();
       }
     }
@@ -2010,12 +2010,12 @@
     }
 
     function renderAdminData() {
-      allPayments = JSON.parse(localStorage.getItem('ffa_payments')) || [];
-      allRedeems = JSON.parse(localStorage.getItem('ffa_redeems')) || [];
-      allReports = JSON.parse(localStorage.getItem('ffa_reports')) || [];
-      allDisputes = JSON.parse(localStorage.getItem('ffa_disputes')) || [];
-      allChatReports = JSON.parse(localStorage.getItem('ffa_chat_reports')) || [];
-      auditLogs = JSON.parse(localStorage.getItem('ffa_audit_logs')) || [];
+      allPayments = JSON.parse(localStorage.getItem('rst_payments')) || [];
+      allRedeems = JSON.parse(localStorage.getItem('rst_redeems')) || [];
+      allReports = JSON.parse(localStorage.getItem('rst_reports')) || [];
+      allDisputes = JSON.parse(localStorage.getItem('rst_disputes')) || [];
+      allChatReports = JSON.parse(localStorage.getItem('rst_chat_reports')) || [];
+      auditLogs = JSON.parse(localStorage.getItem('rst_audit_logs')) || [];
 
       // Badges & Counters
       const pendingPayCount = allPayments.filter(p => p.status === 'PENDING').length;
@@ -2129,18 +2129,18 @@
       payment.status = 'APPROVED';
       payment.updatedAt = new Date().toISOString();
       allPayments[payIndex] = payment;
-      localStorage.setItem('ffa_payments', JSON.stringify(allPayments));
+      localStorage.setItem('rst_payments', JSON.stringify(allPayments));
 
       // Credit User Coins & create transaction exactly once
-      let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
+      let currentUser = JSON.parse(localStorage.getItem('rst_user'));
       if (currentUser && currentUser.uid === payment.userId) {
         currentUser.coins = (currentUser.coins || 0) + payment.coinAmount;
-        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        localStorage.setItem('rst_user', JSON.stringify(currentUser));
       }
 
-      let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+      let userTransactions = JSON.parse(localStorage.getItem('rst_transactions')) || [];
       userTransactions.unshift({
-        transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
+        transactionId: "TX-RST-" + Math.floor(100000 + Math.random() * 900000),
         userId: payment.userId,
         type: "ADD_COINS",
         amount: payment.coinAmount,
@@ -2150,7 +2150,7 @@
         description: `Deposit via ${payment.paymentMethod}`,
         createdAt: new Date().toISOString()
       });
-      localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+      localStorage.setItem('rst_transactions', JSON.stringify(userTransactions));
 
       if (database) {
         database.ref(`payments/${payment.userId}/${paymentId}/status`).set('APPROVED');
@@ -2178,7 +2178,7 @@
       payment.rejectReason = reason || "Unverified payment reference";
       payment.updatedAt = new Date().toISOString();
       allPayments[payIndex] = payment;
-      localStorage.setItem('ffa_payments', JSON.stringify(allPayments));
+      localStorage.setItem('rst_payments', JSON.stringify(allPayments));
 
       if (database) {
         database.ref(`payments/${payment.userId}/${paymentId}/status`).set('REJECTED');
@@ -2212,7 +2212,7 @@
           displayAdminTopupOrdersList(allTopupOrders);
         });
       } else {
-        allTopupOrders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+        allTopupOrders = JSON.parse(localStorage.getItem('rst_topup_orders')) || [];
         displayAdminTopupOrdersList(allTopupOrders);
       }
     }
@@ -2285,10 +2285,10 @@
           targetOrder = snap.val();
           await database.ref('topupOrders/' + orderId).update({ status: newStatus, updatedAt: new Date().toISOString() });
         } else {
-          let orders = JSON.parse(localStorage.getItem('ffa_topup_orders')) || [];
+          let orders = JSON.parse(localStorage.getItem('rst_topup_orders')) || [];
           targetOrder = orders.find(o => o.orderId === orderId);
           orders = orders.map(o => o.orderId === orderId ? { ...o, status: newStatus, updatedAt: new Date().toISOString() } : o);
-          localStorage.setItem('ffa_topup_orders', JSON.stringify(orders));
+          localStorage.setItem('rst_topup_orders', JSON.stringify(orders));
         }
 
         // If rejected and coins were deducted, refund coins
@@ -2301,10 +2301,10 @@
             const newCoins = (uVal.coins || 0) + refundAmount;
             await database.ref('users/' + uid).update({ coins: newCoins, updatedAt: new Date().toISOString() });
           } else {
-            let u = JSON.parse(localStorage.getItem('ffa_user'));
+            let u = JSON.parse(localStorage.getItem('rst_user'));
             if (u && u.uid === uid) {
               u.coins = (u.coins || 0) + refundAmount;
-              localStorage.setItem('ffa_user', JSON.stringify(u));
+              localStorage.setItem('rst_user', JSON.stringify(u));
             }
           }
           recordAudit("TOPUP_REFUND", `Refunded ${refundAmount} coins to user ${uid} for rejected order ${orderId}`);
@@ -2335,7 +2335,7 @@
           renderAdminTopupProductsList(adminTopupProductsCache);
         });
       } else {
-        adminTopupProductsCache = JSON.parse(localStorage.getItem('ffa_topup_products')) || [];
+        adminTopupProductsCache = JSON.parse(localStorage.getItem('rst_topup_products')) || [];
         const toggle = document.getElementById("adminTopupCoinToggle");
         if (toggle) toggle.checked = true;
         renderAdminTopupProductsList(adminTopupProductsCache);
@@ -2409,9 +2409,9 @@
       if (database && firebaseInitialized) {
         database.ref('topupProducts/' + id).set(product);
       } else {
-        let prods = JSON.parse(localStorage.getItem('ffa_topup_products')) || [];
+        let prods = JSON.parse(localStorage.getItem('rst_topup_products')) || [];
         prods.push(product);
-        localStorage.setItem('ffa_topup_products', JSON.stringify(prods));
+        localStorage.setItem('rst_topup_products', JSON.stringify(prods));
       }
       showToast("Topup product added successfully!", "success");
       loadAdminTopupManager();
@@ -2422,9 +2422,9 @@
       if (database && firebaseInitialized) {
         database.ref('topupProducts/' + productId).remove();
       } else {
-        let prods = JSON.parse(localStorage.getItem('ffa_topup_products')) || [];
+        let prods = JSON.parse(localStorage.getItem('rst_topup_products')) || [];
         prods = prods.filter(p => p.id !== productId);
-        localStorage.setItem('ffa_topup_products', JSON.stringify(prods));
+        localStorage.setItem('rst_topup_products', JSON.stringify(prods));
       }
       showToast("Product deleted.", "success");
       loadAdminTopupManager();
@@ -2575,7 +2575,7 @@
       const note = prompt("Enter administrative note for this payout:", allRedeems[index].adminNote || "");
       if (note !== null) {
         allRedeems[index].adminNote = note.trim();
-        localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
+        localStorage.setItem('rst_redeems', JSON.stringify(allRedeems));
         recordAudit("REDEEM_NOTE", `Added note to redeem ${redeemId}: ${note.trim()}`);
         renderAdminData();
       }
@@ -2596,7 +2596,7 @@
       redeem.status = 'PAID';
       redeem.processedAt = new Date().toISOString();
       allRedeems[index] = redeem;
-      localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
+      localStorage.setItem('rst_redeems', JSON.stringify(allRedeems));
 
       if (database) {
         database.ref(`redeems/${redeem.userId}/${redeemId}/status`).set('PAID');
@@ -2624,17 +2624,17 @@
       redeem.rejectReason = reason || "Invalid account details";
       redeem.processedAt = new Date().toISOString();
       allRedeems[index] = redeem;
-      localStorage.setItem('ffa_redeems', JSON.stringify(allRedeems));
+      localStorage.setItem('rst_redeems', JSON.stringify(allRedeems));
 
       // Refund reserved coins once
-      let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
+      let currentUser = JSON.parse(localStorage.getItem('rst_user'));
       if (currentUser && currentUser.uid === redeem.userId) {
         currentUser.coins = (currentUser.coins || 0) + redeem.coins;
-        localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+        localStorage.setItem('rst_user', JSON.stringify(currentUser));
 
-        let userTransactions = JSON.parse(localStorage.getItem('ffa_transactions')) || [];
+        let userTransactions = JSON.parse(localStorage.getItem('rst_transactions')) || [];
         userTransactions.unshift({
-          transactionId: "TX-FFA-" + Math.floor(100000 + Math.random() * 900000),
+          transactionId: "TX-RST-" + Math.floor(100000 + Math.random() * 900000),
           userId: redeem.userId,
           type: "REDEEM_REFUND",
           amount: redeem.coins,
@@ -2644,7 +2644,7 @@
           description: `Refund for rejected redeem ${redeem.redeemId}`,
           createdAt: new Date().toISOString()
         });
-        localStorage.setItem('ffa_transactions', JSON.stringify(userTransactions));
+        localStorage.setItem('rst_transactions', JSON.stringify(userTransactions));
       }
 
       if (database) {
@@ -2732,7 +2732,7 @@
       rep.adminNotes = notes;
       rep.resolvedAt = new Date().toISOString();
       allReports[repIndex] = rep;
-      localStorage.setItem('ffa_reports', JSON.stringify(allReports));
+      localStorage.setItem('rst_reports', JSON.stringify(allReports));
 
       recordAudit("REPORT_RESOLVED", `Resolved report ${repId} (${action}) against ${rep.reportedPlayer}`);
       renderAdminData();
@@ -2756,7 +2756,7 @@
     }
 
     function renderChatModTab() {
-      allChatReports = JSON.parse(localStorage.getItem('ffa_chat_reports')) || [];
+      allChatReports = JSON.parse(localStorage.getItem('rst_chat_reports')) || [];
       const container = document.getElementById("adminChatReportsList");
       if (!container) return;
 
@@ -2824,13 +2824,13 @@
 
       let allMessages = [];
 
-      const commChats = JSON.parse(localStorage.getItem('ffa_community_chats')) || [];
+      const commChats = JSON.parse(localStorage.getItem('rst_community_chats')) || [];
       commChats.forEach(m => {
         allMessages.push({ ...m, source: "Community Chat", channelName: "community", tourneyId: null });
       });
 
       ['ff-tourney-1', 'ff-tourney-2', 'ff-tourney-3'].forEach(tid => {
-        const tMsgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tid}`)) || [];
+        const tMsgs = JSON.parse(localStorage.getItem(`rst_tourney_messages_${tid}`)) || [];
         tMsgs.forEach(m => {
           allMessages.push({ ...m, source: `Tournament: ${tid}`, channelName: tid, tourneyId: tid });
         });
@@ -2890,26 +2890,26 @@
       if (!confirm(`Delete message ${msgId}?`)) return;
 
       if (channelName === 'community') {
-        const commChats = JSON.parse(localStorage.getItem('ffa_community_chats')) || [];
+        const commChats = JSON.parse(localStorage.getItem('rst_community_chats')) || [];
         const idx = commChats.findIndex(m => m.messageId === msgId);
         if (idx !== -1) {
           commChats[idx].deleted = true;
           commChats[idx].deletedBy = "ADMIN";
           commChats[idx].deletedAt = new Date().toISOString();
-          localStorage.setItem('ffa_community_chats', JSON.stringify(commChats));
+          localStorage.setItem('rst_community_chats', JSON.stringify(commChats));
         }
         if (database && firebaseInitialized) {
           database.ref(`communityChats/${msgId}/deleted`).set(true);
           database.ref(`communityChats/${msgId}/deletedBy`).set("ADMIN");
         }
       } else if (tourneyId) {
-        const tMsgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tourneyId}`)) || [];
+        const tMsgs = JSON.parse(localStorage.getItem(`rst_tourney_messages_${tourneyId}`)) || [];
         const idx = tMsgs.findIndex(m => m.messageId === msgId);
         if (idx !== -1) {
           tMsgs[idx].deleted = true;
           tMsgs[idx].deletedBy = "ADMIN";
           tMsgs[idx].deletedAt = new Date().toISOString();
-          localStorage.setItem(`ffa_tourney_messages_${tourneyId}`, JSON.stringify(tMsgs));
+          localStorage.setItem(`rst_tourney_messages_${tourneyId}`, JSON.stringify(tMsgs));
         }
         if (database && firebaseInitialized) {
           database.ref(`tournamentChats/${tourneyId}/${msgId}/deleted`).set(true);
@@ -2927,28 +2927,28 @@
       if (rep) {
         rep.status = "ACTION_TAKEN";
         rep.resolutionNote = "Message deleted and warning issued.";
-        localStorage.setItem('ffa_chat_reports', JSON.stringify(allChatReports));
+        localStorage.setItem('rst_chat_reports', JSON.stringify(allChatReports));
       }
 
       if (channel === 'community') {
-        const commChats = JSON.parse(localStorage.getItem('ffa_community_chats')) || [];
+        const commChats = JSON.parse(localStorage.getItem('rst_community_chats')) || [];
         const idx = commChats.findIndex(m => m.messageId === msgId);
         if (idx !== -1) {
           commChats[idx].deleted = true;
           commChats[idx].deletedBy = "ADMIN";
-          localStorage.setItem('ffa_community_chats', JSON.stringify(commChats));
+          localStorage.setItem('rst_community_chats', JSON.stringify(commChats));
         }
         if (database && firebaseInitialized) {
           database.ref(`communityChats/${msgId}/deleted`).set(true);
         }
       } else {
         const tid = rep && rep.channel !== 'community' ? rep.channel : "ff-tourney-1";
-        const tMsgs = JSON.parse(localStorage.getItem(`ffa_tourney_messages_${tid}`)) || [];
+        const tMsgs = JSON.parse(localStorage.getItem(`rst_tourney_messages_${tid}`)) || [];
         const idx = tMsgs.findIndex(m => m.messageId === msgId);
         if (idx !== -1) {
           tMsgs[idx].deleted = true;
           tMsgs[idx].deletedBy = "ADMIN";
-          localStorage.setItem(`ffa_tourney_messages_${tid}`, JSON.stringify(tMsgs));
+          localStorage.setItem(`rst_tourney_messages_${tid}`, JSON.stringify(tMsgs));
         }
         if (database && firebaseInitialized) {
           database.ref(`tournamentChats/${tid}/${msgId}/deleted`).set(true);
@@ -2962,7 +2962,7 @@
 
     function adminMuteUserFromChat(uid, username) {
       if (!confirm(`Restrict chat permissions for player ${username} (${uid})?`)) return;
-      localStorage.setItem(`ffa_chat_muted_${uid}`, 'true');
+      localStorage.setItem(`rst_chat_muted_${uid}`, 'true');
 
       if (database && firebaseInitialized) {
         database.ref(`chatRestrictions/${uid}`).set({
@@ -2982,7 +2982,7 @@
       if (rep) {
         rep.status = "DISMISSED";
         rep.resolutionNote = "Report reviewed by arbiter and dismissed (no violation).";
-        localStorage.setItem('ffa_chat_reports', JSON.stringify(allChatReports));
+        localStorage.setItem('rst_chat_reports', JSON.stringify(allChatReports));
       }
       recordAudit("REPORT_DISMISSED", `Dismissed chat report ${reportId}`);
       renderAdminData();
@@ -3012,9 +3012,9 @@
         createdAt: new Date().toISOString()
       };
 
-      let anns = JSON.parse(localStorage.getItem(`ffa_tourney_announcements_${tourneyId}`)) || [];
+      let anns = JSON.parse(localStorage.getItem(`rst_tourney_announcements_${tourneyId}`)) || [];
       anns.unshift(newAnn);
-      localStorage.setItem(`ffa_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
+      localStorage.setItem(`rst_tourney_announcements_${tourneyId}`, JSON.stringify(anns));
 
       if (database && firebaseInitialized) {
         database.ref(`tournamentAnnouncements/${tourneyId}/${annId}`).set(newAnn);
@@ -3041,7 +3041,7 @@
         updatedAt: new Date().toISOString()
       };
 
-      localStorage.setItem('ffa_gateway_settings', JSON.stringify(settings));
+      localStorage.setItem('rst_gateway_settings', JSON.stringify(settings));
       recordAudit("SETTINGS_SAVED", `Updated Khalti/eSewa payment gateway configuration.`);
       alert("Payment Gateways and App Rules saved successfully!");
     }
@@ -3089,7 +3089,7 @@
     }
 
     function getAdminScoringRules() {
-      const saved = JSON.parse(localStorage.getItem('ffa_scoring_rules'));
+      const saved = JSON.parse(localStorage.getItem('rst_scoring_rules'));
       if (saved) return saved;
       return {
         perKill: 25,
@@ -3136,7 +3136,7 @@
         updatedAt: new Date().toISOString()
       };
 
-      localStorage.setItem('ffa_scoring_rules', JSON.stringify(rules));
+      localStorage.setItem('rst_scoring_rules', JSON.stringify(rules));
       recordAudit("SCORING_RULES_UPDATED", `Configured tournament scoring engine: 1 Kill = ${perKill} Pts, Booyah Bonus = ${booyahBonus} Pts, Tie-breaker = ${tieBreaker}`);
 
       recalculateCurrentTournamentScores(true);
@@ -3144,7 +3144,7 @@
     }
 
     function getTourneyStandings(tourneyId) {
-      let standings = JSON.parse(localStorage.getItem(`ffa_tourney_leaderboard_${tourneyId}`));
+      let standings = JSON.parse(localStorage.getItem(`rst_tourney_leaderboard_${tourneyId}`));
       if (!standings || standings.length === 0) {
         // Generate initial standings for tournament
         const t = (getAdminTournaments() || []).find(x => x.id === tourneyId) || { id: tourneyId, perKill: 25, prizeFirst: 1000, prizeSecond: 500, prizeThird: 300 };
@@ -3178,7 +3178,7 @@
             prizeWon
           };
         });
-        localStorage.setItem(`ffa_tourney_leaderboard_${tourneyId}`, JSON.stringify(standings));
+        localStorage.setItem(`rst_tourney_leaderboard_${tourneyId}`, JSON.stringify(standings));
       }
       return standings;
     }
@@ -3315,7 +3315,7 @@
         verifiedAt: new Date().toISOString()
       }));
 
-      localStorage.setItem(`ffa_tourney_leaderboard_${currentAdminResultsTourneyId}`, JSON.stringify(standings));
+      localStorage.setItem(`rst_tourney_leaderboard_${currentAdminResultsTourneyId}`, JSON.stringify(standings));
 
       if (database && firebaseInitialized) {
         const updates = {};
@@ -3356,7 +3356,7 @@
         };
       });
 
-      localStorage.setItem(`ffa_tourney_leaderboard_${currentAdminResultsTourneyId}`, JSON.stringify(standings));
+      localStorage.setItem(`rst_tourney_leaderboard_${currentAdminResultsTourneyId}`, JSON.stringify(standings));
 
       if (database && firebaseInitialized) {
         const updates = {};
@@ -3461,7 +3461,7 @@
         correctedBy: "admin-auth"
       };
 
-      localStorage.setItem(`ffa_tourney_leaderboard_${tourneyId}`, JSON.stringify(standings));
+      localStorage.setItem(`rst_tourney_leaderboard_${tourneyId}`, JSON.stringify(standings));
 
       // Create Audit Log with mandatory tracking fields
       const auditEntry = {
@@ -3478,7 +3478,7 @@
       };
 
       auditLogs.unshift(auditEntry);
-      localStorage.setItem('ffa_audit_logs', JSON.stringify(auditLogs));
+      localStorage.setItem('rst_audit_logs', JSON.stringify(auditLogs));
 
       if (database && firebaseInitialized) {
         database.ref(`auditLogs/${Date.now()}`).set(auditEntry);
@@ -3637,7 +3637,7 @@
       const d = allDisputes.find(x => x.disputeId === disputeId);
       if (!d) return;
       d.status = "RESOLVED";
-      localStorage.setItem('ffa_disputes', JSON.stringify(allDisputes));
+      localStorage.setItem('rst_disputes', JSON.stringify(allDisputes));
       recordAudit("DISPUTE_RESOLVED", `Resolved match dispute ${disputeId} for ${d.matchId}`);
       renderResultsCenter();
       alert(`Dispute ${disputeId} accepted. You can now use the Correct Result tool to adjust the match standing.`);
@@ -3647,7 +3647,7 @@
       const d = allDisputes.find(x => x.disputeId === disputeId);
       if (!d) return;
       d.status = "REJECTED";
-      localStorage.setItem('ffa_disputes', JSON.stringify(allDisputes));
+      localStorage.setItem('rst_disputes', JSON.stringify(allDisputes));
       recordAudit("DISPUTE_DISMISSED", `Dismissed dispute ticket ${disputeId} for ${d.matchId}`);
       renderResultsCenter();
       alert(`Dispute ticket ${disputeId} dismissed.`);
@@ -3678,14 +3678,14 @@
         admin: "admin-auth",
         timestamp: new Date().toISOString()
       });
-      localStorage.setItem('ffa_audit_logs', JSON.stringify(auditLogs));
+      localStorage.setItem('rst_audit_logs', JSON.stringify(auditLogs));
     }
 
     // ==========================================
     // TOURNAMENT MANAGEMENT
     // ==========================================
     function getAdminTournaments() {
-      return JSON.parse(localStorage.getItem('ffa_tournaments')) || [];
+      return JSON.parse(localStorage.getItem('rst_tournaments')) || [];
     }
 
     function renderAdminTournaments() {
@@ -3819,7 +3819,7 @@
         tourneys.unshift(tourneyObj);
       }
 
-      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      localStorage.setItem('rst_tournaments', JSON.stringify(tourneys));
       if (typeof database !== 'undefined' && database) {
         database.ref('tournaments/' + id).set(tourneyObj).catch(err => console.warn("Firebase tournament sync error:", err));
       }
@@ -3855,7 +3855,7 @@
       tourneys[idx].roomId = roomId;
       tourneys[idx].roomPassword = roomPass;
       tourneys[idx].status = "CHECKIN_OPEN";
-      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      localStorage.setItem('rst_tournaments', JSON.stringify(tourneys));
 
       // Also dispatch alert to shared emergency room node
       const emergencyAlert = {
@@ -3866,7 +3866,7 @@
         reason: "Official room credentials published by Arbiter",
         timestamp: new Date().toISOString()
       };
-      localStorage.setItem('ffa_emergency_room_change', JSON.stringify(emergencyAlert));
+      localStorage.setItem('rst_emergency_room_change', JSON.stringify(emergencyAlert));
 
       recordAudit("ROOM_RELEASED", `Released Room ID ${roomId} for match ${id}`);
       closeAdminModal("modalAdminRoomRelease");
@@ -3880,7 +3880,7 @@
       if (idx === -1) return;
 
       tourneys[idx].status = newStatus;
-      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      localStorage.setItem('rst_tournaments', JSON.stringify(tourneys));
       recordAudit("TOURNAMENT_STATUS", `Changed tournament ${tourneyId} status to ${newStatus}`);
       renderAdminTournaments();
       alert(`Tournament status set to ${newStatus}`);
@@ -3895,14 +3895,14 @@
 
       const t = tourneys[idx];
       t.status = "CANCELLED";
-      localStorage.setItem('ffa_tournaments', JSON.stringify(tourneys));
+      localStorage.setItem('rst_tournaments', JSON.stringify(tourneys));
 
       // Process automatic entry fee refund
       if (t.entryFee > 0) {
-        let currentUser = JSON.parse(localStorage.getItem('ffa_user'));
+        let currentUser = JSON.parse(localStorage.getItem('rst_user'));
         if (currentUser) {
           currentUser.coins = (currentUser.coins || 0) + t.entryFee;
-          localStorage.setItem('ffa_user', JSON.stringify(currentUser));
+          localStorage.setItem('rst_user', JSON.stringify(currentUser));
         }
       }
 
@@ -3915,14 +3915,14 @@
     // USER ROSTER & COINS MODERATION
     // ==========================================
     function getAdminUsers() {
-      const activeUser = JSON.parse(localStorage.getItem('ffa_user'));
+      const activeUser = JSON.parse(localStorage.getItem('rst_user'));
       const sampleUsers = [
         {
           uid: "user-101",
           username: "ShadowHunter",
           displayName: "ShadowHunter",
           playerId: "6829401827",
-          email: "shadow@freefirearena.com",
+          email: "shadow@rstournament.com",
           coins: 250,
           matches: 34,
           wins: 12,
@@ -3934,7 +3934,7 @@
           username: "ApexPredator",
           displayName: "ApexPredator",
           playerId: "789102451",
-          email: "apex@freefirearena.com",
+          email: "apex@rstournament.com",
           coins: 520,
           matches: 48,
           wins: 23,
@@ -3946,7 +3946,7 @@
           username: "ViperKing",
           displayName: "ViperKing",
           playerId: "7812904812",
-          email: "viper@freefirearena.com",
+          email: "viper@rstournament.com",
           coins: 980,
           matches: 62,
           wins: 28,
@@ -4060,10 +4060,10 @@
         return;
       }
 
-      let activeUser = JSON.parse(localStorage.getItem('ffa_user'));
+      let activeUser = JSON.parse(localStorage.getItem('rst_user'));
       if (activeUser && activeUser.uid === uid) {
         activeUser.coins = isAdd ? (activeUser.coins || 0) + amount : Math.max(0, (activeUser.coins || 0) - amount);
-        localStorage.setItem('ffa_user', JSON.stringify(activeUser));
+        localStorage.setItem('rst_user', JSON.stringify(activeUser));
       }
 
       recordAudit("MANUAL_BALANCE_ADJUST", `${isAdd ? 'Credited' : 'Deducted'} ${amount} coins for user ${uid}. Reason: ${reason.trim()}`);
@@ -4085,7 +4085,7 @@
     // ANNOUNCEMENTS MANAGEMENT
     // ==========================================
     function getAdminAnnouncements() {
-      return JSON.parse(localStorage.getItem('ffa_announcements')) || [
+      return JSON.parse(localStorage.getItem('rst_announcements')) || [
         {
           id: "ANN-1",
           title: "SEASON 4 GRAND FINALS REGISTRATION IS OPEN!",
@@ -4141,7 +4141,7 @@
       };
 
       items.unshift(newAnn);
-      localStorage.setItem('ffa_announcements', JSON.stringify(items));
+      localStorage.setItem('rst_announcements', JSON.stringify(items));
       recordAudit("ANNOUNCEMENT_POSTED", `Published live banner: "${title}"`);
       document.getElementById("announcementTitle").value = "";
       document.getElementById("announcementBody").value = "";
@@ -4152,7 +4152,7 @@
     function deleteAdminAnnouncement(id) {
       let items = getAdminAnnouncements();
       items = items.filter(x => x.id !== id);
-      localStorage.setItem('ffa_announcements', JSON.stringify(items));
+      localStorage.setItem('rst_announcements', JSON.stringify(items));
       recordAudit("ANNOUNCEMENT_DELETED", `Removed announcement ${id}`);
       renderAdminAnnouncements();
     }
@@ -4164,7 +4164,7 @@
       const container = document.getElementById("adminSupportList");
       if (!container) return;
 
-      const tickets = JSON.parse(localStorage.getItem('ffa_support_tickets')) || [
+      const tickets = JSON.parse(localStorage.getItem('rst_support_tickets')) || [
         {
           id: "SUP-101",
           userId: "user-102",
@@ -4257,7 +4257,7 @@
     // ==========================================
     // PAYMENT QR MANAGEMENT
     // ==========================================
-    let paymentConfigState = JSON.parse(localStorage.getItem('ffa_payment_config')) || {
+    let paymentConfigState = JSON.parse(localStorage.getItem('rst_payment_config')) || {
       esewa: {
         enabled: true,
         qrImageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=eSewa%20Payment%209812345678%20RS%20TOURNAMENT&color=41a317",
@@ -4311,8 +4311,8 @@
       paymentConfigState[method].updatedAt = new Date().toISOString();
       paymentConfigState[method].updatedBy = currentAdminUser ? (currentAdminUser.email || currentAdminUser.uid) : "Admin";
 
-      localStorage.setItem(`ffa_payment_config_${method}`, JSON.stringify(paymentConfigState[method]));
-      localStorage.setItem('ffa_payment_config', JSON.stringify(paymentConfigState));
+      localStorage.setItem(`rst_payment_config_${method}`, JSON.stringify(paymentConfigState[method]));
+      localStorage.setItem('rst_payment_config', JSON.stringify(paymentConfigState));
 
       if (database) {
         database.ref(`paymentConfig/${method}`).set(paymentConfigState[method])
@@ -4332,7 +4332,7 @@
     }
 
     function renderPaymentConfigAdmin() {
-      const saved = JSON.parse(localStorage.getItem('ffa_payment_config')) || paymentConfigState;
+      const saved = JSON.parse(localStorage.getItem('rst_payment_config')) || paymentConfigState;
       paymentConfigState = saved;
 
       if (paymentConfigState.esewa) {
@@ -4373,7 +4373,7 @@
           populateBrandingForm(currentAdminBranding);
         });
       } else {
-        const saved = JSON.parse(localStorage.getItem('ffa_branding'));
+        const saved = JSON.parse(localStorage.getItem('rst_branding'));
         if (saved) currentAdminBranding = saved;
         populateBrandingForm(currentAdminBranding);
       }
@@ -4411,7 +4411,7 @@
       };
 
       currentAdminBranding = updated;
-      localStorage.setItem('ffa_branding', JSON.stringify(updated));
+      localStorage.setItem('rst_branding', JSON.stringify(updated));
 
       if (database && firebaseInitialized) {
         await database.ref('appSettings/branding').set(updated);
@@ -4432,7 +4432,7 @@
         tagline: "South Asia's Premier Esports Battleground"
       };
       currentAdminBranding = defaultB;
-      localStorage.setItem('ffa_branding', JSON.stringify(defaultB));
+      localStorage.setItem('rst_branding', JSON.stringify(defaultB));
       if (database && firebaseInitialized) {
         database.ref('appSettings/branding').set(defaultB);
       }
