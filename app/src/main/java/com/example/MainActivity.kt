@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       MyApplicationTheme {
-        FreeFireArenaApp()
+        RsTournamentApp()
       }
     }
   }
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun FreeFireArenaApp() {
+fun RsTournamentApp() {
   var webViewInstance by remember { mutableStateOf<WebView?>(null) }
   var canGoBack by remember { mutableStateOf(false) }
 
@@ -55,12 +55,12 @@ fun FreeFireArenaApp() {
       .fillMaxSize()
       .background(androidx.compose.ui.graphics.Color(0xFF090B10))
       .systemBarsPadding()
-      .testTag("free_fire_arena_webview_container")
+      .testTag("rs_tournament_webview_container")
   ) {
     AndroidView(
       modifier = Modifier
         .fillMaxSize()
-        .testTag("free_fire_arena_webview"),
+        .testTag("rs_tournament_webview"),
       factory = { context ->
         WebView(context).apply {
           layoutParams = ViewGroup.LayoutParams(
