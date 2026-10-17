@@ -2984,23 +2984,7 @@
       </div>
     </div>
 
-    <!-- Player UID Input Box -->
-    <div style="background:var(--bg-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:14px;">
-      <label style="display:block; font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">
-        Free Fire Player UID *
-      </label>
-      <div id="topupUidInputContainer" style="display:flex; flex-direction:column; gap:8px;">
-        <div style="display:flex; gap:8px; align-items:center;">
-          <input type="text" id="topupPlayerUID" class="form-input" inputmode="numeric" pattern="[0-9]{8,12}" maxlength="12" placeholder="Enter your Free Fire UID (8-12 digits)" style="flex:1; min-width:0; padding:10px 12px; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:8px; color:#fff; font-size:14px;">
-          <button class="btn btn-secondary" onclick="saveTopupUIDDefault()" style="padding: 10px 14px; font-size:12px; white-space:nowrap;">Save UID</button>
-        </div>
-        <div id="topupUidError" style="font-size:11px; color:var(--neon-red); display:none;"></div>
-      </div>
-      <div id="topupSavedUidDisplay" style="display:none; align-items:center; justify-content:space-between; font-size:13px; color:#fff;">
-        <span>Saved UID: <strong id="topupSavedUidText" style="color:var(--neon-cyan);">--</strong></span>
-        <a href="javascript:void(0)" onclick="editTopupUID()" style="font-size:12px; color:var(--neon-orange); text-decoration:underline;">Edit</a>
-      </div>
-    </div>
+
 
     <div class="section-title">
       <span><i class="fa-solid fa-boxes-stacked" style="color:var(--neon-amber); margin-right:6px;"></i>Select Package</span>
@@ -3027,16 +3011,39 @@
         <span id="topupSummaryLabel">Diamonds</span>
         <strong id="topupSummaryDiamonds" style="color:#fff;">0</strong>
       </div>
-      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
         <span>Total Cost</span>
         <strong id="topupSummaryCoins" style="color:var(--neon-green);">0 Coins</strong>
+      </div>
+      <div style="font-size:11px; color:var(--neon-cyan); margin-bottom:12px;" id="topupDeliveryPreview">
+        Deliver to: --
+      </div>
+
+      <!-- Player Details Row -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">In-Game Name *</label>
+          <div style="display:flex; align-items:center; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:8px; height:44px; overflow:hidden;">
+            <input type="text" id="topupIGN" maxlength="20" placeholder="Paste your name" oninput="validateTopupInputs()" style="width:100%; height:100%; border:none; background:transparent; padding:0 8px; color:#fff; font-size:16px; outline:none; min-width:0;">
+            <button type="button" class="btn btn-secondary" onclick="pasteTopupField('topupIGN')" style="padding:0 8px; height:100%; border:none; background:rgba(0,229,255,0.15); color:var(--neon-cyan); font-size:11px; white-space:nowrap;">Paste</button>
+          </div>
+          <div id="topupIgnError" style="font-size:10px; color:var(--neon-red); margin-top:2px; display:none;">Enter your in-game name (3-20 chars)</div>
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">Free Fire UID *</label>
+          <div style="display:flex; align-items:center; background:var(--bg-dark); border:1px solid var(--surface-border); border-radius:8px; height:44px; overflow:hidden;">
+            <input type="text" id="topupPlayerUID" inputmode="numeric" maxlength="12" placeholder="Paste your UID" oninput="validateTopupInputs()" style="width:100%; height:100%; border:none; background:transparent; padding:0 8px; color:#fff; font-size:16px; outline:none; min-width:0;">
+            <button type="button" class="btn btn-secondary" onclick="pasteTopupField('topupPlayerUID')" style="padding:0 8px; height:100%; border:none; background:rgba(0,229,255,0.15); color:var(--neon-cyan); font-size:11px; white-space:nowrap;">Paste</button>
+          </div>
+          <div id="topupUidError" style="font-size:10px; color:var(--neon-red); margin-top:2px; display:none;">Enter valid UID (8-12 digits)</div>
+        </div>
       </div>
 
       <div id="topupCoinInsufficientWarning" style="display:none; background:rgba(255,23,68,0.12); border:1px solid rgba(255,23,68,0.3); border-radius:8px; padding:10px; margin-bottom:12px; font-size:12px; color:var(--neon-red); text-align:center;">
         Not enough coins! <button class="btn btn-secondary" onclick="switchTab('wallet')" style="margin-top:6px; padding:4px 10px; font-size:11px;">Add Coins</button>
       </div>
 
-      <button class="btn btn-primary" id="btnPlaceTopupOrder" onclick="placeTopupOrder()" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
+      <button class="btn btn-primary" id="btnPlaceTopupOrder" onclick="placeTopupOrder()" disabled style="width:100%; justify-content:center; padding:12px; font-weight:700; opacity:0.5;">
         <i class="fa-solid fa-paper-plane"></i> Confirm & Place Order
       </button>
     </div>
@@ -6107,6 +6114,10 @@
       selectedTopupPkg = null;
       const checkoutCard = document.getElementById("topupCheckoutCard");
       if (checkoutCard) checkoutCard.style.display = "none";
+      const ignEl = document.getElementById("topupIGN");
+      const uidEl = document.getElementById("topupPlayerUID");
+      if (ignEl) ignEl.value = "";
+      if (uidEl) uidEl.value = "";
       renderTopupScreen();
     }
 
@@ -6167,6 +6178,9 @@
       const checkoutCard = document.getElementById("topupCheckoutCard");
       if (selectedTopupPkg && checkoutCard) {
         checkoutCard.style.display = "block";
+        checkoutCard.scrollIntoView({ behavior: 'smooth' });
+        const ignEl = document.getElementById("topupIGN");
+        if (ignEl) ignEl.focus();
         document.getElementById("topupSelectedPkgName").innerText = selectedTopupPkg.name;
         const isMember = selectedTopupPkg.type === 'weekly' || selectedTopupPkg.type === 'monthly';
         const labelEl = document.getElementById("topupSummaryLabel");
@@ -6238,17 +6252,19 @@
         showToast("Please select a top-up package first.", "error");
         return;
       }
+      if (!validateTopupInputs()) {
+        showToast("Please enter a valid In-Game Name (3-20 chars) and Free Fire UID (8-12 digits).", "error");
+        const ignEl = document.getElementById("topupIGN");
+        if (ignEl && (ignEl.value.trim().length < 3 || ignEl.value.trim().length > 20)) {
+          ignEl.focus();
+        } else {
+          const uidEl = document.getElementById("topupPlayerUID");
+          if (uidEl) uidEl.focus();
+        }
+        return;
+      }
       const playerUID = document.getElementById("topupPlayerUID").value.trim();
-      const inGameName = document.getElementById("topupIGN") ? document.getElementById("topupIGN").value.trim() : (currentUser.ign || currentUser.displayName || "Player");
-      
-      if (!playerUID || playerUID.length < 6) {
-        showToast("Please enter a valid Free Fire Player UID.", "error");
-        return;
-      }
-      if (!inGameName) {
-        showToast("Please enter your In-Game Name (IGN).", "error");
-        return;
-      }
+      const inGameName = document.getElementById("topupIGN").value.trim();
 
       const requiredCoins = selectedTopupPkg.coinCost || selectedTopupPkg.price;
       if (topupCoinDeductionEnabled) {
@@ -12057,3 +12073,61 @@
   </script>
 </body>
 </html>
+
+    async function pasteTopupField(fieldId) {
+      try {
+        const text = await navigator.clipboard.readText();
+        const el = document.getElementById(fieldId);
+        if (!el) return;
+        if (fieldId === 'topupPlayerUID') {
+          el.value = text.replace(/\D/g, '').slice(0, 12);
+        } else {
+          el.value = text.trim().slice(0, 20);
+        }
+        validateTopupInputs();
+        showToast("Pasted successfully", "success");
+      } catch (e) {
+        showToast("Long-press the field and choose Paste", "error");
+      }
+    }
+
+    function validateTopupInputs() {
+      const ignEl = document.getElementById("topupIGN");
+      const uidEl = document.getElementById("topupPlayerUID");
+      const ignErr = document.getElementById("topupIgnError");
+      const uidErr = document.getElementById("topupUidError");
+      const btnPlace = document.getElementById("btnPlaceTopupOrder");
+      const deliveryPreview = document.getElementById("topupDeliveryPreview");
+
+      if (!ignEl || !uidEl) return false;
+
+      uidEl.value = uidEl.value.replace(/\D/g, '').slice(0, 12);
+
+      const ign = ignEl.value.trim();
+      const uid = uidEl.value.trim();
+
+      const ignValid = ign.length >= 3 && ign.length <= 20;
+      const uidValid = /^\d{8,12}$/.test(uid);
+
+      if (ignErr) ignErr.style.display = ignValid ? "none" : "block";
+      if (uidErr) uidErr.style.display = uidValid ? "none" : "block";
+
+      if (deliveryPreview) {
+        if (ignValid && uidValid) {
+          deliveryPreview.innerText = `Deliver to: ${ign} - UID: ${uid}`;
+        } else {
+          deliveryPreview.innerText = `Deliver to: --`;
+        }
+      }
+
+      const userCoins = currentUser ? (currentUser.coins || 0) : 0;
+      const requiredCoins = selectedTopupPkg ? (selectedTopupPkg.coinCost || selectedTopupPkg.price) : 0;
+      const hasEnoughCoins = !topupCoinDeductionEnabled || userCoins >= requiredCoins;
+
+      const allValid = ignValid && uidValid && hasEnoughCoins && selectedTopupPkg;
+      if (btnPlace) {
+        btnPlace.disabled = !allValid;
+        btnPlace.style.opacity = allValid ? "1" : "0.5";
+      }
+      return ignValid && uidValid;
+    }
