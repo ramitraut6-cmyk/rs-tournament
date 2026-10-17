@@ -8063,7 +8063,7 @@
         container.innerHTML = `
           <div class="state-container" style="padding:24px 16px;">
             <i class="fa-solid fa-receipt state-icon" style="font-size:32px;"></i>
-            <h4 class="state-title" style="font-size:14px;">No Transactions Yet</h4>
+            <h4 class="state-title" style="font-size:14px;">No transactions yet. Add coins or join a tournament to see your history.</h4>
             <p class="state-desc" style="font-size:11px;">Join tournaments or add coins to generate verified ledger records.</p>
           </div>
         `;
@@ -10715,13 +10715,13 @@
     // ==========================================
     let userReports = JSON.parse(localStorage.getItem('rst_reports')) || [
       {
-        id: "REP-RST-8901",
+        id: "REP-RST-DEMO",
         reportedPlayer: "SuspiciousAim99",
         matchRef: "Bermuda Clash Squad (MATCH-RST-8910)",
         reason: "Hacker / suspicious gameplay",
         description: "Instant 180 snap through smoke grenade wall on factory roof.",
         status: "ACTION_TAKEN",
-        adminNotes: "Investigated by Arbiter. Suspicious aim snap confirmed; user banned for 30 days.",
+        adminNotes: "Investigated by Arbiter. Suspicious aim snap confirmed; user banned for 14 days.",
         createdAt: new Date(Date.now() - 86400000).toISOString()
       }
     ];
