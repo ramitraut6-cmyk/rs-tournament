@@ -12069,65 +12069,65 @@
         const b = document.getElementById('offlineBanner');
         if (b) b.style.display = 'flex';
       });
+
+      window.pasteTopupField = async function(fieldId) {
+        try {
+          const text = await navigator.clipboard.readText();
+          const el = document.getElementById(fieldId);
+          if (!el) return;
+          if (fieldId === 'topupPlayerUID') {
+            el.value = text.replace(/\D/g, '').slice(0, 12);
+          } else {
+            el.value = text.trim().slice(0, 20);
+          }
+          validateTopupInputs();
+          showToast("Pasted successfully", "success");
+        } catch (e) {
+          showToast("Long-press the field and choose Paste", "error");
+        }
+      };
+
+      window.validateTopupInputs = function() {
+        const ignEl = document.getElementById("topupIGN");
+        const uidEl = document.getElementById("topupPlayerUID");
+        const ignErr = document.getElementById("topupIgnError");
+        const uidErr = document.getElementById("topupUidError");
+        const btnPlace = document.getElementById("btnPlaceTopupOrder");
+        const deliveryPreview = document.getElementById("topupDeliveryPreview");
+
+        if (!ignEl || !uidEl) return false;
+
+        uidEl.value = uidEl.value.replace(/\D/g, '').slice(0, 12);
+
+        const ign = ignEl.value.trim();
+        const uid = uidEl.value.trim();
+
+        const ignValid = ign.length >= 3 && ign.length <= 20;
+        const uidValid = /^\d{8,12}$/.test(uid);
+
+        if (ignErr) ignErr.style.display = ignValid ? "none" : "block";
+        if (uidErr) uidErr.style.display = uidValid ? "none" : "block";
+
+        if (deliveryPreview) {
+          if (ignValid && uidValid) {
+            deliveryPreview.innerText = `Deliver to: ${ign} - UID: ${uid}`;
+          } else {
+            deliveryPreview.innerText = `Deliver to: --`;
+          }
+        }
+
+        const userCoins = currentUser ? (currentUser.coins || 0) : 0;
+        const requiredCoins = selectedTopupPkg ? (selectedTopupPkg.coinCost || selectedTopupPkg.price) : 0;
+        const hasEnoughCoins = !topupCoinDeductionEnabled || userCoins >= requiredCoins;
+
+        const allValid = ignValid && uidValid && hasEnoughCoins && selectedTopupPkg;
+        if (btnPlace) {
+          btnPlace.disabled = !allValid;
+          btnPlace.style.opacity = allValid ? "1" : "0.5";
+        }
+        return ignValid && uidValid;
+      };
     });
   </script>
 </body>
 </html>
-
-    async function pasteTopupField(fieldId) {
-      try {
-        const text = await navigator.clipboard.readText();
-        const el = document.getElementById(fieldId);
-        if (!el) return;
-        if (fieldId === 'topupPlayerUID') {
-          el.value = text.replace(/\D/g, '').slice(0, 12);
-        } else {
-          el.value = text.trim().slice(0, 20);
-        }
-        validateTopupInputs();
-        showToast("Pasted successfully", "success");
-      } catch (e) {
-        showToast("Long-press the field and choose Paste", "error");
-      }
-    }
-
-    function validateTopupInputs() {
-      const ignEl = document.getElementById("topupIGN");
-      const uidEl = document.getElementById("topupPlayerUID");
-      const ignErr = document.getElementById("topupIgnError");
-      const uidErr = document.getElementById("topupUidError");
-      const btnPlace = document.getElementById("btnPlaceTopupOrder");
-      const deliveryPreview = document.getElementById("topupDeliveryPreview");
-
-      if (!ignEl || !uidEl) return false;
-
-      uidEl.value = uidEl.value.replace(/\D/g, '').slice(0, 12);
-
-      const ign = ignEl.value.trim();
-      const uid = uidEl.value.trim();
-
-      const ignValid = ign.length >= 3 && ign.length <= 20;
-      const uidValid = /^\d{8,12}$/.test(uid);
-
-      if (ignErr) ignErr.style.display = ignValid ? "none" : "block";
-      if (uidErr) uidErr.style.display = uidValid ? "none" : "block";
-
-      if (deliveryPreview) {
-        if (ignValid && uidValid) {
-          deliveryPreview.innerText = `Deliver to: ${ign} - UID: ${uid}`;
-        } else {
-          deliveryPreview.innerText = `Deliver to: --`;
-        }
-      }
-
-      const userCoins = currentUser ? (currentUser.coins || 0) : 0;
-      const requiredCoins = selectedTopupPkg ? (selectedTopupPkg.coinCost || selectedTopupPkg.price) : 0;
-      const hasEnoughCoins = !topupCoinDeductionEnabled || userCoins >= requiredCoins;
-
-      const allValid = ignValid && uidValid && hasEnoughCoins && selectedTopupPkg;
-      if (btnPlace) {
-        btnPlace.disabled = !allValid;
-        btnPlace.style.opacity = allValid ? "1" : "0.5";
-      }
-      return ignValid && uidValid;
-    }
