@@ -2826,92 +2826,34 @@
       </button>
     </div>
 
-    <!-- Daily Challenges Card (Part 3) -->
-    <div class="card" style="padding:14px; margin-bottom:18px; background:linear-gradient(135deg, rgba(255,152,0,0.1), rgba(124,77,255,0.08)); border-color:rgba(255,152,0,0.3);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <span style="font-size:13px; font-weight:700; color:#fff;"><i class="fa-solid fa-bullseye" style="color:var(--neon-amber); margin-right:6px;"></i>Daily Challenge</span>
-        <span class="status-chip status-open">+25 Coins Reward</span>
-      </div>
-      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
-        Play 1 tournament match and eliminate at least 2 opponents today.
-      </div>
-      <div class="slot-bar-wrap" style="margin-bottom:6px;">
-        <div class="slot-label-row"><span>Progress</span><span>1/2 Kills</span></div>
-        <div class="slot-bar-bg"><div class="slot-bar-fill" style="width:50%;"></div></div>
+    <!-- Full Map Matches Header & Info Strip -->
+    <div style="margin: 16px 0 10px 0;">
+      <h2 style="font-family: var(--font-heading); font-size: 18px; color: #fff; margin-bottom: 4px;">Free Fire Full Map Matches</h2>
+      <div style="background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.25); border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--neon-cyan); display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>All matches are created by admin. Everyday at the same time.</span>
       </div>
     </div>
 
-    <!-- Arena Champions Spotlight (Ranking Hub) -->
-    <div class="card" style="padding:14px; margin-bottom:18px; background:linear-gradient(135deg, rgba(255,215,0,0.07), rgba(0,229,255,0.05)); border:1px solid rgba(255,215,0,0.25);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-crown" style="color:#ffd700; font-size:16px;"></i>
-          <strong style="color:#fff; font-size:14px;">Arena Champions Board</strong>
-        </div>
-        <button class="btn btn-secondary" style="font-size:11px; padding:4px 10px;" onclick="openLeaderboardModal()">
-          View Full Board <i class="fa-solid fa-arrow-right" style="font-size:10px; margin-left:4px;"></i>
-        </button>
-      </div>
-
-      <div id="homeChampionsSpotlight">
-        <!-- Rendered dynamically with top 3 players -->
-      </div>
-
-      <div style="background:rgba(0,0,0,0.25); border:1px solid var(--surface-border); border-radius:10px; padding:8px 12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
-        <span style="color:var(--text-secondary);"><i class="fa-solid fa-shield-halved" style="color:var(--neon-green); margin-right:4px;"></i>Your Ranking: <strong id="homeMyRankText" style="color:#fff;">#7 • 1,520 Verified Pts (Pro)</strong></span>
-        <a href="javascript:void(0)" onclick="openLeaderboardModal()" style="color:var(--neon-cyan); font-weight:700;">Check Standing</a>
-      </div>
+    <!-- Full Map Filter Chips -->
+    <div class="filter-scroll" id="fullMapModeFilters" style="margin-bottom: 14px;">
+      <button class="filter-chip active" data-mapmode="all" onclick="setFullMapFilter('all')"><i class="fa-solid fa-layer-group"></i> All</button>
+      <button class="filter-chip" data-mapmode="Solo" onclick="setFullMapFilter('Solo')"><i class="fa-solid fa-user"></i> Solo</button>
+      <button class="filter-chip" data-mapmode="Duo" onclick="setFullMapFilter('Duo')"><i class="fa-solid fa-user-group"></i> Duo</button>
+      <button class="filter-chip" data-mapmode="Squad" onclick="setFullMapFilter('Squad')"><i class="fa-solid fa-users"></i> Squad</button>
     </div>
 
-    <!-- Recommended For You (Part 3) -->
+    <!-- Full Map Live Matches Section -->
     <div class="section-title">
-      <span><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--neon-cyan); margin-right:6px;"></i>Recommended For You</span>
+      <span><i class="fa-solid fa-satellite-dish" style="color:var(--neon-red); margin-right:6px;"></i>Live Full Map Matches</span>
     </div>
-    <div id="recommendedTournamentsContainer" style="margin-bottom:18px;">
-      <!-- Populated dynamically based on preferred mode & skill -->
-    </div>
+    <div id="homeFullMapLiveContainer" style="margin-bottom: 16px;"></div>
 
-    <!-- Featured Tournament -->
+    <!-- Full Map Matches List Container -->
     <div class="section-title">
-      <span><i class="fa-solid fa-bolt" style="color:var(--neon-orange); margin-right:6px;"></i>Featured Arena</span>
-      <button onclick="switchTab('tournaments')">View All</button>
+      <span><i class="fa-solid fa-trophy" style="color:var(--neon-orange); margin-right:6px;"></i>Available Full Map Matches</span>
     </div>
-    <div id="featuredTournamentContainer">
-      <!-- Populated dynamically -->
-    </div>
-
-    <!-- Live Tournaments -->
-    <div class="section-title">
-      <span><i class="fa-solid fa-satellite-dish" style="color:var(--neon-red); margin-right:6px;"></i>Live Matches</span>
-    </div>
-    <div id="liveTournamentsContainer">
-      <!-- Populated dynamically -->
-    </div>
-
-    <!-- Practice Arena (Free Practice) -->
-    <div class="section-title">
-      <span><i class="fa-solid fa-crosshairs" style="color:var(--neon-green); margin-right:6px;"></i>Practice Arena (Free Entry)</span>
-    </div>
-    <div id="practiceTournamentsContainer" style="margin-bottom:18px;">
-      <!-- Populated dynamically -->
-    </div>
-
-    <!-- Upcoming Tournaments -->
-    <div class="section-title">
-      <span><i class="fa-solid fa-clock" style="color:var(--neon-cyan); margin-right:6px;"></i>Upcoming Matches</span>
-    </div>
-    <div id="upcomingTournamentsContainer">
-      <!-- Populated dynamically -->
-    </div>
-
-    <!-- Recently Viewed Matches (Part 4) -->
-    <div id="recentlyViewedSection" style="display:none; margin-bottom:18px;">
-      <div class="section-title">
-        <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--neon-amber); margin-right:6px;"></i>Recently Viewed</span>
-        <button onclick="clearRecentViews()">Clear History</button>
-      </div>
-      <div id="recentlyViewedContainer"></div>
-    </div>
+    <div id="homeFullMapListContainer" style="margin-bottom: 24px;"></div>
 
     <!-- Trust & Fair Play Section with Report Button -->
     <div class="fair-play-card">
@@ -2931,41 +2873,31 @@
     </div>
   </main>
 
-  <!-- SCREEN 2: TOURNAMENTS LIST -->
+  <!-- SCREEN 2: TOURNAMENTS TAB (CLASH SQUAD / LONE WOLF) -->
   <section id="screen-tournaments" class="screen">
-    <div style="display:flex; gap:8px; margin-bottom:12px;">
+    <div style="margin-bottom: 12px;">
+      <h2 style="font-family: var(--font-heading); font-size: 18px; color: #fff; margin-bottom: 4px;">Clash Squad Match</h2>
+      <div style="background: rgba(255,152,0,0.08); border: 1px solid rgba(255,152,0,0.25); border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--neon-amber); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>All matches here are made by host players, not by admin</span>
+        <button class="btn btn-primary" style="width:auto; padding: 6px 12px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, var(--neon-amber), #ff5722); color: #fff;" onclick="openModal('modalCreateMatch')">
+          <i class="fa-solid fa-plus"></i> Create
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Box -->
+    <div style="margin-bottom: 12px;">
       <div class="search-wrap" style="flex:1; margin-bottom:0;">
         <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
-        <input type="text" id="tournamentSearchInput" class="search-input" placeholder="Search by name, map, or mode...">
+        <input type="text" id="tournamentSearchInput" class="search-input" placeholder="Search your match..." oninput="renderTournaments()">
       </div>
-      <button class="btn btn-secondary" style="width:auto; padding:0 14px;" onclick="openAdvancedFiltersModal()" title="Advanced Filters">
-        <i class="fa-solid fa-sliders"></i>
-      </button>
-      <button class="btn btn-secondary" style="width:auto; padding:0 14px;" onclick="openTournamentCompareModal()" title="Compare Tournaments">
-        <i class="fa-solid fa-code-compare"></i>
-      </button>
-      <button class="btn btn-primary" style="width:auto; padding:0 14px; font-size:12px; font-weight:700; background:linear-gradient(135deg, var(--neon-cyan), #00b0ff); color:#000;" onclick="openModal('modalCreateMatch')" title="Add Tournament Matches">
-        <i class="fa-solid fa-plus"></i> Add Match
-      </button>
     </div>
 
-    <!-- Mode Filters -->
-    <div class="filter-scroll" id="modeFilterRow">
-      <button class="filter-chip active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All Modes</button>
-      <button class="filter-chip" data-filter="Solo"><i class="fa-solid fa-user"></i> Solo</button>
-      <button class="filter-chip" data-filter="Duo"><i class="fa-solid fa-user-group"></i> Duo</button>
-      <button class="filter-chip" data-filter="Squad"><i class="fa-solid fa-users"></i> Squad</button>
+    <!-- Live Clash Matches Section -->
+    <div class="section-title">
+      <span><i class="fa-solid fa-satellite-dish" style="color:var(--neon-red); margin-right:6px;"></i>Live Custom Matches</span>
     </div>
-
-    <!-- Type / Status Filters -->
-    <div class="filter-scroll" id="typeFilterRow">
-      <button class="filter-chip active" data-type="all">All Types</button>
-      <button class="filter-chip" data-type="Free"><i class="fa-solid fa-tag"></i> Free</button>
-      <button class="filter-chip" data-type="Paid"><i class="fa-solid fa-coins"></i> Paid</button>
-      <button class="filter-chip" data-type="Practice">Practice</button>
-      <button class="filter-chip" data-type="Competitive">Competitive</button>
-      <button class="filter-chip" data-type="favorites"><i class="fa-solid fa-heart" style="color:var(--neon-red);"></i> Favorites</button>
-    </div>
+    <div id="liveTournamentsContainer" style="margin-bottom: 14px;"></div>
 
     <!-- Tournament List Container -->
     <div id="tournamentsListContainer">
