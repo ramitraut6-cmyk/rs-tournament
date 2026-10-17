@@ -3003,7 +3003,13 @@
     </div>
 
     <div class="section-title">
-      <span><i class="fa-solid fa-boxes-stacked" style="color:var(--neon-amber); margin-right:6px;"></i>Select Diamond Package</span>
+      <span><i class="fa-solid fa-boxes-stacked" style="color:var(--neon-amber); margin-right:6px;"></i>Select Package</span>
+    </div>
+
+    <div style="display:flex; gap:6px; margin-bottom:12px;" id="topupCategoryTabs">
+      <button class="filter-chip active" id="topupCat_diamond" onclick="setTopupCategory('diamond')" style="flex:1; justify-content:center; padding:8px 4px; font-size:12px; background:var(--neon-cyan); color:#000; font-weight:700;">Diamonds</button>
+      <button class="filter-chip" id="topupCat_weekly" onclick="setTopupCategory('weekly')" style="flex:1; justify-content:center; padding:8px 4px; font-size:12px; background:var(--bg-card); color:var(--text-secondary); font-weight:700;">Weekly</button>
+      <button class="filter-chip" id="topupCat_monthly" onclick="setTopupCategory('monthly')" style="flex:1; justify-content:center; padding:8px 4px; font-size:12px; background:var(--bg-card); color:var(--text-secondary); font-weight:700;">Monthly</button>
     </div>
 
     <!-- Diamond Packages Grid -->
@@ -3018,7 +3024,7 @@
         <span id="topupSelectedPkgName" style="color:var(--neon-cyan);">--</span>
       </div>
       <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
-        <span>Diamonds</span>
+        <span id="topupSummaryLabel">Diamonds</span>
         <strong id="topupSummaryDiamonds" style="color:#fff;">0</strong>
       </div>
       <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
@@ -6111,22 +6117,28 @@
       const filteredProducts = (topupProductsCache.length ? topupProductsCache : getDefaultTopupProducts())
         .filter(p => p.active !== false && p.type === topupCategoryFilter);
 
-      grid.innerHTML = filteredProducts.map(p => {
-        const isSelected = selectedTopupPkg && selectedTopupPkg.id === p.id;
-        const coinCost = p.coinCost || p.price;
-        return `
-          <div class="package-card ${isSelected ? 'selected' : ''}" onclick="selectTopupPackage('${p.id}')" style="background:var(--bg-card); border:${isSelected ? '2px solid var(--neon-orange)' : '1px solid var(--surface-border)'}; border-radius:14px; padding:18px 14px 14px 14px; cursor:pointer; position:relative; transition:all 0.2s; box-shadow:${isSelected ? '0 0 14px rgba(255,87,34,0.3)' : 'none'};">
-            ${p.badge ? `<span style="position:absolute; top:-10px; right:12px; z-index:2; background:rgba(0,229,255,0.25); color:var(--neon-cyan); font-size:9px; font-weight:800; padding:3px 8px; border-radius:6px; border:1px solid rgba(0,229,255,0.4); text-transform:uppercase;">${escapeHTML(p.badge)}</span>` : ''}
-            <div style="font-size:15px; font-weight:800; color:#fff; margin-bottom:8px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-              <i class="fa-solid fa-gem" style="color:var(--neon-cyan); font-size:14px;"></i> ${escapeHTML(String(p.name || p.diamonds))}
+      if (!filteredProducts.length) {
+        grid.innerHTML = '<div style="grid-column: span 2; text-align:center; padding:24px; color:var(--text-secondary); font-size:13px;">No packages available here right now.</div>';
+      } else {
+        grid.innerHTML = filteredProducts.map(p => {
+          const isSelected = selectedTopupPkg && selectedTopupPkg.id === p.id;
+          const coinCost = p.coinCost || p.price;
+          const isMembership = p.type === 'weekly' || p.type === 'monthly';
+          return `
+            <div class="package-card ${isSelected ? 'selected' : ''}" onclick="selectTopupPackage('${p.id}')" style="background:var(--bg-card); border:${isSelected ? '2px solid var(--neon-orange)' : '1px solid var(--surface-border)'}; border-radius:14px; padding:18px 14px 14px 14px; cursor:pointer; position:relative; transition:all 0.2s; box-shadow:${isSelected ? '0 0 14px rgba(255,87,34,0.3)' : 'none'};">
+              ${p.badge ? `<span style="position:absolute; top:-10px; right:12px; z-index:2; background:rgba(0,229,255,0.25); color:var(--neon-cyan); font-size:9px; font-weight:800; padding:3px 8px; border-radius:6px; border:1px solid rgba(0,229,255,0.4); text-transform:uppercase;">${escapeHTML(p.badge)}</span>` : ''}
+              <div style="font-size:15px; font-weight:800; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                <i class="fa-solid fa-gem" style="color:var(--neon-cyan); font-size:14px;"></i> ${escapeHTML(String(p.name || p.diamonds))}
+              </div>
+              ${isMembership ? `<div style="font-size:11px; color:var(--neon-cyan); margin-bottom:6px;"><i class="fa-solid fa-clock"></i> Duration: ${escapeHTML(String(p.diamonds))}</div>` : ''}
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                <span style="font-size:13px; font-weight:800; color:var(--neon-green);"><i class="fa-solid fa-coins"></i> ${coinCost} Coins</span>
+                ${isSelected ? `<i class="fa-solid fa-circle-check" style="color:var(--neon-orange); font-size:16px;"></i>` : ''}
+              </div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px; font-weight:800; color:var(--neon-green);"><i class="fa-solid fa-coins"></i> ${coinCost} Coins</span>
-              ${isSelected ? `<i class="fa-solid fa-circle-check" style="color:var(--neon-orange); font-size:16px;"></i>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
 
       const inputContainer = document.getElementById("topupUidInputContainer");
       const savedDisplay = document.getElementById("topupSavedUidDisplay");
@@ -6156,7 +6168,10 @@
       if (selectedTopupPkg && checkoutCard) {
         checkoutCard.style.display = "block";
         document.getElementById("topupSelectedPkgName").innerText = selectedTopupPkg.name;
-        document.getElementById("topupSummaryDiamonds").innerText = String(selectedTopupPkg.diamonds) + (typeof selectedTopupPkg.diamonds === 'number' ? " Diamonds" : "");
+        const isMember = selectedTopupPkg.type === 'weekly' || selectedTopupPkg.type === 'monthly';
+        const labelEl = document.getElementById("topupSummaryLabel");
+        if (labelEl) labelEl.innerText = isMember ? "Duration" : "Diamonds";
+        document.getElementById("topupSummaryDiamonds").innerText = String(selectedTopupPkg.diamonds) + (!isMember && typeof selectedTopupPkg.diamonds === 'number' ? " Diamonds" : "");
 
         const coinCostEl = document.getElementById("topupSummaryCoins");
         const coinWarningEl = document.getElementById("topupCoinInsufficientWarning");
@@ -6357,7 +6372,7 @@
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
               <div>
                 <div style="font-size:15px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)}
+                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)} (${typeof o.diamonds === "number" ? o.diamonds + " Diamonds" : "Duration: " + o.diamonds})
                 </div>
                 <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
                   Order ID: <strong style="color:#fff;">${escapeHTML(o.orderId)}</strong> | UID: <strong style="color:var(--neon-cyan);">${escapeHTML(o.playerUID)}</strong>

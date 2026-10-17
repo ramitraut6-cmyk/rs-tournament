@@ -827,9 +827,14 @@
           <h3 class="card-title" style="margin-bottom:0;">
             <i class="fa-solid fa-boxes-stacked" style="color:var(--neon-cyan);"></i> Topup Product Catalog
           </h3>
-          <button class="btn btn-primary" onclick="openAddTopupProductModal()" style="padding:8px 14px; font-size:12px;">
-            <i class="fa-solid fa-plus"></i> Add Product
-          </button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="addSampleWeeklyMonthlyPacks()" style="padding:8px 12px; font-size:12px; background:rgba(0,229,255,0.15); color:var(--neon-cyan); border:1px solid rgba(0,229,255,0.3);">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Add sample Weekly & Monthly packs
+            </button>
+            <button class="btn btn-primary" onclick="openAddTopupProductModal()" style="padding:8px 14px; font-size:12px;">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </button>
+          </div>
         </div>
         <div id="adminTopupProductsList">
           <!-- Rendered dynamically -->
@@ -2251,7 +2256,7 @@
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
               <div>
                 <div style="font-size:16px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)} (${o.diamonds} Diamonds)
+                  <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(o.packageName)} (${typeof o.diamonds === "number" ? o.diamonds + " Diamonds" : "Duration: " + o.diamonds})
                 </div>
                 <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
                   Order ID: <strong style="color:#fff;">${escapeHTML(o.orderId)}</strong> | Player: <strong style="color:var(--neon-orange);">${escapeHTML(o.username)}</strong> (UID: <strong style="color:var(--neon-cyan);">${escapeHTML(o.playerUID)}</strong>)
@@ -2363,57 +2368,166 @@
         return;
       }
 
-      container.innerHTML = products.map(p => `
-        <div style="background:var(--bg-card-hover); border:1px solid var(--surface-border); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <div style="font-size:15px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(p.name)} (${escapeHTML(String(p.diamonds))})
+      container.innerHTML = products.map(p => {
+        const isActive = p.active !== false;
+        return `
+          <div style="background:var(--bg-card-hover); border:1px solid var(--surface-border); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:15px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-gem" style="color:var(--neon-cyan);"></i> ${escapeHTML(p.name)} (${escapeHTML(String(p.diamonds))})
+              </div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
+                Type: <strong style="color:var(--neon-amber);">${escapeHTML(p.type)}</strong> | Price: <strong style="color:#fff;">₹${p.price}</strong> | Coins: <strong style="color:var(--neon-green);">${p.coinCost || p.price}</strong> | Status: <strong style="color:${isActive ? 'var(--neon-green)' : 'var(--neon-red)'};">${isActive ? 'Active' : 'Inactive'}</strong>
+              </div>
             </div>
-            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
-              Type: <strong style="color:var(--neon-amber);">${escapeHTML(p.type)}</strong> | Price: <strong style="color:#fff;">₹${p.price}</strong> | Coins: <strong style="color:var(--neon-green);">${p.coinCost || p.price}</strong> | Status: <strong style="color:${p.active !== false ? 'var(--neon-green)' : 'var(--neon-red)'};">${p.active !== false ? 'Active' : 'Inactive'}</strong>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-secondary" onclick="editTopupProduct('${p.id}')" style="padding:6px 10px; font-size:11px;">Edit</button>
+              <button class="btn btn-secondary" onclick="toggleTopupProductActive('${p.id}', ${isActive})" style="padding:6px 10px; font-size:11px;">${isActive ? 'Hide' : 'Show'}</button>
+              <button class="btn btn-secondary" onclick="deleteTopupProduct('${p.id}')" style="padding:6px 10px; font-size:11px; background:rgba(255,23,68,0.2); color:var(--neon-red);">Delete</button>
             </div>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-secondary" onclick="deleteTopupProduct('${p.id}')" style="padding:6px 10px; font-size:11px; background:rgba(255,23,68,0.2); color:var(--neon-red);">Delete</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function openAddTopupProductModal() {
-      const name = prompt("Enter Product Name (e.g., '1000 Diamonds'):");
-      if (!name) return;
-      const type = prompt("Enter Type ('diamond', 'weekly', or 'monthly'):", "diamond");
-      if (!type) return;
-      const diamonds = prompt("Enter Diamonds quantity or duration (e.g., '1000' or '7 Days'):", "1000");
-      if (!diamonds) return;
-      const price = parseFloat(prompt("Enter Price in NPR:", "500"));
-      if (isNaN(price)) return;
-      const coinCost = parseFloat(prompt("Enter Coin Cost required:", price));
-      if (isNaN(coinCost)) return;
-      const badge = prompt("Enter Badge (optional, e.g., 'Best Value'):", "Popular");
+      document.getElementById("adminTopupId").value = "";
+      document.getElementById("adminTopupName").value = "";
+      document.getElementById("adminTopupType").value = "diamond";
+      document.getElementById("adminTopupDiamonds").value = "1000";
+      document.getElementById("adminTopupPrice").value = "500";
+      document.getElementById("adminTopupCoinCost").value = "500";
+      document.getElementById("adminTopupBadge").value = "Popular";
+      document.getElementById("adminTopupActive").checked = true;
+      document.getElementById("adminTopupSort").value = "1";
+      document.getElementById("modalTopupHeading").innerText = "Add Top-up Product";
+      openAdminModal("modalAdminTopupProduct");
+    }
 
-      const id = "pkg_" + Date.now();
+    function editTopupProduct(productId) {
+      const prods = topupProductsCache.length ? topupProductsCache : [];
+      const p = prods.find(item => item.id === productId);
+      if (!p) {
+        showToast("Product not found.", "error");
+        return;
+      }
+      document.getElementById("adminTopupId").value = p.id;
+      document.getElementById("adminTopupName").value = p.name || "";
+      document.getElementById("adminTopupType").value = p.type || "diamond";
+      document.getElementById("adminTopupDiamonds").value = p.diamonds !== undefined ? p.diamonds : "1000";
+      document.getElementById("adminTopupPrice").value = p.price !== undefined ? p.price : 100;
+      document.getElementById("adminTopupCoinCost").value = p.coinCost !== undefined ? p.coinCost : (p.price || 100);
+      document.getElementById("adminTopupBadge").value = p.badge || "";
+      document.getElementById("adminTopupActive").checked = p.active !== false;
+      document.getElementById("adminTopupSort").value = p.sortOrder !== undefined ? p.sortOrder : 1;
+      document.getElementById("modalTopupHeading").innerText = "Edit Top-up Product";
+      openAdminModal("modalAdminTopupProduct");
+    }
+
+    function toggleTopupProductActive(productId, currentActive) {
+      const newActive = !currentActive;
+      if (database && firebaseInitialized) {
+        database.ref('topupProducts/' + productId).update({ active: newActive });
+      } else {
+        let prods = JSON.parse(localStorage.getItem('rst_topup_products')) || [];
+        prods = prods.map(item => item.id === productId ? { ...item, active: newActive } : item);
+        localStorage.setItem('rst_topup_products', JSON.stringify(prods));
+      }
+      showToast(`Product ${newActive ? 'activated' : 'hidden'} successfully!`, "success");
+      loadAdminTopupManager();
+    }
+
+    async function saveAdminTopupProduct(event) {
+      event.preventDefault();
+      const id = document.getElementById("adminTopupId").value || "pkg_" + Date.now();
+      const name = document.getElementById("adminTopupName").value.trim();
+      const type = document.getElementById("adminTopupType").value;
+      const rawDiamonds = document.getElementById("adminTopupDiamonds").value.trim();
+      const price = parseFloat(document.getElementById("adminTopupPrice").value);
+      const coinCost = parseFloat(document.getElementById("adminTopupCoinCost").value);
+      const badge = document.getElementById("adminTopupBadge").value.trim();
+      const active = document.getElementById("adminTopupActive").checked;
+      const sortOrder = parseInt(document.getElementById("adminTopupSort").value) || 1;
+
+      if (!name) {
+        showToast("Product name is required.", "error");
+        return;
+      }
+      if (isNaN(price) || price <= 0) {
+        showToast("Price must be greater than 0.", "error");
+        return;
+      }
+      if (isNaN(coinCost) || coinCost <= 0) {
+        showToast("Coin cost must be greater than 0.", "error");
+        return;
+      }
+
+      const diamondsVal = /^\d+$/.test(rawDiamonds) ? Number(rawDiamonds) : rawDiamonds;
+
       const product = {
         id: id,
         name: name,
         type: type,
-        diamonds: isNaN(diamonds) ? diamonds : Number(diamonds),
+        diamonds: diamondsVal,
         price: price,
         coinCost: coinCost,
-        badge: badge || "",
-        active: true,
-        sortOrder: Date.now()
+        badge: badge,
+        active: active,
+        sortOrder: sortOrder
       };
 
       if (database && firebaseInitialized) {
-        database.ref('topupProducts/' + id).set(product);
+        await database.ref('topupProducts/' + id).set(product);
       } else {
         let prods = JSON.parse(localStorage.getItem('rst_topup_products')) || [];
-        prods.push(product);
+        const idx = prods.findIndex(item => item.id === id);
+        if (idx >= 0) prods[idx] = product;
+        else prods.push(product);
         localStorage.setItem('rst_topup_products', JSON.stringify(prods));
       }
-      showToast("Topup product added successfully!", "success");
+
+      closeAdminModal("modalAdminTopupProduct");
+      showToast("Top-up product saved successfully!", "success");
+      loadAdminTopupManager();
+    }
+
+    async function addSampleWeeklyMonthlyPacks() {
+      const sampleWeekly = {
+        id: "pkg_weekly",
+        name: "Weekly Membership",
+        type: "weekly",
+        diamonds: "7 Days",
+        price: 200,
+        coinCost: 200,
+        badge: "Membership",
+        active: true,
+        sortOrder: 7
+      };
+      const sampleMonthly = {
+        id: "pkg_monthly",
+        name: "Monthly Membership",
+        type: "monthly",
+        diamonds: "30 Days",
+        price: 500,
+        coinCost: 500,
+        badge: "VIP Elite",
+        active: true,
+        sortOrder: 8
+      };
+
+      if (database && firebaseInitialized) {
+        const snapW = await database.ref('topupProducts/pkg_weekly').once('value');
+        if (!snapW.exists()) await database.ref('topupProducts/pkg_weekly').set(sampleWeekly);
+
+        const snapM = await database.ref('topupProducts/pkg_monthly').once('value');
+        if (!snapM.exists()) await database.ref('topupProducts/pkg_monthly').set(sampleMonthly);
+      } else {
+        let prods = JSON.parse(localStorage.getItem('rst_topup_products')) || [];
+        if (!prods.some(p => p.id === 'pkg_weekly')) prods.push(sampleWeekly);
+        if (!prods.some(p => p.id === 'pkg_monthly')) prods.push(sampleMonthly);
+        localStorage.setItem('rst_topup_products', JSON.stringify(prods));
+      }
+      showToast("Sample Weekly & Monthly packs added (if missing).", "success");
       loadAdminTopupManager();
     }
 
@@ -4445,5 +4559,65 @@
       renderAdminData();
     });
   </script>
+  <!-- MODAL: ADD/EDIT TOPUP PRODUCT -->
+  <div class="admin-modal-backdrop" id="modalAdminTopupProduct">
+    <div class="admin-modal-content" style="max-width:440px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-family:var(--font-heading); font-size:16px; color:#fff;" id="modalTopupHeading">Add Top-up Product</h3>
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminTopupProduct')" style="padding:4px 8px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form onsubmit="saveAdminTopupProduct(event)">
+        <input type="hidden" id="adminTopupId">
+        <div class="admin-input-group">
+          <label class="admin-input-label">Product Name *</label>
+          <input type="text" id="adminTopupName" class="admin-input" placeholder="e.g. Weekly Membership" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Type *</label>
+            <select id="adminTopupType" class="admin-input" style="background:#090c13;">
+              <option value="diamond">Diamond</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Diamonds / Duration *</label>
+            <input type="text" id="adminTopupDiamonds" class="admin-input" placeholder="1000 or 7 Days" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Price (NPR) *</label>
+            <input type="number" id="adminTopupPrice" class="admin-input" min="1" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Coin Cost *</label>
+            <input type="number" id="adminTopupCoinCost" class="admin-input" min="1" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="admin-input-group">
+            <label class="admin-input-label">Badge Text (Optional)</label>
+            <input type="text" id="adminTopupBadge" class="admin-input" placeholder="e.g. Popular">
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-input-label">Sort Order</label>
+            <input type="number" id="adminTopupSort" class="admin-input" value="1">
+          </div>
+        </div>
+        <div class="admin-input-group" style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+          <input type="checkbox" id="adminTopupActive" checked style="width:18px; height:18px; accent-color:var(--neon-green);">
+          <label for="adminTopupActive" style="font-size:13px; color:#fff; cursor:pointer;">Active (Visible in App)</label>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAdminModal('modalAdminTopupProduct')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
